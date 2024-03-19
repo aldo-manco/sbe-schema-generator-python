@@ -1,0 +1,6 @@
+layoutparser
+git+https://github.com/facebookresearch/detectron2.git@v0.4#egg=detectron2
+layoutparser[ocr]
+torch
+torchvision
+torchaudio
