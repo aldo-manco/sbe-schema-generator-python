@@ -1,0 +1,8 @@
+version: '3.7.11'
+services:
+  recognizer:
+    image: recognizer-image
+    volumes:
+      - .:/container
+    working_dir: /container
+    command: python3 app.py
