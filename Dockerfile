@@ -12,14 +12,17 @@ RUN apt-get update && apt-get install -y \
     libgl1-mesa-glx \
     tesseract-ocr \
     libtesseract-dev \
+    poppler-utils \
     && rm -rf /var/lib/apt/lists/*
 
 # Aggiorna pip e installa pacchetti Python richiesti
 RUN pip3 install --upgrade pip && \
     pip3 install \
     Pillow \
+    pdf2image \
     layoutparser[ocr] \
-    opencv-python
+    opencv-python \
+    langchain
 
 RUN pip install detectron2 -f \
   https://dl.fbaipublicfiles.com/detectron2/wheels/cu113/torch1.10/index.html
