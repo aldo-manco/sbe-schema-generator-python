@@ -7,7 +7,7 @@ import os
 from pdf2image import convert_from_path
 from PIL import Image
 import json
-from langchain_community.chat_models.openai import ChatOpenAI
+#from langchain_community.chat_models.openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 
 import utils
@@ -17,7 +17,7 @@ def convert_pdf_pages_to_jpg(pdf_path, starting_page, ending_page, folder_path):
     try:
         if starting_page > ending_page:
             raise ValueError("Starting page cannot be greater than ending page.")
-        create_directory_if_not_exists(folder_path)
+        utils.create_directory_if_not_exists(folder_path)
 
         array_images = convert_from_path(pdf_path, first_page=starting_page, last_page=ending_page)
         page_offset = 0
@@ -73,7 +73,7 @@ def thresholding(image, image_path):
 
 def detect_tables(image, output_previous_function):
     model = lp.Detectron2LayoutModel(
-        'lp://PubLayNet/mask_rcnn_X_101_32x8d_FPN_3x/config',
+        config_path='config.yaml',
         extra_config=["MODEL.ROI_HEADS.SCORE_THRESH_TEST", 0.65],
         label_map={
             0: "Text",
@@ -157,33 +157,41 @@ Assicurati di includere solo ed esclusivamente il codice JSON. con le informazio
 ### OUTPUT JSON CON LE INFORMAZIONI RICHIESTE ###
     """
 
-    ai_model = ChatOpenAI(
-        openai_api_key=utils.openai_api_key,
-        model=utils.ai_model_name,
-        temperature=0,
-        top_p=0
-    )
+    # ai_model = ChatOpenAI(
+    #     openai_api_key=utils.openai_api_key,
+    #     model=utils.ai_model_name,
+    #     temperature=0,
+    #     top_p=0
+    # )
+    #
+    # array_document_fields = ai_model([
+    #     SystemMessage(content=replace_newlines_with_space(system_message)),
+    #     HumanMessage(content=example_1_human_message),
+    #     AIMessage(content=example_1_assistant_message),
+    #     HumanMessage(content=example_2_human_message),
+    #     AIMessage(content=example_2_assistant_message),
+    #     HumanMessage(content=example_3_human_message),
+    #     AIMessage(content=example_3_assistant_message),
+    #     HumanMessage(content=replace_newlines_with_space(human_message))
+    # ])
 
-    array_document_fields = ai_model([
-        SystemMessage(content=replace_newlines_with_space(system_message)),
-        HumanMessage(content=example_1_human_message),
-        AIMessage(content=example_1_assistant_message),
-        HumanMessage(content=example_2_human_message),
-        AIMessage(content=example_2_assistant_message),
-        HumanMessage(content=example_3_human_message),
-        AIMessage(content=example_3_assistant_message),
-        HumanMessage(content=replace_newlines_with_space(human_message))
-    ])
+    #return json.loads(array_document_fields.content)
+    with open('a.json', 'r') as file:
+        data = json.load(file)
 
-    return json.loads(array_document_fields.content)
+    return data
 
 
 def generate_sbe_fields(image, array_document_fields):
-    array_sbe_fields = []
-    for document_field in array_document_fields:
-        sbe_field = generate_sbe_field(document_field)
-        array_sbe_fields.append(sbe_field)
-    return array_sbe_fields
+    # array_sbe_fields = []
+    # for document_field in array_document_fields:
+    #     sbe_field = generate_sbe_field(document_field)
+    #     array_sbe_fields.append(sbe_field)
+    # return array_sbe_fields
+    with open('b.json', 'r') as file:
+        data = json.load(file)
+
+    return data
 
 
 def generate_sbe_field(document_field):
@@ -363,17 +371,20 @@ def process(pdf_path, starting_page, ending_page, folder_path="extracted_pdf_pag
 
         data = image_path
         pipeline_functions = [
-            increase_contrast,
-            thresholding,
+            #increase_contrast,
+            #thresholding,
             detect_tables,
-            ocr_tables
-            #generate_document_fields,
-            #generate_sbe_fields
+            ocr_tables,
+            generate_document_fields,
+            generate_sbe_fields
         ]
 
+        i = 1
         for function in pipeline_functions:
             try:
                 data = function(image, data)
+                print(i)
+                i = i + 1
             except FileNotFoundError as e:
                 print(e)
             except Exception as e:
@@ -387,4 +398,4 @@ def process(pdf_path, starting_page, ending_page, folder_path="extracted_pdf_pag
 
 
 if __name__ == "__main__":
-    process("drop_copy_service.pdf", 25, 25, "extracted_pdf_pages")
+    process("drop_copy_service.pdf", 23, 24, "extracted_pdf_pages")

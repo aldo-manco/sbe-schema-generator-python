@@ -1,4 +1,5 @@
-
+extracted_pdf_pages/
+model_final.pth
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

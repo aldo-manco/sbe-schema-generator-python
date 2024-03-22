@@ -1,5 +1,6 @@
 # Usa come base l'immagine ufficiale di Ubuntu
-FROM pytorch/pytorch:1.10.0-cuda11.3-cudnn8-runtime
+#FROM pytorch/pytorch:1.13.1-cuda11.6-cudnn8-runtime
+FROM pytorch/pytorch:latest
 
 # Imposta variabili di ambiente per evitare domande durante l'installazione
 ARG DEBIAN_FRONTEND=noninteractive
@@ -18,14 +19,18 @@ RUN apt-get update && apt-get install -y \
 # Aggiorna pip e installa pacchetti Python richiesti
 RUN pip3 install --upgrade pip && \
     pip3 install \
+    streamlit \
+    lxml \
     Pillow \
     pdf2image \
     layoutparser[ocr] \
     opencv-python \
-    langchain
+    openai \
+    langchain \
+    langchain-openai
 
-RUN pip install detectron2 -f \
-  https://dl.fbaipublicfiles.com/detectron2/wheels/cu113/torch1.10/index.html
+RUN python -m pip install \
+    'git+https://github.com/facebookresearch/detectron2.git'
 
 # Imposta il workspace
 WORKDIR /container

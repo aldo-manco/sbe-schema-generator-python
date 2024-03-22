@@ -5,4 +5,6 @@ services:
     volumes:
       - .:/container
     working_dir: /container
-    command: python3 app.py
+    command: streamlit run streamlit.py
+    ports:
+      - "8502:8501"

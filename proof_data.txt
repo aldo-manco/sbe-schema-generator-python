@@ -1,2 +1,1330 @@
 [' \n\nTag\n\nField Name\n\nFormat\n\nLen\n\nPossible Values\n\nm/c\n\nShort Description, Compatibility Notes\n& Conditions\n\nValue\nExample\n\n \n\n \n\n \n\nMessage Header\n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\x0c']
 [' \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\nTag Field Name Format Len Possible Values M/C | Short Description, Compatibility Notes Value\n& Conditions Example\n21005 | ClientMessageSen | UTCTimestam 27 | Timestamp Cc Indicates the time of message transmission, | 20190214-\ndingTime p the consistency of the time provided is not 15:30:01.4\nchecked by the Exchange. 62743346\n5979 | OEGINFromMemb | UTCTimestam 27 | Timestamp Cc Order Entry Gateway IN time from member | 29190214-\ner p (in ns), measured when inbound message 15:28:52.8\nenters the gateway 33883664\n7764 | OEGOUTTOME UTCTimestam 27 | Timestamp Cc Gateway OUT time to ME (inns), measured | 29190214-\np when inbound message leaves the gateway | 15-28-52.8\n34193232\n21002 | BookINTime UTCTimestam 27 | Timestamp A Time of order creation in ME 20190214-\np 15:28:52.8\n40530924\n21003 | BookOUTTime UTCTimestam | 27 | Timestamp c Matching Engine OUT time (in ns), when 20190214-\np message leaves the Matching Engine (ME) 15:28:52.8\n40568733\n7765 | OEGINFromME UTCTimestam | 27 | Timestamp c Gateway IN time from ME (in ns), measured | 29190214-\np when outbound message enters the 15:28:52.8\ngateway 33883664\n11 CclOrdiD String 20 | From -2463 to 2463-1 A Identifier of an Order assigned by the Client | 39\nwhen submitting an order to the Exchange\n48 SecuritylD String 10 | From 0 to 2432-2 M Exchange defined ID of an 1110530\ninstrument/contract\n22 SecurityIDSource String 1 8 = Symbol Index M Type of the SecurityID. Always set to 8 8\n20020 | EMM Int 2 1 = Cash and Derivative Central Order Book (COB) A Exchange Market Mechanism a\n7 = Derivative On Exchange Off book\n8 = ETF MTF - NAV Central Order Book\n37 OrderID String 20 | From 0 to 2464-2 M Numerical order identifier assigned by ME. 5\nFor acknowledgement of RFQ populated\nwith the same value as in field QuoteReqID\n(131)\n39 OrdStatus Char 1 0=New M Order status 0\n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\x0c']
+e
+x
+t
+r
+a
+c
+t
+e
+d
+_
+p
+d
+f
+_
+p
+a
+g
+e
+s
+/
+p
+a
+g
+e
+_
+2
+3
+.
+j
+p
+g
+e
+x
+t
+r
+a
+c
+t
+e
+d
+_
+p
+d
+f
+_
+p
+a
+g
+e
+s
+/
+p
+a
+g
+e
+_
+2
+4
+.
+j
+p
+g
+e
+x
+t
+r
+a
+c
+t
+e
+d
+_
+p
+d
+f
+_
+p
+a
+g
+e
+s
+/
+p
+a
+g
+e
+_
+2
+5
+.
+j
+p
+g
+e
+x
+t
+r
+a
+c
+t
+e
+d
+_
+p
+d
+f
+_
+p
+a
+g
+e
+s
+/
+p
+a
+g
+e
+_
+2
+6
+.
+j
+p
+g
+e
+x
+t
+r
+a
+c
+t
+e
+d
+_
+p
+d
+f
+_
+p
+a
+g
+e
+s
+/
+p
+a
+g
+e
+_
+2
+3
+.
+j
+p
+g
+e
+x
+t
+r
+a
+c
+t
+e
+d
+_
+p
+d
+f
+_
+p
+a
+g
+e
+s
+/
+p
+a
+g
+e
+_
+2
+4
+.
+j
+p
+g
+e
+x
+t
+r
+a
+c
+t
+e
+d
+_
+p
+d
+f
+_
+p
+a
+g
+e
+s
+/
+p
+a
+g
+e
+_
+2
+5
+.
+j
+p
+g
+e
+x
+t
+r
+a
+c
+t
+e
+d
+_
+p
+d
+f
+_
+p
+a
+g
+e
+s
+/
+p
+a
+g
+e
+_
+2
+6
+.
+j
+p
+g
+e
+x
+t
+r
+a
+c
+t
+e
+d
+_
+p
+d
+f
+_
+p
+a
+g
+e
+s
+/
+p
+a
+g
+e
+_
+2
+3
+.
+j
+p
+g
+e
+x
+t
+r
+a
+c
+t
+e
+d
+_
+p
+d
+f
+_
+p
+a
+g
+e
+s
+/
+p
+a
+g
+e
+_
+2
+4
+.
+j
+p
+g
+e
+x
+t
+r
+a
+c
+t
+e
+d
+_
+p
+d
+f
+_
+p
+a
+g
+e
+s
+/
+p
+a
+g
+e
+_
+2
+5
+.
+j
+p
+g
+e
+x
+t
+r
+a
+c
+t
+e
+d
+_
+p
+d
+f
+_
+p
+a
+g
+e
+s
+/
+p
+a
+g
+e
+_
+2
+6
+.
+j
+p
+g
+e
+x
+t
+r
+a
+c
+t
+e
+d
+_
+p
+d
+f
+_
+p
+a
+g
+e
+s
+/
+p
+a
+g
+e
+_
+2
+3
+.
+j
+p
+g
+e
+x
+t
+r
+a
+c
+t
+e
+d
+_
+p
+d
+f
+_
+p
+a
+g
+e
+s
+/
+p
+a
+g
+e
+_
+2
+4
+.
+j
+p
+g
+e
+x
+t
+r
+a
+c
+t
+e
+d
+_
+p
+d
+f
+_
+p
+a
+g
+e
+s
+/
+p
+a
+g
+e
+_
+2
+5
+.
+j
+p
+g
+e
+x
+t
+r
+a
+c
+t
+e
+d
+_
+p
+d
+f
+_
+p
+a
+g
+e
+s
+/
+p
+a
+g
+e
+_
+2
+6
+.
+j
+p
+g
+e
+x
+t
+r
+a
+c
+t
+e
+d
+_
+p
+d
+f
+_
+p
+a
+g
+e
+s
+/
+p
+a
+g
+e
+_
+2
+3
+.
+j
+p
+g
+e
+x
+t
+r
+a
+c
+t
+e
+d
+_
+p
+d
+f
+_
+p
+a
+g
+e
+s
+/
+p
+a
+g
+e
+_
+2
+4
+.
+j
+p
+g
+e
+x
+t
+r
+a
+c
+t
+e
+d
+_
+p
+d
+f
+_
+p
+a
+g
+e
+s
+/
+p
+a
+g
+e
+_
+2
+5
+.
+j
+p
+g
+e
+x
+t
+r
+a
+c
+t
+e
+d
+_
+p
+d
+f
+_
+p
+a
+g
+e
+s
+/
+p
+a
+g
+e
+_
+2
+6
+.
+j
+p
+g
+ 
+
+Tag
+
+Field Name
+
+Format
+
+Len
+
+Possible Values
+
+m/c
+
+Short Description, Compatibility Notes
+& Conditions
+
+Value
+Example
+
+ 
+
+ 
+
+ 
+
+Message Header
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+Tag Field Name Format Len Possible Values M/C | Short Description, Compatibility Notes Value
+& Conditions Example
+21005 | ClientMessageSen | UTCTimestam 27 | Timestamp Cc Indicates the time of message transmission, | 20190214-
+dingTime p the consistency of the time provided is not 15:30:01.4
+checked by the Exchange. 62743346
+5979 | OEGINFromMemb | UTCTimestam 27 | Timestamp Cc Order Entry Gateway IN time from member | 29190214-
+er p (in ns), measured when inbound message 15:28:52.8
+enters the gateway 33883664
+7764 | OEGOUTTOME UTCTimestam 27 | Timestamp Cc Gateway OUT time to ME (inns), measured | 29190214-
+p when inbound message leaves the gateway | 15-28-52.8
+34193232
+21002 | BookINTime UTCTimestam 27 | Timestamp A Time of order creation in ME 20190214-
+p 15:28:52.8
+40530924
+21003 | BookOUTTime UTCTimestam | 27 | Timestamp c Matching Engine OUT time (in ns), when 20190214-
+p message leaves the Matching Engine (ME) 15:28:52.8
+40568733
+7765 | OEGINFromME UTCTimestam | 27 | Timestamp c Gateway IN time from ME (in ns), measured | 29190214-
+p when outbound message enters the 15:28:52.8
+gateway 33883664
+11 CclOrdiD String 20 | From -2463 to 2463-1 A Identifier of an Order assigned by the Client | 39
+when submitting an order to the Exchange
+48 SecuritylD String 10 | From 0 to 2432-2 M Exchange defined ID of an 1110530
+instrument/contract
+22 SecurityIDSource String 1 8 = Symbol Index M Type of the SecurityID. Always set to 8 8
+20020 | EMM Int 2 1 = Cash and Derivative Central Order Book (COB) A Exchange Market Mechanism a
+7 = Derivative On Exchange Off book
+8 = ETF MTF - NAV Central Order Book
+37 OrderID String 20 | From 0 to 2464-2 M Numerical order identifier assigned by ME. 5
+For acknowledgement of RFQ populated
+with the same value as in field QuoteReqID
+(131)
+39 OrdStatus Char 1 0=New M Order status 0
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+Tag Field Name Format Len Possible Values M/C | Short Description, Compatibility Notes Value
+& Conditions Example
+21004 | OrderPriority Int 20 | From 0 to 2464-1 Cc Rank / priority of an order. Order with 2
+lowest value in OrderPriority has the
+highest priority. Value that can be used to
+reconcile orders between private and public
+messages.
+20052 | DarkExecutionInst | MultipleCharV 9 First Position = Dark Indicator (0: No ; 1: Yes) Cc CASH ONLY 000
+ruction alue Forth Position = Sweep Order Indicator (0: No; 1: Field used as instruction for dark order
+Yes) handling.
+Fifth Position = Minimum Quantity Type (0: MAQ ;
+1: MES)
+44 Price Price 20 From -2463 to 2463-1 Cc Instrument price per quantity unit. 25
+Field populated for Limit, Iceberg (Cash) and
+Stop Limit (Cash) orders. Not provided for
+Market, Stop-market (Cash), Peg (Cash) and
+MTL orders.
+38 OrderQty Qty 20 | From 0 to 2464-1 Cc Total order quantity, per quantity unit 1050
+151 LeavesQty Qty 20 | From -1 to 2%64-2 M Indicates the remaining quantity of an order | 1050
+(quantity open for further execution).
+For RFQ Ack field populated with value -1
+17 ExecID String 10 | From 0 to 2432-2 M Set to NA for non-trade related messages NA
+150 ExecType Char 1 0=New M Describes the specific type of 0
+i = Order Creation By Market Operations ExecutionReport (8) message while
+j =RFQAck OrdStatus (39) always identifies the current
+e = Refilled Iceberg Ack order status (e.g. Partially Filled).
+h = Iceberg Transformed to Limit due to Minimum
+size
+99 StopPx Price 20 | From -2*63+1 to 2*63-1 c CASH ONLY
+Stop Trigger Price / Mandatory for Stop
+orders
+20004 | UndisclosedPrice Price 20 F CASH ONLY
+Future Use
+1138 | DisplayQty Qty 20 | From 0 to 2464-1 Cc Maximum quantity shown to market
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+participants (for Iceberg Order only)
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+Tag Field Name Format Len Possible Values M/C | Short Description, Compatibility Notes Value
+& Conditions Example
+20175 | TriggeredStopTim Char 1 0=Day Cc CASH ONLY
+elnForce 1 = Good Till Cancel Specifies the maximum validity of an
+6 = Good till Date triggered stop order. On triggering of a Stop
+order the value in this field is populated in
+the field TimelnForce (59).
+131 QuoteReqID String 20 | From 0 to 2464-2 Cc Numerical RFQ identifier assigned by the
+matching engine, unique per instrument
+and EMM.
+21037 | RFQAnswerindicat Int 1 0=No i CASH ONLY
+or 1=Yes Indicates whether the message is, or not, a
+quote sent as an answer to a QuoteRequest
+(R) message.
+21038 | RFQConfirmation| Int 1 | 0=No C | CASH ONLY
+ndicator 1=Yes Indicates whether the message is, or not, an
+order sent as a confirmation of a
+QuoteRequest (R) message.
+21800 | ConditionalOrderF Int 1 0 = Firm (default) c CASH ONLY
+
+lag
+
+NoPartylDs
+
+NumInGroup
+
+1 = Conditional
+
+Always set to 1
+
+Indicates if the order is a conditional or a
+firm order
+
+Number of PartylD entries
+
+ 
+
+ 
+
+ 
+
+448 PartyID String 11 | Alphanumeric A In this case provides the 59786
+ExecutionWithinFirmShortCode
+
+447 PartylDSource Char 1 P = Short code identifier A Source of PartylD value B
+
+452 PartyRole Int 3 3 = Client ID A Identifies the type or role of the PartyID 3
+
+ 
+
+ 
+
+ 
+
+ 
+
+12 = Executing Trader
+999 = Not Applicable
+
+ 
+
+ 
+
+(448) specified.
+
+For Execution with Firm short code in Drop
+Copy where the values in the original
+trading OEG message:
+
+e were received in SBE protocol the
+value will be set to 999 (Not
+Applicable);
+
+e were received in FIX protocol, the
+value will be set to 3 (Client ID) or
+12 (Executing Trader)
+
+ 
+
+ 
+
+Tag
+
+Field Name
+
+Format
+
+Len
+
+Possible Values
+
+m/c
+
+Short Description, Compatibility Notes
+& Conditions
+
+Value
+Example
+
+ 
+
+ 
+
+ 
+
+Message Header
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+Tag Field Name Format Len Possible Values M/C | Short Description, Compatibility Notes Value
+& Conditions Example
+21005 | ClientMessageSen | UTCTimestam 27 | Timestamp Cc Indicates the time of message transmission, | 20190214-
+dingTime p the consistency of the time provided is not 15:30:01.4
+checked by the Exchange. 62743346
+5979 | OEGINFromMemb | UTCTimestam 27 | Timestamp Cc Order Entry Gateway IN time from member | 29190214-
+er p (in ns), measured when inbound message 15:28:52.8
+enters the gateway 33883664
+7764 | OEGOUTTOME UTCTimestam 27 | Timestamp Cc Gateway OUT time to ME (inns), measured | 29190214-
+p when inbound message leaves the gateway | 15-28-52.8
+34193232
+21002 | BookINTime UTCTimestam 27 | Timestamp A Time of order creation in ME 20190214-
+p 15:28:52.8
+40530924
+21003 | BookOUTTime UTCTimestam | 27 | Timestamp c Matching Engine OUT time (in ns), when 20190214-
+p message leaves the Matching Engine (ME) 15:28:52.8
+40568733
+7765 | OEGINFromME UTCTimestam | 27 | Timestamp c Gateway IN time from ME (in ns), measured | 29190214-
+p when outbound message enters the 15:28:52.8
+gateway 33883664
+11 CclOrdiD String 20 | From -2463 to 2463-1 A Identifier of an Order assigned by the Client | 39
+when submitting an order to the Exchange
+48 SecuritylD String 10 | From 0 to 2432-2 M Exchange defined ID of an 1110530
+instrument/contract
+22 SecurityIDSource String 1 8 = Symbol Index M Type of the SecurityID. Always set to 8 8
+20020 | EMM Int 2 1 = Cash and Derivative Central Order Book (COB) A Exchange Market Mechanism a
+7 = Derivative On Exchange Off book
+8 = ETF MTF - NAV Central Order Book
+37 OrderID String 20 | From 0 to 2464-2 M Numerical order identifier assigned by ME. 5
+For acknowledgement of RFQ populated
+with the same value as in field QuoteReqID
+(131)
+39 OrdStatus Char 1 0=New M Order status 0
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+Tag Field Name Format Len Possible Values M/C | Short Description, Compatibility Notes Value
+& Conditions Example
+21004 | OrderPriority Int 20 | From 0 to 2464-1 Cc Rank / priority of an order. Order with 2
+lowest value in OrderPriority has the
+highest priority. Value that can be used to
+reconcile orders between private and public
+messages.
+20052 | DarkExecutionInst | MultipleCharV 9 First Position = Dark Indicator (0: No ; 1: Yes) Cc CASH ONLY 000
+ruction alue Forth Position = Sweep Order Indicator (0: No; 1: Field used as instruction for dark order
+Yes) handling.
+Fifth Position = Minimum Quantity Type (0: MAQ ;
+1: MES)
+44 Price Price 20 From -2463 to 2463-1 Cc Instrument price per quantity unit. 25
+Field populated for Limit, Iceberg (Cash) and
+Stop Limit (Cash) orders. Not provided for
+Market, Stop-market (Cash), Peg (Cash) and
+MTL orders.
+38 OrderQty Qty 20 | From 0 to 2464-1 Cc Total order quantity, per quantity unit 1050
+151 LeavesQty Qty 20 | From -1 to 2%64-2 M Indicates the remaining quantity of an order | 1050
+(quantity open for further execution).
+For RFQ Ack field populated with value -1
+17 ExecID String 10 | From 0 to 2432-2 M Set to NA for non-trade related messages NA
+150 ExecType Char 1 0=New M Describes the specific type of 0
+i = Order Creation By Market Operations ExecutionReport (8) message while
+j =RFQAck OrdStatus (39) always identifies the current
+e = Refilled Iceberg Ack order status (e.g. Partially Filled).
+h = Iceberg Transformed to Limit due to Minimum
+size
+99 StopPx Price 20 | From -2*63+1 to 2*63-1 c CASH ONLY
+Stop Trigger Price / Mandatory for Stop
+orders
+20004 | UndisclosedPrice Price 20 F CASH ONLY
+Future Use
+1138 | DisplayQty Qty 20 | From 0 to 2464-1 Cc Maximum quantity shown to market
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+participants (for Iceberg Order only)
+
+ 
+
+ 
+
+Tag
+
+Field Name
+
+Format
+
+Len
+
+Possible Values
+
+m/c
+
+Short Description, Compatibility Notes
+& Conditions
+
+Value
+Example
+
+ 
+
+ 
+
+ 
+
+Message Header
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+Tag Field Name Format Len Possible Values M/C | Short Description, Compatibility Notes Value
+& Conditions Example
+21005 | ClientMessageSen | UTCTimestam 27 | Timestamp Cc Indicates the time of message transmission, | 20190214-
+dingTime p the consistency of the time provided is not 15:30:01.4
+checked by the Exchange. 62743346
+5979 | OEGINFromMemb | UTCTimestam 27 | Timestamp Cc Order Entry Gateway IN time from member | 29190214-
+er p (in ns), measured when inbound message 15:28:52.8
+enters the gateway 33883664
+7764 | OEGOUTTOME UTCTimestam 27 | Timestamp Cc Gateway OUT time to ME (inns), measured | 29190214-
+p when inbound message leaves the gateway | 15-28-52.8
+34193232
+21002 | BookINTime UTCTimestam 27 | Timestamp A Time of order creation in ME 20190214-
+p 15:28:52.8
+40530924
+21003 | BookOUTTime UTCTimestam | 27 | Timestamp c Matching Engine OUT time (in ns), when 20190214-
+p message leaves the Matching Engine (ME) 15:28:52.8
+40568733
+7765 | OEGINFromME UTCTimestam | 27 | Timestamp c Gateway IN time from ME (in ns), measured | 29190214-
+p when outbound message enters the 15:28:52.8
+gateway 33883664
+11 CclOrdiD String 20 | From -2463 to 2463-1 A Identifier of an Order assigned by the Client | 39
+when submitting an order to the Exchange
+48 SecuritylD String 10 | From 0 to 2432-2 M Exchange defined ID of an 1110530
+instrument/contract
+22 SecurityIDSource String 1 8 = Symbol Index M Type of the SecurityID. Always set to 8 8
+20020 | EMM Int 2 1 = Cash and Derivative Central Order Book (COB) A Exchange Market Mechanism a
+7 = Derivative On Exchange Off book
+8 = ETF MTF - NAV Central Order Book
+37 OrderID String 20 | From 0 to 2464-2 M Numerical order identifier assigned by ME. 5
+For acknowledgement of RFQ populated
+with the same value as in field QuoteReqID
+(131)
+39 OrdStatus Char 1 0=New M Order status 0
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+Tag Field Name Format Len Possible Values M/C | Short Description, Compatibility Notes Value
+& Conditions Example
+21004 | OrderPriority Int 20 | From 0 to 2464-1 Cc Rank / priority of an order. Order with 2
+lowest value in OrderPriority has the
+highest priority. Value that can be used to
+reconcile orders between private and public
+messages.
+20052 | DarkExecutionInst | MultipleCharV 9 First Position = Dark Indicator (0: No ; 1: Yes) Cc CASH ONLY 000
+ruction alue Forth Position = Sweep Order Indicator (0: No; 1: Field used as instruction for dark order
+Yes) handling.
+Fifth Position = Minimum Quantity Type (0: MAQ ;
+1: MES)
+44 Price Price 20 From -2463 to 2463-1 Cc Instrument price per quantity unit. 25
+Field populated for Limit, Iceberg (Cash) and
+Stop Limit (Cash) orders. Not provided for
+Market, Stop-market (Cash), Peg (Cash) and
+MTL orders.
+38 OrderQty Qty 20 | From 0 to 2464-1 Cc Total order quantity, per quantity unit 1050
+151 LeavesQty Qty 20 | From -1 to 2%64-2 M Indicates the remaining quantity of an order | 1050
+(quantity open for further execution).
+For RFQ Ack field populated with value -1
+17 ExecID String 10 | From 0 to 2432-2 M Set to NA for non-trade related messages NA
+150 ExecType Char 1 0=New M Describes the specific type of 0
+i = Order Creation By Market Operations ExecutionReport (8) message while
+j =RFQAck OrdStatus (39) always identifies the current
+e = Refilled Iceberg Ack order status (e.g. Partially Filled).
+h = Iceberg Transformed to Limit due to Minimum
+size
+99 StopPx Price 20 | From -2*63+1 to 2*63-1 c CASH ONLY
+Stop Trigger Price / Mandatory for Stop
+orders
+20004 | UndisclosedPrice Price 20 F CASH ONLY
+Future Use
+1138 | DisplayQty Qty 20 | From 0 to 2464-1 Cc Maximum quantity shown to market
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+participants (for Iceberg Order only)
+
+ 
+
+{'field_id': 21005, 'field_name': 'ClientMessageSendingTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 5979, 'field_name': 'OEGINFromMember', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 7764, 'field_name': 'OEGOUTTOME', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 21002, 'field_name': 'BookINTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 21003, 'field_name': 'BookOUTTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 7765, 'field_name': 'OEGINFromME', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 11, 'field_name': 'ClOrdID', 'data_type': 'char', 'encoding_type': 'char', 'length': 20, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 48, 'field_name': 'SecurityID', 'data_type': 'char', 'encoding_type': 'char', 'length': 10, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 22, 'field_name': 'SecurityIDSource', 'data_type': 'SecurityIDSource_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'8': 'Symbol'}}
+{'field_id': 20020, 'field_name': 'EMM', 'data_type': 'EMM_enum', 'encoding_type': 'int8', 'length': 2, 'presence': 'optional', 'structure': {'1': 'Cash and Derivative Central Order Book (COB)', '7': 'Derivative On Exchange Off book', '8': 'ETF MTF - NAV Central Order Book'}}
+{'field_id': 37, 'field_name': 'OrderID', 'data_type': 'char', 'encoding_type': 'char', 'length': 20, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 39, 'field_name': 'OrdStatus', 'data_type': 'OrdStatus_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'0': 'New'}}
+{'field_id': 21005, 'field_name': 'ClientMessageSendingTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 5979, 'field_name': 'OEGINFromMember', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 7764, 'field_name': 'OEGOUTTOME', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 21002, 'field_name': 'BookINTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 21003, 'field_name': 'BookOUTTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 7765, 'field_name': 'OEGINFromME', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 11, 'field_name': 'ClOrdID', 'data_type': 'char', 'encoding_type': 'char', 'length': 20, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 48, 'field_name': 'SecurityID', 'data_type': 'char', 'encoding_type': 'char', 'length': 10, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 22, 'field_name': 'SecurityIDSource', 'data_type': 'SecurityIDSource_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'8': 'Symbol'}}
+{'field_id': 20020, 'field_name': 'EMM', 'data_type': 'EMM_enum', 'encoding_type': 'int8', 'length': 2, 'presence': 'optional', 'structure': {'1': 'Cash and Derivative Central Order Book (COB)', '7': 'Derivative On Exchange Off book', '8': 'ETF MTF - NAV Central Order Book'}}
+{'field_id': 37, 'field_name': 'OrderID', 'data_type': 'char', 'encoding_type': 'char', 'length': 20, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 39, 'field_name': 'OrdStatus', 'data_type': 'OrdStatus_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'0': 'New'}}
+{'field_id': 21005, 'field_name': 'ClientMessageSendingTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 5979, 'field_name': 'OEGINFromMember', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 7764, 'field_name': 'OEGOUTTOME', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 21002, 'field_name': 'BookINTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 21003, 'field_name': 'BookOUTTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 7765, 'field_name': 'OEGINFromME', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 11, 'field_name': 'ClOrdID', 'data_type': 'char', 'encoding_type': 'char', 'length': 20, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 48, 'field_name': 'SecurityID', 'data_type': 'char', 'encoding_type': 'char', 'length': 10, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 22, 'field_name': 'SecurityIDSource', 'data_type': 'SecurityIDSource_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'8': 'Symbol'}}
+{'field_id': 20020, 'field_name': 'EMM', 'data_type': 'EMM_enum', 'encoding_type': 'int8', 'length': 2, 'presence': 'optional', 'structure': {'1': 'Cash and Derivative Central Order Book (COB)', '7': 'Derivative On Exchange Off book', '8': 'ETF MTF - NAV Central Order Book'}}
+{'field_id': 37, 'field_name': 'OrderID', 'data_type': 'char', 'encoding_type': 'char', 'length': 20, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 39, 'field_name': 'OrdStatus', 'data_type': 'OrdStatus_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'0': 'New'}}
