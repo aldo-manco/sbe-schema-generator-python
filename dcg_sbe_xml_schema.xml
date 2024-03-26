@@ -1,52 +1,20 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<sbe:messageSchema xmlns:sbe="http://fixprotocol.io/2016/sbe" xmlns:enx="http://www.euronext.com/dd" xmlns:str="http://exslt.org/strings" xmlns:ext="http://exslt.org/common" package="euronext_dcg" id="25" version="306" semanticVersion="4.6.0" description="euronext drop copy service" byteOrder="littleEndian">
+<sbe:messageSchema xmlns:sbe="http://fixprotocol.io/2016/sbe" xmlns:enx="enx" xmlns:str="http://exslt.org/strings" xmlns:ext="http://exslt.org/common" package="dcg.euronext.com" id="25" version="306" semanticVersion="4.6.0" description="desc" byteOrder="littleEndian">
   <types>
-    <type name="uint64_t" primitiveType="uint64" nullValue="18446744073709551615" presence="optional" minValue="0" maxValue="18446744073709551614"/>
-    <type name="char27_optional" length="27" primitiveType="char" presence="optional"/>
-    <type name="char11" length="11" primitiveType="char"/>
-    <type name="char31" length="31" primitiveType="char"/>
-    <type name="char48" length="48" primitiveType="char"/>
-    <enum encodingType="int8" name="AckPhase_enum">
-      <validValue name="1">Continuous Trading Phase</validValue>
-      <validValue name="2">Call Phase</validValue>
-      <validValue name="3">Halt Phase</validValue>
-      <validValue name="5">Trading At Last Phase</validValue>
-      <validValue name="6">Reserved</validValue>
-      <validValue name="7">Suspended</validValue>
-      <validValue name="8">Random Uncrossing Phase</validValue>
+    <type name="char27" length="27" primitiveType="char"/>
+    <type name="char20" length="20" primitiveType="char"/>
+    <type name="char10" length="10" primitiveType="char"/>
+    <enum encodingType="char" name="SecurityIDSource_enum">
+      <validValue name="8">Symbol</validValue>
     </enum>
-    <enum encodingType="int8" name="AccountCode_enum">
-      <validValue name="1">Client</validValue>
-      <validValue name="2">House</validValue>
-      <validValue name="4">RO</validValue>
-      <validValue name="6">Liquidity Provider</validValue>
-      <validValue name="7">Related Party</validValue>
-      <validValue name="8">Structured Product Market Maker</validValue>
-      <validValue name="14">Omega Client</validValue>
-      <validValue name="15">Ceres Client</validValue>
+    <enum encodingType="int8" name="EMM_enum">
+      <validValue name="1">Cash and Derivative Central Order Book (COB)</validValue>
+      <validValue name="7">Derivative On Exchange Off book</validValue>
+      <validValue name="8">ETF MTF - NAV Central Order Book</validValue>
     </enum>
-    <set encodingType="int8" name="AckQualifiers_set">
-      <choice name="0">Dark Indicator</choice>
-      <choice name="1">Queue Indicator</choice>
-      <choice name="2">Request with Client Order ID</choice>
-      <choice name="3">Use of Cross Partition</choice>
-      <choice name="4">Internal1</choice>
-      <choice name="5">Internal2</choice>
-      <choice name="6">Execution Upon Entry flag Enabled</choice>
-      <choice name="7">Executed Upon Entry flag</choice>
-    </set>
-    <set encodingType="int8" name="PostingAction_set">
-      <choice name="0">Field Actively Used</choice>
-      <choice name="1">Leg 1</choice>
-      <choice name="2">Leg 2</choice>
-      <choice name="3">Leg 3</choice>
-      <choice name="4">Leg 4</choice>
-      <choice name="5">Leg 5</choice>
-      <choice name="6">Leg 6</choice>
-      <choice name="7">Leg 7</choice>
-      <choice name="8">Leg 8</choice>
-      <choice name="9">Leg 9</choice>
-    </set>
+    <enum encodingType="char" name="OrdStatus_enum">
+      <validValue name="0">New</validValue>
+    </enum>
     <composite name="messageHeader" description="Message identifiers and length of message root">
       <type name="blockLength" primitiveType="uint16"/>
       <type name="templateId" primitiveType="uint16"/>
@@ -62,17 +30,19 @@
       <type name="numInGroup" primitiveType="uint8" semanticType="NumInGroup"/>
     </composite>
   </types>
-  <sbe:message name="DCOrder" id="8">
+  <sbe:message name="DCOrder" id="28">
     <field id="20007" name="FixHeader" type="fixHeader"/>
-    <field id="21005" name="ClientMessageSendingTime" type="char27_optional" presence="optional"/>
-    <field id="5979" name="OEGINFromMember" type="char27_optional" presence="optional"/>
-    <field id="21013" name="AckPhase" type="AckPhase_enum"/>
-    <field id="21014" name="AckQualifiers" type="AckQualifiers_set"/>
-    <field id="7443" name="PostingAction" type="PostingAction_set" presence="optional"/>
-    <field id="6399" name="AccountCode" type="AccountCode_enum"/>
-    <field id="21004" name="OrderPriority" type="uint64_t" presence="optional"/>
-    <group dimensionType="groupSizeEncoding" name="party_id_group" id="453">
-      <field name="PartyID" id="448" type="char11"/>
-    </group>
+    <field id="21005" name="ClientMessageSendingTime" type="char27"/>
+    <field id="5979" name="OEGINFromMember" type="char27"/>
+    <field id="7764" name="OEGOUTTOME" type="char27"/>
+    <field id="21002" name="BookINTime" type="char27"/>
+    <field id="21003" name="BookOUTTime" type="char27"/>
+    <field id="7765" name="OEGINFromME" type="char27"/>
+    <field id="11" name="ClOrdID" type="char20"/>
+    <field id="48" name="SecurityID" type="char10"/>
+    <field id="22" name="SecurityIDSource" type="SecurityIDSource_enum"/>
+    <field id="20020" name="EMM" type="EMM_enum" presence="optional"/>
+    <field id="37" name="OrderID" type="char20"/>
+    <field id="39" name="OrdStatus" type="OrdStatus_enum"/>
   </sbe:message>
 </sbe:messageSchema>

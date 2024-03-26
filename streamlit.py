@@ -1,11 +1,12 @@
 # app.py
-
+import app
 import streamlit as st
 import json
 
 from langchain_community.chat_models.openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 
+import utils
 from json_schema_handler import JsonSchemaHandler
 from xml_sbe_schema_handler import XmlSbeSchemaHandler
 
@@ -251,18 +252,181 @@ def add_sbe_field(json_handler, document_message, document_field):
             json.loads(generate_sbe_field(document_field)))
 
 
+def form_new_sbe_schema():
+    st.subheader("Create New JSON Schema")
+
+    json_schema_name = st.text_input(
+        "Name JSON Schema",
+        key="json_schema_name_form_new_sbe_schema"
+    )
+    package = st.text_input(
+        "Package",
+        key="package_form_new_sbe_schema"
+    )
+    description = st.text_input(
+        "Description",
+        key="description_form_new_sbe_schema"
+    )
+    namespace_enx = st.text_input(
+        "Namespace ENX",
+        key="namespace_enx_form_new_sbe_schema"
+    )
+    namespace_sbe = st.text_input(
+        "Namespace SBE",
+        key="namespace_sbe_form_new_sbe_schema",
+        value="http://fixprotocol.io/2016/sbe"
+    )
+    namespace_str = st.text_input(
+        "Namespace STR",
+        key="namespace_str_form_new_sbe_schema",
+        value="http://exslt.org/strings"
+    )
+    namespace_ext = st.text_input(
+        "Namespace EXT",
+        key="namespace_ext_form_new_sbe_schema",
+        value="http://exslt.org/common"
+    )
+    schema_id = st.text_input(
+        "Schema ID",
+        key="schema_id_form_new_sbe_schema",
+        value="25"
+    )
+    version = st.text_input(
+        "Version",
+        key="version_form_new_sbe_schema",
+        value="306"
+    )
+    semantic_version = st.text_input(
+        "Semantic Version",
+        key="semantic_version_form_new_sbe_schema",
+        value="4.6.0"
+    )
+    byte_order = st.text_input(
+        "Byte Order",
+        key="byte_order_form_new_sbe_schema",
+        value="littleEndian"
+    )
+
+    if json_schema_name:
+        if st.button(f"Create JSON Schema File"):
+            try:
+                JsonSchemaHandler(
+                    json_schema_name,
+                    namespace_sbe,
+                    namespace_enx,
+                    namespace_str,
+                    namespace_ext,
+                    package,
+                    schema_id,
+                    version,
+                    semantic_version,
+                    description,
+                    byte_order
+                )
+                st.success(f"Schema '{json_schema_name}' saved successfully.")
+            except Exception as e:
+                st.error(f"Error saving file: {str(e)}")
+
+
+def form_new_sbe_message():
+    st.subheader(tab_new_document_message)
+
+    json_schema_name = st.text_input(
+        "Name JSON Schema",
+        key="json_schema_name_form_new_sbe_message"
+    )
+    message_name = st.text_input(
+        "Name Document Message",
+        key="message_name_form_new_sbe_message"
+    )
+    template_id = st.number_input(
+        "Template ID",
+        key="template_id_form_new_sbe_message",
+        value=0,
+        format="%d"
+    )
+
+    if json_schema_name and message_name and template_id >= 0:
+        json_handler = JsonSchemaHandler(json_schema_name)
+
+        if st.button(f"Create Message in {json_schema_name}"):
+            json_handler.add_document_message(message_name, template_id)
+            st.success(json_handler.load_schema())
+
+            if "upload_pdf_document" not in st.session_state:
+                st.session_state["upload_pdf_document"] = True
+            st.session_state["upload_pdf_document"] = True
+
+        if "upload_pdf_document" in st.session_state and st.session_state["upload_pdf_document"] == True:
+            uploaded_file = st.file_uploader("Carica un file PDF", type="pdf")
+
+            if uploaded_file is not None:
+                pdf_path = utils.save_uploaded_file("pdf_documents", uploaded_file)
+                st.success(f"File salvato in: {pdf_path}")
+
+                starting_page = st.number_input(
+                    "Pagina di inizio della tabella",
+                    key="starting_page_form_new_sbe_message",
+                    min_value=1,
+                    format="%d"
+                )
+                ending_page = st.number_input(
+                    "Pagina di fine della tabella",
+                    key="ending_page_form_new_sbe_message",
+                    min_value=1,
+                    format="%d"
+                )
+
+                if starting_page and ending_page:
+                    st.write(f"Percorso del file: {pdf_path}")
+                    st.write(f"Pagina di inizio della tabella: {starting_page}")
+                    st.write(f"Pagina di fine della tabella: {ending_page}")
+
+                    if "generate_sbe_xml_schema" not in st.session_state:
+                        st.session_state["generate_sbe_xml_schema"] = True
+                    st.session_state["generate_sbe_xml_schema"] = True
+
+                if "generate_sbe_xml_schema" in st.session_state and st.session_state["generate_sbe_xml_schema"] == True:
+
+                    if st.button(f"Generate SBE XML Schema \'{json_schema_name}\'"):
+
+                        array_sbe_fields = app.process(pdf_path, starting_page, ending_page)
+
+                        for sbe_field in array_sbe_fields:
+                            json_handler.add_sbe_field_to_message(message_name, sbe_field)
+
+                        st.success(json_handler.load_schema())
+
+                        lambda_generate_sbe_data_type_definitions = lambda sbe_field: (
+                            generate_sbe_data_type_definitions(json_handler, sbe_field)
+                        )
+
+                        json_handler.iterate_sbe_fields_of_document_messages(lambda_generate_sbe_data_type_definitions)
+
+                        xml_handler = XmlSbeSchemaHandler(json_schema_name)
+                        generate_xml_schema_from_json_schema(json_handler, xml_handler)
+
+            else:
+                st.error("Per favore, seleziona un file PDF.")
+
+
 def main():
     st.title("SBE XML Schema Generator")
 
     tab1, tab2 = st.tabs(["Automatic", "Manual"])
 
     with tab1:
-        st.header("Questo è il Tab 1")
-        st.write("Qui puoi inserire il contenuto per il Tab 1.")
+        st.header("AI Automatic Generator")
+        tabs = [tab_new_json_schema, tab_new_document_message]
+        default_index = tabs.index(tab_new_document_message)
+        tab = st.selectbox("Select Tab", tabs, index=default_index)
+        if tab == tab_new_json_schema:
+            form_new_sbe_schema()
+        elif tab == tab_new_document_message:
+            form_new_sbe_message()
 
     with tab2:
-        st.header("Questo è il Tab 2")
-        st.write("Qui puoi inserire il contenuto per il Tab 2.")
+        st.header("Manual Generator")
 
         tabs = [tab_new_json_schema, tab_new_document_message, tab_new_document_message_column,
                 tab_new_document_message_field, tab_new_document_repeating_group, tab_generate_sbe_xml_schema]
@@ -270,29 +434,7 @@ def main():
         tab = st.selectbox("Select Tab", tabs, index=default_index)
 
         if tab == tab_new_json_schema:
-            st.subheader("Create New JSON Schema")
-            json_schema_name = st.text_input("Name JSON Schema")
-            package = st.text_input("Package")
-            description = st.text_input("Description")
-            namespace_enx = st.text_input("Namespace ENX")
-
-            namespace_sbe = st.text_input("Namespace SBE", value="http://fixprotocol.io/2016/sbe")
-            namespace_str = st.text_input("Namespace STR", value="http://exslt.org/strings")
-            namespace_ext = st.text_input("Namespace EXT", value="http://exslt.org/common")
-            schema_id = st.text_input("Schema ID", value="25")
-            version = st.text_input("Version", value="306")
-            semantic_version = st.text_input("Semantic Version", value="4.6.0")
-            byte_order = st.text_input("Byte Order", value="littleEndian")
-
-            if json_schema_name:
-                if st.button(f"Create JSON Schema File"):
-                    try:
-                        json_handler = JsonSchemaHandler(namespace_sbe, namespace_enx, namespace_str,
-                                                         namespace_ext, package, schema_id, version, semantic_version,
-                                                         description, byte_order)
-                        st.success(f"Schema '{json_schema_name}' saved successfully.")
-                    except Exception as e:
-                        st.error(f"Error saving file: {str(e)}")
+            form_new_sbe_schema()
 
         elif tab == tab_new_document_message:
             st.subheader(tab_new_document_message)

@@ -3,16 +3,40 @@ from pathlib import Path
 
 
 class JsonSchemaHandler:
-    def __init__(self, json_schema_name, namespace_sbe=None, namespace_enx=None, namespace_str=None, namespace_ext=None,
-                 package=None, schema_id=None, version=None, semantic_version=None, description=None, byte_order=None,
-                 suffix_name="_json_schema"):
+    def __init__(
+            self,
+            json_schema_name,
+            namespace_sbe=None,
+            namespace_enx=None,
+            namespace_str=None,
+            namespace_ext=None,
+            package=None,
+            schema_id=None,
+            version=None,
+            semantic_version=None,
+            description=None,
+            byte_order=None,
+            suffix_name="_json_schema"
+    ):
         self.json_schema_name = json_schema_name.lower()
-        self.file_name = f"{self.json_schema_name}{suffix_name.lower()}.json"
+        self.suffix_name = suffix_name.lower()
+        self.file_name = f"{self.json_schema_name}{self.suffix_name}.json"
         self.file_path = Path(self.file_name)
+
         if namespace_sbe and namespace_enx and namespace_str and namespace_ext and package and schema_id and version and semantic_version and description and byte_order:
-            self.create_new_file_json_schema(namespace_sbe, namespace_enx, namespace_str,
-                                             namespace_ext, package, schema_id, version, semantic_version, description,
-                                             byte_order)
+            self.namespace_sbe = namespace_sbe.lower()
+            self.namespace_enx = namespace_enx.lower()
+            self.namespace_str = namespace_str.lower()
+            self.namespace_ext = namespace_ext.lower()
+            self.package = package.lower()
+            self.schema_id = schema_id
+            self.version = version
+            self.semantic_version = semantic_version
+            self.description = description
+            self.byte_order = byte_order
+
+            self.create_new_file_json_schema()
+
         self.schema = self.load_schema()
 
     def load_schema(self):
@@ -21,23 +45,21 @@ class JsonSchemaHandler:
         except FileNotFoundError:
             raise KeyError(f"JSON schema file '{self.file_path}' not found.")
 
-    def create_new_file_json_schema(self, namespace_sbe, namespace_enx, namespace_str, namespace_ext,
-                                    package, schema_id, version, semantic_version, description, byte_order,
-                                    suffix_name="_json_schema"):
-        file_name = f"{self.json_schema_name}{suffix_name.lower()}.json"
+    def create_new_file_json_schema(self):
+        file_name = f"{self.json_schema_name}{self.suffix_name}.json"
         file_path = Path(file_name)
         file_content = {
             self.json_schema_name: {
-                "namespace_sbe": namespace_sbe,
-                "namespace_enx": namespace_enx,
-                "namespace_str": namespace_str,
-                "namespace_ext": namespace_ext,
-                "package": package,
-                "schema_id": schema_id,
-                "version": version,
-                "semantic_version": semantic_version,
-                "description": description,
-                "byte_order": byte_order,
+                "namespace_sbe": self.namespace_sbe,
+                "namespace_enx": self.namespace_enx,
+                "namespace_str": self.namespace_str,
+                "namespace_ext": self.namespace_ext,
+                "package": self.package,
+                "schema_id": self.schema_id,
+                "version": self.version,
+                "semantic_version": self.semantic_version,
+                "description": self.description,
+                "byte_order": self.byte_order,
                 "array_number_data_types": [],
                 "array_string_data_types": [],
                 "array_enum_data_types": [],
@@ -56,9 +78,10 @@ class JsonSchemaHandler:
     def add_document_message(self, message_name, template_id):
         if self.json_schema_name not in self.schema:
             raise KeyError(f"JSON schema '{self.json_schema_name}' not found.")
-        if message_name in self.schema[self.json_schema_name]['array_document_messages']:
-            print(f"Message \'{message_name}\' already exists in the JSON schema \'{self.json_schema_name}\'")
-            return
+        for document_message in self.get_schema_array_iterator("array_document_messages"):
+            if document_message["message_name"] == message_name or document_message["template_id"] == template_id:
+                print(f"Message \'{message_name}\' already exists in the JSON schema \'{self.json_schema_name}\'")
+                return
 
         new_document_message = {
             "message_name": message_name,
@@ -130,7 +153,7 @@ class JsonSchemaHandler:
         message = self.find_document_message_in_json_schema(message_key)
         if message is None:
             raise KeyError(f"Message '{message_key}' not found in schema.")
-        if json_sbe_field in self.get_message_array_iterator('array_sbe_fields'):
+        if json_sbe_field in self.get_message_array_iterator(message_key, 'array_sbe_fields'):
             print(
                 f"SBE Field already exists in the message '{message_key}' of the JSON schema '{self.json_schema_name}'")
             return
