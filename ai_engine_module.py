@@ -1,4 +1,4 @@
-# app.py
+# ai_engine_module.py
 
 import cv2
 import layoutparser as lp
@@ -7,8 +7,14 @@ import os
 from pdf2image import convert_from_path
 from PIL import Image
 import json
+import multiprocessing
+from functools import partial
 # from langchain_community.chat_models.openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 import utils
 
@@ -34,30 +40,55 @@ def convert_pdf_pages_to_jpg(pdf_path, starting_page, ending_page, folder_path):
         print(f"Error during PDF to JPEG conversion: {e}")
 
 
-def increase_contrast(image, image_path):
+def convert_grayscale(image_path):
+    try:
+        image = cv2.imread(image_path)
+        if image is None:
+            raise FileNotFoundError("L'immagine specificata non è stata trovata.")
+
+        image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        image_gray = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2GRAY)
+
+        return {
+            "image_path": image_path,
+            "image": image_gray
+        }
+
+    except Exception as e:
+        print(f"Si è verificato un errore durante la conversione dell'immagine: {e}")
+        return None
+
+
+def increase_contrast(output_previous_function):
+    image_path = output_previous_function["image_path"]
+    image = output_previous_function["image"]
+
     # Crea un oggetto CLAHE (adattamento del contrasto limitato adattivo)
-    bw_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
-    clahe_image = clahe.apply(bw_image)
+    image_clahe = clahe.apply(image)
 
-    cv2.imwrite(image_path, clahe_image)
+    cv2.imwrite(image_path, image_clahe)
 
-    return image_path
+    return {
+        "image_path": image_path,
+        "image": image_clahe
+    }
 
 
-def thresholding(image, image_path):
-    bw_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+def thresholding(output_previous_function):
+    image_path = output_previous_function["image_path"]
+    image = output_previous_function["image"]
 
     # Applica la soglia di Otsu per la binarizzazione
-    _, otsu_image = cv2.threshold(
-        bw_image,
+    _, image_otsu = cv2.threshold(
+        image,
         0,
         255,
         cv2.THRESH_BINARY + cv2.THRESH_OTSU
     )
 
-    adaptive_image = cv2.adaptiveThreshold(
-        bw_image,
+    image_adaptive = cv2.adaptiveThreshold(
+        image,
         255,
         cv2.ADAPTIVE_THRESH_MEAN_C,
         cv2.THRESH_BINARY,
@@ -65,13 +96,19 @@ def thresholding(image, image_path):
         10  # C-Value: 5, 10
     )
 
-    cv2.imwrite(image_path, otsu_image)
+    cv2.imwrite(image_path, image_otsu)
 
-    return image_path
+    return {
+        "image_path": image_path,
+        "image": image_otsu
+    }
 
 
-def detect_tables(image, output_previous_function):
-    model = lp.Detectron2LayoutModel(
+def detect_tables(output_previous_function):
+
+    logging.info("det1")
+
+    model_detectron2 = lp.Detectron2LayoutModel(
         config_path='config.yaml',
         extra_config=["MODEL.ROI_HEADS.SCORE_THRESH_TEST", 0.65],
         label_map={
@@ -83,13 +120,30 @@ def detect_tables(image, output_previous_function):
         }
     )
 
-    layout = model.detect(image)
+    logging.info("det2")
 
-    return lp.Layout([element for element in layout if element.type == 'Table'])
+    image = output_previous_function["image"]
+    image_rgb = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
+
+    layout = model_detectron2.detect(image_rgb)
+    layout_tables = lp.Layout([element for element in layout if element.type == 'Table'])
+
+    logging.info("det3")
+
+    return {
+        "image": image,
+        "layout_tables": layout_tables
+    }
 
 
-def ocr_tables(image, layout_tables):
-    ocr_agent = lp.TesseractAgent(languages='eng')
+def ocr_tables(output_previous_function):
+
+    model_tesseract = lp.TesseractAgent(languages='eng')
+
+    image = output_previous_function["image"]
+    layout_tables = output_previous_function["layout_tables"]
+
+    logging.info("ocr1")
 
     for table in layout_tables:
         segment_image = (
@@ -98,13 +152,19 @@ def ocr_tables(image, layout_tables):
             .crop_image(image)
         )
 
-        text = ocr_agent.detect(segment_image)
+        text = model_tesseract.detect(segment_image)
         table.set(text=text, inplace=True)
 
-    return layout_tables.get_texts()
+    logging.info("ocr2")
+
+    return {
+        "text_tables": layout_tables.get_texts()
+    }
 
 
-def generate_document_fields(image, array_raw_document_fields):
+def generate_document_fields(output_previous_function):
+    text_tables = output_previous_function["text_tables"]
+
     system_message = """
 Sei un esperto in sistemi di trading elettronico con una conoscenza approfondita dei protocolli FIX e SBE. Ti verra fornita in input una trascrizione grezza ottenuta tramite OCR di una tabella che rappresenta i campi di un messaggio FIX o SBE. La tua missione e ricostruire la tabella step by step seguendo i seguenti passaggi:
 1. Definire quali sono le colonne della tabella.
@@ -560,8 +620,8 @@ exclusive with (1616, 1547) and 1545.
     ### INPUT ###
         """
 
-    for raw_document_field in array_raw_document_fields:
-        human_message += f"{raw_document_field} "
+    for text_table in text_tables:
+        human_message += f"{text_table} "
 
     human_message += """
     ### OUTPUT JSON ###
@@ -574,26 +634,73 @@ exclusive with (1616, 1547) and 1545.
     #     top_p=0
     # )
     #
-    # array_document_fields = ai_model([
-    #     SystemMessage(content=replace_newlines_with_space(system_message)),
+    # json_array_document_fields = ai_model([
+    #     SystemMessage(content=utils.replace_newlines_with_space(system_message)),
     #     HumanMessage(content=example_1_human_message),
     #     AIMessage(content=example_1_assistant_message),
     #     HumanMessage(content=example_2_human_message),
     #     AIMessage(content=example_2_assistant_message),
     #     HumanMessage(content=example_3_human_message),
     #     AIMessage(content=example_3_assistant_message),
-    #     HumanMessage(content=replace_newlines_with_space(human_message))
+    #     HumanMessage(content=utils.replace_newlines_with_space(human_message))
     # ])
 
-    # return json.loads(array_document_fields.content)
+    # return json.loads(json_array_document_fields.content)
 
-    with open('a.json', 'r') as file:
+    with open('document_fields.json', 'r') as file:
         data = json.load(file)
 
     return data
 
 
-def generate_repeating_groups(image, array_raw_document_fields):
+def generate_sbe_message_components(json_array_document_fields_pages):
+    json_array_repeating_groups = []
+
+    for i in range(len(json_array_document_fields_pages) - 1):
+        current_json_array_document_fields_page = json_array_document_fields_pages[i]
+        next_json_array_document_fields_page = json_array_document_fields_pages[i + 1]
+        json_array_document_fields_of_adjacent_pages = current_json_array_document_fields_page + next_json_array_document_fields_page
+        print(f"- {i} {i + 1} #")
+
+        partial_json_array_repeating_groups = generate_repeating_groups(json_array_document_fields_of_adjacent_pages)
+
+        for repeating_group in partial_json_array_repeating_groups:
+            if repeating_group["group_id"] not in json_array_repeating_groups:
+                json_array_repeating_groups.append(repeating_group)
+
+    json_array_sbe_fields = []
+
+    for json_array_document_fields_page in json_array_document_fields_pages:
+        partial_json_array_sbe_fields = generate_sbe_fields(json_array_document_fields_page)
+        json_array_sbe_fields.extend(partial_json_array_sbe_fields)
+
+    for repeating_group in json_array_repeating_groups:
+        repeating_group["items"] = generate_sbe_fields(repeating_group["items"])
+        with open('sbe_fields_repeating_group.json', 'r') as file:
+            file_content = file.read()
+            repeating_group["items"] = json.loads(file_content)
+
+    ids_to_remove = set()
+    names_to_remove = set()
+
+    for repeating_group in json_array_repeating_groups:
+        for group_sbe_field in repeating_group["items"]:
+            ids_to_remove.add(group_sbe_field["field_id"])
+            names_to_remove.add(group_sbe_field["field_name"])
+
+    filtered_sbe_fields = []
+
+    for field in json_array_sbe_fields:
+        if field["field_id"] not in ids_to_remove and field["field_name"] not in names_to_remove:
+            filtered_sbe_fields.append(field)
+
+    return {
+        "json_array_sbe_fields": filtered_sbe_fields,
+        "json_array_repeating_groups": json_array_repeating_groups
+    }
+
+
+def generate_repeating_groups(array_document_fields):
     system_message = """
 Sei esperto in sistemi di trading elettronico e conosci approfonditamente i protocolli FIX e SBE. Devi analizzare un array JSON contenente informazioni sui campi di un messaggio SBE per identificare se alcuni di essi formano un repeating group, basandoti su criteri specifici:
 - Pattern nei Nomi: Campi con nomi simili, come PartyIDGroup, PartyIDSource, PartyIDRole, PartyIDRoleQualifier, indicano un insieme comune.
@@ -1084,8 +1191,8 @@ Segui gli esempi che ti sono stati forniti.
 ### INPUT DELLO SVILUPPATORE ###
     """
 
-    for raw_document_field in array_raw_document_fields:
-        human_message += f"{raw_document_field} "
+    for document_field in array_document_fields:
+        human_message += f"{document_field} "
 
     human_message += """
 ### OUTPUT JSON ###
@@ -1098,8 +1205,8 @@ Segui gli esempi che ti sono stati forniti.
     #     top_p=0
     # )
     #
-    # array_document_fields = ai_model([
-    #     SystemMessage(content=replace_newlines_with_space(system_message)),
+    # json_array_repeating_groups = ai_model([
+    #     SystemMessage(content=utils.replace_newlines_with_space(system_message)),
     #     HumanMessage(content=example_1_human_message),
     #     AIMessage(content=example_1_assistant_message),
     #     HumanMessage(content=example_2_human_message),
@@ -1111,9 +1218,14 @@ Segui gli esempi che ti sono stati forniti.
     #     HumanMessage(content=human_message
     # )
     # ])
+    # return json.loads(json_array_repeating_groups.content)
+    with open('repeating_groups.json', 'r') as file:
+        data = json.load(file)
+
+    return data
 
 
-def generate_sbe_fields(image, array_document_fields):
+def generate_sbe_fields(array_document_fields):
     system_message = """
 Sei un esperto in sistemi di trading elettronico con una profonda conoscenza dei protocolli FIX e SBE. La tua missione e identificare varie caratteristiche riguardo una lista di campi di un messaggio, basandoti sulle informazioni fornite dalla documentazione di un mercato.
 
@@ -1401,77 +1513,89 @@ Assicurati di includere solo ed esclusivamente un array JSON nel codice fornito.
 ### OUTPUT JSON ###
         """
 
-    ai_model = ChatOpenAI(
-        openai_api_key=utils.openai_api_key,
-        model=utils.ai_model_name,
-        temperature=0,
-        top_p=0
-    )
-
-    json_array_sbe_fields = ai_model([
-        SystemMessage(content=replace_newlines_with_space(system_message)),
-        HumanMessage(content=example_1_human_message),
-        AIMessage(content=example_1_assistant_message),
-        HumanMessage(content=example_2_human_message),
-        AIMessage(content=example_2_assistant_message),
-        HumanMessage(content=example_3_human_message),
-        AIMessage(content=example_3_assistant_message),
-        HumanMessage(content=human_message)
-    ])
-
-    #return json.loads(json_array_sbe_fields.content)
-    with open('b.json', 'r') as file:
+    # ai_model = ChatOpenAI(
+    #     openai_api_key=utils.openai_api_key,
+    #     model=utils.ai_model_name,
+    #     temperature=0,
+    #     top_p=0
+    # )
+    #
+    # json_array_sbe_fields = ai_model([
+    #     SystemMessage(content=utils.replace_newlines_with_space(system_message)),
+    #     HumanMessage(content=example_1_human_message),
+    #     AIMessage(content=example_1_assistant_message),
+    #     HumanMessage(content=example_2_human_message),
+    #     AIMessage(content=example_2_assistant_message),
+    #     HumanMessage(content=example_3_human_message),
+    #     AIMessage(content=example_3_assistant_message),
+    #     HumanMessage(content=human_message)
+    # ])
+    #
+    # return json.loads(json_array_sbe_fields.content)
+    with open('sbe_fields.json', 'r') as file:
         data = json.load(file)
 
     return data
 
 
-def replace_newlines_with_space(input_string):
-    return input_string.replace('\n', ' ')
+def execute_pipeline(file_name, folder_path, pipeline_functions):
+
+    image_path = os.path.join(folder_path, file_name)
+    data = image_path
+    logger.info(f"current image path: {image_path}")
+
+    i = 1
+    for function in pipeline_functions:
+        try:
+            data = function(data)
+            logger.info(f"num filter: {i}")
+            i = i + 1
+        except FileNotFoundError as e:
+            print(e)
+        except Exception as e:
+            print(f"Errore nel processare l'immagine {file_name}: {e}")
+
+    return data
 
 
 def process(pdf_path, starting_page, ending_page, folder_path="extracted_pdf_pages"):
+
     convert_pdf_pages_to_jpg(pdf_path, starting_page, ending_page, folder_path)
 
-    array_sbe_fields = []
+    array_file_names = [file for file in os.listdir(folder_path) if file.endswith(('.jpg', '.jpeg', '.png'))]
 
-    for file_name in os.listdir(folder_path):
-        if not file_name.endswith(('.jpg', '.jpeg', '.png')):
-            continue
+    pipeline_functions = [
+        convert_grayscale,
+        increase_contrast,
+        thresholding,
+        detect_tables,
+        ocr_tables,
+        generate_document_fields
+    ]
 
-        image_path = os.path.join(folder_path, file_name)
-        image = cv2.imread(image_path)
-        image = image[..., ::-1]
+    multi_cpu = multiprocessing.cpu_count()
+    single_cpu = 1
+    pool = multiprocessing.Pool(processes=single_cpu)
+    logger.info(f"number of cpu: {multiprocessing.cpu_count()}")
 
-        data = image_path
-        pipeline_functions = [
-            # increase_contrast,
-            # thresholding,
-            detect_tables,
-            ocr_tables
-            # generate_document_fields,
-            # generate_sbe_fields
-        ]
+    process_partial = partial(execute_pipeline, folder_path=folder_path, pipeline_functions=pipeline_functions)
+    array_document_fields_pages = pool.map(process_partial, array_file_names)
 
-        i = 1
-        for function in pipeline_functions:
-            try:
-                data = function(image, data)
-                print(i)
-                i = i + 1
-            except FileNotFoundError as e:
-                print(e)
-            except Exception as e:
-                print(f"Errore nel processare l'immagine {file_name}: {e}")
+    sbe_message_components = generate_sbe_message_components(array_document_fields_pages)
 
-        array_sbe_fields.extend(data)
+    json_array_sbe_fields = sbe_message_components["json_array_sbe_fields"]
+    json_array_repeating_groups = sbe_message_components["json_array_repeating_groups"]
 
     with open('deprecated/proof_data.txt', 'a', encoding="utf-8") as file:
-        for data in array_sbe_fields:
+        file.write("array_sbe_fields:\n")
+        for data in json_array_sbe_fields:
+            file.write(f"{data}\n")
+        file.write("array_repeating_groups:\n")
+        for data in json_array_repeating_groups:
             file.write(f"{data}\n")
 
-    return array_sbe_fields
+    return json_array_sbe_fields, json_array_repeating_groups
 
 
 if __name__ == "__main__":
-    process("pdf_documents/xetra.pdf", 27, 28, "extracted_pdf_pages")
+    process("pdf_documents/drop_copy_service.pdf", 23, 35, "extracted_pdf_pages")

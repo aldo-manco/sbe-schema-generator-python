@@ -1,294 +1,157 @@
-6.1.1 FIXMD : MarketDatalncrementalRefresh Message
-Tag Field Name
-
-Standard Header
-
-35 MsgType
-
-Message Body
-
-268 NoMDEntries
-
->
-
->
-
-279
-
-269
-
-278
-
-48
-22
-
-454
-
-MDUpdateAction
-
-MDEntryType
-
-MDEntryID
-
-Securityld
-
-SecurityIDsource
-
-NoSecurityAltID
-
-Req Description
-
-X = Market Data Incremental Refresh
-
-Number of entries following.
-
-Type of Market Data update action.
-
-Value Meaning
-0 New
-
-1 Update
-2 Delete
-
-Types of Market Data Entries that the firm requesting
-the Market Data is interested in receiving.
-
-Value Meaning
-0 Bid
-1 Offer
-
-Unique entry identifier.
-
-Will be same as the OrderlD value for a firm order or
-an indicative quote side.
-
-The CUSIP or the ISIN of the symbol.
-
-Source database of the Security Id for a given
-symbol.
-By default this field will be populated with the ISIN.
-
-If ISIN is NOT present this will contain the CUSIP of
-the instrument.
-
-Value Meaning
-1 CUSIP
-4 ISIN
-
-Number of alternate Security Identifiers
-
-=> 455 SecurityAltID N
-=> 456 SecurityAltIDSource N
-
-+ 270 MDEntryPx N
-+ 271 MDEntrySize N
-+ 1023 MDPriceLevel Y
-
-+ 290 MDEntryPositionNo Y
-
-+ 6373 FirmnessIndicator N
-> 110 MinQty N
-+ 6372 Mine N
-
-MMI BondsPro — FIX 4.4 Market Data Feed
-
-Security Alternate identifier for this security
-
-Source of SecurityAItID <455>. Required if
-SecurityAltID <455> is specified.
-
-Value Meaning
-
-1 CUSIP
-
-Used if the entry has price related data. Unmarked
-flat price will be populated always.
-
-Required only if the MDUpdateAction(279) is 'New(0)'
-or 'Update(1)’.
-
-Quantity or volume represented by the Market Data
-Entry.
-
-Required only if the MDUpdateAction(279) is 'New(0)'
-or 'Update(1)’.
-
-Integer to convey the level of a bid or offer at a given
-price level.
-
-This is in contrast to MDEntryPositionNo which is
-used to convey the position of an order within a Price
-level.
-
-Display position of a bid or offer within a price level,
-numbered from most competitive to least
-competitive, beginning with 1.
-
-Indicates the quality of market data for indicative
-quotes (>0).
-
-A Firmness Indicator value of 0 is reserved to
-represent firm orders.
-
-Value Meaning
-0 Firm Order
-
->0 Subject quote and quality of market data
-
-Permission
-
-1. Population of the tag is dependent on
-the required permissions being
-present for the user who is receiving
-market data
-
-Minimum quantity of the order in Buy or Sell side. By
-default the value for this field will be set to 0.
-
-Indicates whether the interest was submitted by the
-same firm or an external firm.
-
- 
-
- 
-
- 
-
- 
-
- 
-
- 
-
- 
-
-FIX tag | Field Name R| Field | Description
-e | Form
-q| at
-d
-35 MsgType Y | See Message Type.
-8.16 CO = SecurityMassStatus
-34 See an
-MsgSeqNum x 815 The sequence number of the message is incremented p
-, maintenance feed message.
-See
-49 SenderCompld ¥ 8.28 Source ID of sender
-1679 SecurityMassTradingStatus Y| See 2: Trading Halt
-8.25 17: Ready to Trade
-18: Not available for trading
-23: Fast Market
-1680 SecurityMassTradingEvent Y| See 2: Market Reset, Trading resumes.
-8.24 5: Change of Trading Subsession; Exchange segment
-state change.
-6: Change of SecurityTradingStatus; Fast Market chang
-1544 InstrumentScopeProductComplex | N| See This tag is restricted to instruments in trading model
-8.2 “Continuous Auction” only. The target state is always
-
- 
-
- 
-
- 
-
- 
-
-delivered with TradingSessionSubID (625). Mutually
-exclusive with (1616, 1547) and 1545.
-
- 
-
- 
-
- 
-
- 
-
- 
-
- 
-
- 
-
- 
-
- 
-
- 
-
- 
-
-FIX tag | Field Name Req'd Field Description
-Format
-326 > SecurityTradingStatus N See 17 = Ready to trade
-8.27
-270 > MDEntryPx Y See 8.8 Trade price value
-273 > MDEntryTime Y See Time of price determination
-8.10
-277 > TradeCondition N See V = Special Auction; e.g. for Federal Bonds the Speci
-8.32 Auction indicator is used for prices determined with
-Bundesbank participation
-278 > MDEntrylD Y See 8.7 Transaction match ID
-
- 
-
- 
-
- 
-
- 
-
- 
-
- 
-
- 
-
- 
-
- 
-
- 
-
- 
-
-FIX tag | Field Name R| Field Description
-e| Form
-q| at
-d
-625 TradingSessionSubID N| See 1: Pre-Trading
-8.34 3: Trading
-5: Post-Trading
-7: Quiescent
-Used for exchange state change in trading model
-“Continuous auction” together with
-InstrumentScopeProductComplex (1544).
-The combination of SecurityMassTradingStatus (1679)
-and TradingSessionSubID (625) of 2: Trading Halt and 7:
-Quiescent means that the Trading is on Halt for this
-Exchange Segment. The combination of 18: Not available
-for Trading and 7: Quiescent means that the Trading is
-finished for this business day.
-1616 InstrumentScopeSecurityExchang | N| See Exchange, on which Fast Market is enabled. Together
-e 8.3 with InstrumentScopeSecurityType (1547).
-1547 InstrumentScopeSecurityType N| See Fast Market. The value corresponds to field “instTypCod”
-8.5 in reference data:
-Reference data @ Security Type:
-“EQU" & “STOCK”
-"BON” © “BOND”
-“WAR” @ “WAR”
-“BAS” @ “BAS”
-Mutually exclusive with (1544
-InstrumentScopeProductComplex, 625
-TradingSessionSubID).
-1545 InstrumentScopeSecurityGroup N| See 1x 1007
-8.4 Technical Market Reset. The value corresponds to the
-field “setld” in reference data. Mutually exclusive with
-(1616 InstrumentScopeSecurityExchange, 1547
-InstrumentScopeSecurityType)
-and (1544 InstrumentScopeProductComplex, 625
-TradingSessionSubID).
-60 TransactTime Y| See Timestamp when the business transaction represented by
-8.36 the message occurred.
-
- 
-
+array_sbe_fields:
+{'field_id': 21005, 'field_name': 'ClientMessageSendingTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 5979, 'field_name': 'OEGINFromMember', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 7764, 'field_name': 'OEGOUTTOME', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 21002, 'field_name': 'BookINTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 21003, 'field_name': 'BookOUTTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 7765, 'field_name': 'OEGINFromME', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 11, 'field_name': 'ClOrdID', 'data_type': 'char', 'encoding_type': 'char', 'length': 20, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 22, 'field_name': 'SecurityIDSource', 'data_type': 'SecurityIDSource_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'8': 'Symbol'}}
+{'field_id': 20020, 'field_name': 'EMM', 'data_type': 'EMM_enum', 'encoding_type': 'int8', 'length': 2, 'presence': 'optional', 'structure': {'1': 'Cash and Derivative Central Order Book (COB)', '7': 'Derivative On Exchange Off book', '8': 'ETF MTF - NAV Central Order Book'}}
+{'field_id': 37, 'field_name': 'OrderID', 'data_type': 'char', 'encoding_type': 'char', 'length': 20, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 39, 'field_name': 'OrdStatus', 'data_type': 'OrdStatus_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'0': 'New'}}
+{'field_id': 21005, 'field_name': 'ClientMessageSendingTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 5979, 'field_name': 'OEGINFromMember', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 7764, 'field_name': 'OEGOUTTOME', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 21002, 'field_name': 'BookINTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 21003, 'field_name': 'BookOUTTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 7765, 'field_name': 'OEGINFromME', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 11, 'field_name': 'ClOrdID', 'data_type': 'char', 'encoding_type': 'char', 'length': 20, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 22, 'field_name': 'SecurityIDSource', 'data_type': 'SecurityIDSource_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'8': 'Symbol'}}
+{'field_id': 20020, 'field_name': 'EMM', 'data_type': 'EMM_enum', 'encoding_type': 'int8', 'length': 2, 'presence': 'optional', 'structure': {'1': 'Cash and Derivative Central Order Book (COB)', '7': 'Derivative On Exchange Off book', '8': 'ETF MTF - NAV Central Order Book'}}
+{'field_id': 37, 'field_name': 'OrderID', 'data_type': 'char', 'encoding_type': 'char', 'length': 20, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 39, 'field_name': 'OrdStatus', 'data_type': 'OrdStatus_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'0': 'New'}}
+{'field_id': 21005, 'field_name': 'ClientMessageSendingTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 5979, 'field_name': 'OEGINFromMember', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 7764, 'field_name': 'OEGOUTTOME', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 21002, 'field_name': 'BookINTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 21003, 'field_name': 'BookOUTTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 7765, 'field_name': 'OEGINFromME', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 11, 'field_name': 'ClOrdID', 'data_type': 'char', 'encoding_type': 'char', 'length': 20, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 22, 'field_name': 'SecurityIDSource', 'data_type': 'SecurityIDSource_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'8': 'Symbol'}}
+{'field_id': 20020, 'field_name': 'EMM', 'data_type': 'EMM_enum', 'encoding_type': 'int8', 'length': 2, 'presence': 'optional', 'structure': {'1': 'Cash and Derivative Central Order Book (COB)', '7': 'Derivative On Exchange Off book', '8': 'ETF MTF - NAV Central Order Book'}}
+{'field_id': 37, 'field_name': 'OrderID', 'data_type': 'char', 'encoding_type': 'char', 'length': 20, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 39, 'field_name': 'OrdStatus', 'data_type': 'OrdStatus_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'0': 'New'}}
+{'field_id': 21005, 'field_name': 'ClientMessageSendingTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 5979, 'field_name': 'OEGINFromMember', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 7764, 'field_name': 'OEGOUTTOME', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 21002, 'field_name': 'BookINTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 21003, 'field_name': 'BookOUTTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 7765, 'field_name': 'OEGINFromME', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 11, 'field_name': 'ClOrdID', 'data_type': 'char', 'encoding_type': 'char', 'length': 20, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 22, 'field_name': 'SecurityIDSource', 'data_type': 'SecurityIDSource_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'8': 'Symbol'}}
+{'field_id': 20020, 'field_name': 'EMM', 'data_type': 'EMM_enum', 'encoding_type': 'int8', 'length': 2, 'presence': 'optional', 'structure': {'1': 'Cash and Derivative Central Order Book (COB)', '7': 'Derivative On Exchange Off book', '8': 'ETF MTF - NAV Central Order Book'}}
+{'field_id': 37, 'field_name': 'OrderID', 'data_type': 'char', 'encoding_type': 'char', 'length': 20, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 39, 'field_name': 'OrdStatus', 'data_type': 'OrdStatus_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'0': 'New'}}
+{'field_id': 21005, 'field_name': 'ClientMessageSendingTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 5979, 'field_name': 'OEGINFromMember', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 7764, 'field_name': 'OEGOUTTOME', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 21002, 'field_name': 'BookINTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 21003, 'field_name': 'BookOUTTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 7765, 'field_name': 'OEGINFromME', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 11, 'field_name': 'ClOrdID', 'data_type': 'char', 'encoding_type': 'char', 'length': 20, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 22, 'field_name': 'SecurityIDSource', 'data_type': 'SecurityIDSource_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'8': 'Symbol'}}
+{'field_id': 20020, 'field_name': 'EMM', 'data_type': 'EMM_enum', 'encoding_type': 'int8', 'length': 2, 'presence': 'optional', 'structure': {'1': 'Cash and Derivative Central Order Book (COB)', '7': 'Derivative On Exchange Off book', '8': 'ETF MTF - NAV Central Order Book'}}
+{'field_id': 37, 'field_name': 'OrderID', 'data_type': 'char', 'encoding_type': 'char', 'length': 20, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 39, 'field_name': 'OrdStatus', 'data_type': 'OrdStatus_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'0': 'New'}}
+{'field_id': 21005, 'field_name': 'ClientMessageSendingTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 5979, 'field_name': 'OEGINFromMember', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 7764, 'field_name': 'OEGOUTTOME', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 21002, 'field_name': 'BookINTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 21003, 'field_name': 'BookOUTTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 7765, 'field_name': 'OEGINFromME', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 11, 'field_name': 'ClOrdID', 'data_type': 'char', 'encoding_type': 'char', 'length': 20, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 22, 'field_name': 'SecurityIDSource', 'data_type': 'SecurityIDSource_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'8': 'Symbol'}}
+{'field_id': 20020, 'field_name': 'EMM', 'data_type': 'EMM_enum', 'encoding_type': 'int8', 'length': 2, 'presence': 'optional', 'structure': {'1': 'Cash and Derivative Central Order Book (COB)', '7': 'Derivative On Exchange Off book', '8': 'ETF MTF - NAV Central Order Book'}}
+{'field_id': 37, 'field_name': 'OrderID', 'data_type': 'char', 'encoding_type': 'char', 'length': 20, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 39, 'field_name': 'OrdStatus', 'data_type': 'OrdStatus_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'0': 'New'}}
+{'field_id': 21005, 'field_name': 'ClientMessageSendingTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 5979, 'field_name': 'OEGINFromMember', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 7764, 'field_name': 'OEGOUTTOME', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 21002, 'field_name': 'BookINTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 21003, 'field_name': 'BookOUTTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 7765, 'field_name': 'OEGINFromME', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 11, 'field_name': 'ClOrdID', 'data_type': 'char', 'encoding_type': 'char', 'length': 20, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 22, 'field_name': 'SecurityIDSource', 'data_type': 'SecurityIDSource_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'8': 'Symbol'}}
+{'field_id': 20020, 'field_name': 'EMM', 'data_type': 'EMM_enum', 'encoding_type': 'int8', 'length': 2, 'presence': 'optional', 'structure': {'1': 'Cash and Derivative Central Order Book (COB)', '7': 'Derivative On Exchange Off book', '8': 'ETF MTF - NAV Central Order Book'}}
+{'field_id': 37, 'field_name': 'OrderID', 'data_type': 'char', 'encoding_type': 'char', 'length': 20, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 39, 'field_name': 'OrdStatus', 'data_type': 'OrdStatus_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'0': 'New'}}
+{'field_id': 21005, 'field_name': 'ClientMessageSendingTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 5979, 'field_name': 'OEGINFromMember', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 7764, 'field_name': 'OEGOUTTOME', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 21002, 'field_name': 'BookINTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 21003, 'field_name': 'BookOUTTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 7765, 'field_name': 'OEGINFromME', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 11, 'field_name': 'ClOrdID', 'data_type': 'char', 'encoding_type': 'char', 'length': 20, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 22, 'field_name': 'SecurityIDSource', 'data_type': 'SecurityIDSource_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'8': 'Symbol'}}
+{'field_id': 20020, 'field_name': 'EMM', 'data_type': 'EMM_enum', 'encoding_type': 'int8', 'length': 2, 'presence': 'optional', 'structure': {'1': 'Cash and Derivative Central Order Book (COB)', '7': 'Derivative On Exchange Off book', '8': 'ETF MTF - NAV Central Order Book'}}
+{'field_id': 37, 'field_name': 'OrderID', 'data_type': 'char', 'encoding_type': 'char', 'length': 20, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 39, 'field_name': 'OrdStatus', 'data_type': 'OrdStatus_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'0': 'New'}}
+{'field_id': 21005, 'field_name': 'ClientMessageSendingTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 5979, 'field_name': 'OEGINFromMember', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 7764, 'field_name': 'OEGOUTTOME', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 21002, 'field_name': 'BookINTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 21003, 'field_name': 'BookOUTTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 7765, 'field_name': 'OEGINFromME', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 11, 'field_name': 'ClOrdID', 'data_type': 'char', 'encoding_type': 'char', 'length': 20, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 22, 'field_name': 'SecurityIDSource', 'data_type': 'SecurityIDSource_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'8': 'Symbol'}}
+{'field_id': 20020, 'field_name': 'EMM', 'data_type': 'EMM_enum', 'encoding_type': 'int8', 'length': 2, 'presence': 'optional', 'structure': {'1': 'Cash and Derivative Central Order Book (COB)', '7': 'Derivative On Exchange Off book', '8': 'ETF MTF - NAV Central Order Book'}}
+{'field_id': 37, 'field_name': 'OrderID', 'data_type': 'char', 'encoding_type': 'char', 'length': 20, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 39, 'field_name': 'OrdStatus', 'data_type': 'OrdStatus_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'0': 'New'}}
+{'field_id': 21005, 'field_name': 'ClientMessageSendingTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 5979, 'field_name': 'OEGINFromMember', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 7764, 'field_name': 'OEGOUTTOME', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 21002, 'field_name': 'BookINTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 21003, 'field_name': 'BookOUTTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 7765, 'field_name': 'OEGINFromME', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 11, 'field_name': 'ClOrdID', 'data_type': 'char', 'encoding_type': 'char', 'length': 20, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 22, 'field_name': 'SecurityIDSource', 'data_type': 'SecurityIDSource_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'8': 'Symbol'}}
+{'field_id': 20020, 'field_name': 'EMM', 'data_type': 'EMM_enum', 'encoding_type': 'int8', 'length': 2, 'presence': 'optional', 'structure': {'1': 'Cash and Derivative Central Order Book (COB)', '7': 'Derivative On Exchange Off book', '8': 'ETF MTF - NAV Central Order Book'}}
+{'field_id': 37, 'field_name': 'OrderID', 'data_type': 'char', 'encoding_type': 'char', 'length': 20, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 39, 'field_name': 'OrdStatus', 'data_type': 'OrdStatus_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'0': 'New'}}
+{'field_id': 21005, 'field_name': 'ClientMessageSendingTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 5979, 'field_name': 'OEGINFromMember', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 7764, 'field_name': 'OEGOUTTOME', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 21002, 'field_name': 'BookINTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 21003, 'field_name': 'BookOUTTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 7765, 'field_name': 'OEGINFromME', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 11, 'field_name': 'ClOrdID', 'data_type': 'char', 'encoding_type': 'char', 'length': 20, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 22, 'field_name': 'SecurityIDSource', 'data_type': 'SecurityIDSource_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'8': 'Symbol'}}
+{'field_id': 20020, 'field_name': 'EMM', 'data_type': 'EMM_enum', 'encoding_type': 'int8', 'length': 2, 'presence': 'optional', 'structure': {'1': 'Cash and Derivative Central Order Book (COB)', '7': 'Derivative On Exchange Off book', '8': 'ETF MTF - NAV Central Order Book'}}
+{'field_id': 37, 'field_name': 'OrderID', 'data_type': 'char', 'encoding_type': 'char', 'length': 20, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 39, 'field_name': 'OrdStatus', 'data_type': 'OrdStatus_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'0': 'New'}}
+{'field_id': 21005, 'field_name': 'ClientMessageSendingTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 5979, 'field_name': 'OEGINFromMember', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 7764, 'field_name': 'OEGOUTTOME', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 21002, 'field_name': 'BookINTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 21003, 'field_name': 'BookOUTTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 7765, 'field_name': 'OEGINFromME', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 11, 'field_name': 'ClOrdID', 'data_type': 'char', 'encoding_type': 'char', 'length': 20, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 22, 'field_name': 'SecurityIDSource', 'data_type': 'SecurityIDSource_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'8': 'Symbol'}}
+{'field_id': 20020, 'field_name': 'EMM', 'data_type': 'EMM_enum', 'encoding_type': 'int8', 'length': 2, 'presence': 'optional', 'structure': {'1': 'Cash and Derivative Central Order Book (COB)', '7': 'Derivative On Exchange Off book', '8': 'ETF MTF - NAV Central Order Book'}}
+{'field_id': 37, 'field_name': 'OrderID', 'data_type': 'char', 'encoding_type': 'char', 'length': 20, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 39, 'field_name': 'OrdStatus', 'data_type': 'OrdStatus_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'0': 'New'}}
+{'field_id': 21005, 'field_name': 'ClientMessageSendingTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 5979, 'field_name': 'OEGINFromMember', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 7764, 'field_name': 'OEGOUTTOME', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 21002, 'field_name': 'BookINTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 21003, 'field_name': 'BookOUTTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 7765, 'field_name': 'OEGINFromME', 'data_type': 'char', 'encoding_type': 'char', 'length': 27, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 11, 'field_name': 'ClOrdID', 'data_type': 'char', 'encoding_type': 'char', 'length': 20, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 22, 'field_name': 'SecurityIDSource', 'data_type': 'SecurityIDSource_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'8': 'Symbol'}}
+{'field_id': 20020, 'field_name': 'EMM', 'data_type': 'EMM_enum', 'encoding_type': 'int8', 'length': 2, 'presence': 'optional', 'structure': {'1': 'Cash and Derivative Central Order Book (COB)', '7': 'Derivative On Exchange Off book', '8': 'ETF MTF - NAV Central Order Book'}}
+{'field_id': 37, 'field_name': 'OrderID', 'data_type': 'char', 'encoding_type': 'char', 'length': 20, 'presence': 'mandatory', 'structure': {}}
+{'field_id': 39, 'field_name': 'OrdStatus', 'data_type': 'OrdStatus_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'0': 'New'}}
+array_repeating_groups:
+{'group_id': '268', 'group_name': 'MDEntriesGroup', 'items': [{'field_id': 279, 'field_name': 'MDUpdateAction', 'data_type': 'MDUpdateAction_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'0': 'New'}}, {'field_id': 48, 'field_name': 'SecurityID', 'data_type': 'char', 'encoding_type': 'char', 'length': 12, 'presence': 'mandatory', 'structure': {}}, {'field_id': 270, 'field_name': 'MDEntryPx', 'data_type': 'float', 'encoding_type': 'float', 'length': 4, 'presence': 'mandatory', 'structure': {}}, {'field_id': 271, 'field_name': 'MDEntrySize', 'data_type': 'int32', 'encoding_type': 'int32', 'length': 4, 'presence': 'optional', 'structure': {}}, {'field_id': 273, 'field_name': 'MDEntryTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 8, 'presence': 'optional', 'structure': {}}, {'field_id': 15, 'field_name': 'Currency', 'data_type': 'char', 'encoding_type': 'char', 'length': 3, 'presence': 'optional', 'structure': {}}, {'field_id': 1500, 'field_name': 'MDStreamID', 'data_type': 'char', 'encoding_type': 'char', 'length': 10, 'presence': 'mandatory', 'structure': {}}]}
+{'group_id': '268', 'group_name': 'MDEntriesGroup', 'items': [{'field_id': 279, 'field_name': 'MDUpdateAction', 'data_type': 'MDUpdateAction_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'0': 'New'}}, {'field_id': 48, 'field_name': 'SecurityID', 'data_type': 'char', 'encoding_type': 'char', 'length': 12, 'presence': 'mandatory', 'structure': {}}, {'field_id': 270, 'field_name': 'MDEntryPx', 'data_type': 'float', 'encoding_type': 'float', 'length': 4, 'presence': 'mandatory', 'structure': {}}, {'field_id': 271, 'field_name': 'MDEntrySize', 'data_type': 'int32', 'encoding_type': 'int32', 'length': 4, 'presence': 'optional', 'structure': {}}, {'field_id': 273, 'field_name': 'MDEntryTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 8, 'presence': 'optional', 'structure': {}}, {'field_id': 15, 'field_name': 'Currency', 'data_type': 'char', 'encoding_type': 'char', 'length': 3, 'presence': 'optional', 'structure': {}}, {'field_id': 1500, 'field_name': 'MDStreamID', 'data_type': 'char', 'encoding_type': 'char', 'length': 10, 'presence': 'mandatory', 'structure': {}}]}
+{'group_id': '268', 'group_name': 'MDEntriesGroup', 'items': [{'field_id': 279, 'field_name': 'MDUpdateAction', 'data_type': 'MDUpdateAction_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'0': 'New'}}, {'field_id': 48, 'field_name': 'SecurityID', 'data_type': 'char', 'encoding_type': 'char', 'length': 12, 'presence': 'mandatory', 'structure': {}}, {'field_id': 270, 'field_name': 'MDEntryPx', 'data_type': 'float', 'encoding_type': 'float', 'length': 4, 'presence': 'mandatory', 'structure': {}}, {'field_id': 271, 'field_name': 'MDEntrySize', 'data_type': 'int32', 'encoding_type': 'int32', 'length': 4, 'presence': 'optional', 'structure': {}}, {'field_id': 273, 'field_name': 'MDEntryTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 8, 'presence': 'optional', 'structure': {}}, {'field_id': 15, 'field_name': 'Currency', 'data_type': 'char', 'encoding_type': 'char', 'length': 3, 'presence': 'optional', 'structure': {}}, {'field_id': 1500, 'field_name': 'MDStreamID', 'data_type': 'char', 'encoding_type': 'char', 'length': 10, 'presence': 'mandatory', 'structure': {}}]}
+{'group_id': '268', 'group_name': 'MDEntriesGroup', 'items': [{'field_id': 279, 'field_name': 'MDUpdateAction', 'data_type': 'MDUpdateAction_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'0': 'New'}}, {'field_id': 48, 'field_name': 'SecurityID', 'data_type': 'char', 'encoding_type': 'char', 'length': 12, 'presence': 'mandatory', 'structure': {}}, {'field_id': 270, 'field_name': 'MDEntryPx', 'data_type': 'float', 'encoding_type': 'float', 'length': 4, 'presence': 'mandatory', 'structure': {}}, {'field_id': 271, 'field_name': 'MDEntrySize', 'data_type': 'int32', 'encoding_type': 'int32', 'length': 4, 'presence': 'optional', 'structure': {}}, {'field_id': 273, 'field_name': 'MDEntryTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 8, 'presence': 'optional', 'structure': {}}, {'field_id': 15, 'field_name': 'Currency', 'data_type': 'char', 'encoding_type': 'char', 'length': 3, 'presence': 'optional', 'structure': {}}, {'field_id': 1500, 'field_name': 'MDStreamID', 'data_type': 'char', 'encoding_type': 'char', 'length': 10, 'presence': 'mandatory', 'structure': {}}]}
+{'group_id': '268', 'group_name': 'MDEntriesGroup', 'items': [{'field_id': 279, 'field_name': 'MDUpdateAction', 'data_type': 'MDUpdateAction_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'0': 'New'}}, {'field_id': 48, 'field_name': 'SecurityID', 'data_type': 'char', 'encoding_type': 'char', 'length': 12, 'presence': 'mandatory', 'structure': {}}, {'field_id': 270, 'field_name': 'MDEntryPx', 'data_type': 'float', 'encoding_type': 'float', 'length': 4, 'presence': 'mandatory', 'structure': {}}, {'field_id': 271, 'field_name': 'MDEntrySize', 'data_type': 'int32', 'encoding_type': 'int32', 'length': 4, 'presence': 'optional', 'structure': {}}, {'field_id': 273, 'field_name': 'MDEntryTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 8, 'presence': 'optional', 'structure': {}}, {'field_id': 15, 'field_name': 'Currency', 'data_type': 'char', 'encoding_type': 'char', 'length': 3, 'presence': 'optional', 'structure': {}}, {'field_id': 1500, 'field_name': 'MDStreamID', 'data_type': 'char', 'encoding_type': 'char', 'length': 10, 'presence': 'mandatory', 'structure': {}}]}
+{'group_id': '268', 'group_name': 'MDEntriesGroup', 'items': [{'field_id': 279, 'field_name': 'MDUpdateAction', 'data_type': 'MDUpdateAction_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'0': 'New'}}, {'field_id': 48, 'field_name': 'SecurityID', 'data_type': 'char', 'encoding_type': 'char', 'length': 12, 'presence': 'mandatory', 'structure': {}}, {'field_id': 270, 'field_name': 'MDEntryPx', 'data_type': 'float', 'encoding_type': 'float', 'length': 4, 'presence': 'mandatory', 'structure': {}}, {'field_id': 271, 'field_name': 'MDEntrySize', 'data_type': 'int32', 'encoding_type': 'int32', 'length': 4, 'presence': 'optional', 'structure': {}}, {'field_id': 273, 'field_name': 'MDEntryTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 8, 'presence': 'optional', 'structure': {}}, {'field_id': 15, 'field_name': 'Currency', 'data_type': 'char', 'encoding_type': 'char', 'length': 3, 'presence': 'optional', 'structure': {}}, {'field_id': 1500, 'field_name': 'MDStreamID', 'data_type': 'char', 'encoding_type': 'char', 'length': 10, 'presence': 'mandatory', 'structure': {}}]}
+{'group_id': '268', 'group_name': 'MDEntriesGroup', 'items': [{'field_id': 279, 'field_name': 'MDUpdateAction', 'data_type': 'MDUpdateAction_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'0': 'New'}}, {'field_id': 48, 'field_name': 'SecurityID', 'data_type': 'char', 'encoding_type': 'char', 'length': 12, 'presence': 'mandatory', 'structure': {}}, {'field_id': 270, 'field_name': 'MDEntryPx', 'data_type': 'float', 'encoding_type': 'float', 'length': 4, 'presence': 'mandatory', 'structure': {}}, {'field_id': 271, 'field_name': 'MDEntrySize', 'data_type': 'int32', 'encoding_type': 'int32', 'length': 4, 'presence': 'optional', 'structure': {}}, {'field_id': 273, 'field_name': 'MDEntryTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 8, 'presence': 'optional', 'structure': {}}, {'field_id': 15, 'field_name': 'Currency', 'data_type': 'char', 'encoding_type': 'char', 'length': 3, 'presence': 'optional', 'structure': {}}, {'field_id': 1500, 'field_name': 'MDStreamID', 'data_type': 'char', 'encoding_type': 'char', 'length': 10, 'presence': 'mandatory', 'structure': {}}]}
+{'group_id': '268', 'group_name': 'MDEntriesGroup', 'items': [{'field_id': 279, 'field_name': 'MDUpdateAction', 'data_type': 'MDUpdateAction_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'0': 'New'}}, {'field_id': 48, 'field_name': 'SecurityID', 'data_type': 'char', 'encoding_type': 'char', 'length': 12, 'presence': 'mandatory', 'structure': {}}, {'field_id': 270, 'field_name': 'MDEntryPx', 'data_type': 'float', 'encoding_type': 'float', 'length': 4, 'presence': 'mandatory', 'structure': {}}, {'field_id': 271, 'field_name': 'MDEntrySize', 'data_type': 'int32', 'encoding_type': 'int32', 'length': 4, 'presence': 'optional', 'structure': {}}, {'field_id': 273, 'field_name': 'MDEntryTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 8, 'presence': 'optional', 'structure': {}}, {'field_id': 15, 'field_name': 'Currency', 'data_type': 'char', 'encoding_type': 'char', 'length': 3, 'presence': 'optional', 'structure': {}}, {'field_id': 1500, 'field_name': 'MDStreamID', 'data_type': 'char', 'encoding_type': 'char', 'length': 10, 'presence': 'mandatory', 'structure': {}}]}
+{'group_id': '268', 'group_name': 'MDEntriesGroup', 'items': [{'field_id': 279, 'field_name': 'MDUpdateAction', 'data_type': 'MDUpdateAction_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'0': 'New'}}, {'field_id': 48, 'field_name': 'SecurityID', 'data_type': 'char', 'encoding_type': 'char', 'length': 12, 'presence': 'mandatory', 'structure': {}}, {'field_id': 270, 'field_name': 'MDEntryPx', 'data_type': 'float', 'encoding_type': 'float', 'length': 4, 'presence': 'mandatory', 'structure': {}}, {'field_id': 271, 'field_name': 'MDEntrySize', 'data_type': 'int32', 'encoding_type': 'int32', 'length': 4, 'presence': 'optional', 'structure': {}}, {'field_id': 273, 'field_name': 'MDEntryTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 8, 'presence': 'optional', 'structure': {}}, {'field_id': 15, 'field_name': 'Currency', 'data_type': 'char', 'encoding_type': 'char', 'length': 3, 'presence': 'optional', 'structure': {}}, {'field_id': 1500, 'field_name': 'MDStreamID', 'data_type': 'char', 'encoding_type': 'char', 'length': 10, 'presence': 'mandatory', 'structure': {}}]}
+{'group_id': '268', 'group_name': 'MDEntriesGroup', 'items': [{'field_id': 279, 'field_name': 'MDUpdateAction', 'data_type': 'MDUpdateAction_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'0': 'New'}}, {'field_id': 48, 'field_name': 'SecurityID', 'data_type': 'char', 'encoding_type': 'char', 'length': 12, 'presence': 'mandatory', 'structure': {}}, {'field_id': 270, 'field_name': 'MDEntryPx', 'data_type': 'float', 'encoding_type': 'float', 'length': 4, 'presence': 'mandatory', 'structure': {}}, {'field_id': 271, 'field_name': 'MDEntrySize', 'data_type': 'int32', 'encoding_type': 'int32', 'length': 4, 'presence': 'optional', 'structure': {}}, {'field_id': 273, 'field_name': 'MDEntryTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 8, 'presence': 'optional', 'structure': {}}, {'field_id': 15, 'field_name': 'Currency', 'data_type': 'char', 'encoding_type': 'char', 'length': 3, 'presence': 'optional', 'structure': {}}, {'field_id': 1500, 'field_name': 'MDStreamID', 'data_type': 'char', 'encoding_type': 'char', 'length': 10, 'presence': 'mandatory', 'structure': {}}]}
+{'group_id': '268', 'group_name': 'MDEntriesGroup', 'items': [{'field_id': 279, 'field_name': 'MDUpdateAction', 'data_type': 'MDUpdateAction_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'0': 'New'}}, {'field_id': 48, 'field_name': 'SecurityID', 'data_type': 'char', 'encoding_type': 'char', 'length': 12, 'presence': 'mandatory', 'structure': {}}, {'field_id': 270, 'field_name': 'MDEntryPx', 'data_type': 'float', 'encoding_type': 'float', 'length': 4, 'presence': 'mandatory', 'structure': {}}, {'field_id': 271, 'field_name': 'MDEntrySize', 'data_type': 'int32', 'encoding_type': 'int32', 'length': 4, 'presence': 'optional', 'structure': {}}, {'field_id': 273, 'field_name': 'MDEntryTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 8, 'presence': 'optional', 'structure': {}}, {'field_id': 15, 'field_name': 'Currency', 'data_type': 'char', 'encoding_type': 'char', 'length': 3, 'presence': 'optional', 'structure': {}}, {'field_id': 1500, 'field_name': 'MDStreamID', 'data_type': 'char', 'encoding_type': 'char', 'length': 10, 'presence': 'mandatory', 'structure': {}}]}
+{'group_id': '268', 'group_name': 'MDEntriesGroup', 'items': [{'field_id': 279, 'field_name': 'MDUpdateAction', 'data_type': 'MDUpdateAction_enum', 'encoding_type': 'char', 'length': 1, 'presence': 'mandatory', 'structure': {'0': 'New'}}, {'field_id': 48, 'field_name': 'SecurityID', 'data_type': 'char', 'encoding_type': 'char', 'length': 12, 'presence': 'mandatory', 'structure': {}}, {'field_id': 270, 'field_name': 'MDEntryPx', 'data_type': 'float', 'encoding_type': 'float', 'length': 4, 'presence': 'mandatory', 'structure': {}}, {'field_id': 271, 'field_name': 'MDEntrySize', 'data_type': 'int32', 'encoding_type': 'int32', 'length': 4, 'presence': 'optional', 'structure': {}}, {'field_id': 273, 'field_name': 'MDEntryTime', 'data_type': 'char', 'encoding_type': 'char', 'length': 8, 'presence': 'optional', 'structure': {}}, {'field_id': 15, 'field_name': 'Currency', 'data_type': 'char', 'encoding_type': 'char', 'length': 3, 'presence': 'optional', 'structure': {}}, {'field_id': 1500, 'field_name': 'MDStreamID', 'data_type': 'char', 'encoding_type': 'char', 'length': 10, 'presence': 'mandatory', 'structure': {}}]}

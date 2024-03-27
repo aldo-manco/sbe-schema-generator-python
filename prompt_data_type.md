@@ -275,46 +275,55 @@ Assicurati di includere solo ed esclusivamente un array JSON nel codice fornito.
 ### INPUT ###
 
 [
-  {
-    "Field Name": "HeartBtInt",
-    "FIX Tag": "108",
-    "Use in Drop Copy": "While FIX allows clients to set a value for Heartbeat interval, in Optiq this value will be restricted to the maximum allowed by the exchange and made available in configuration of the segment."
-  },
-  {
-    "Field Name": "EncryptMethod",
-    "FIX Tag": "98",
-    "Use in Drop Copy": "Always set to zero (0)"
-  },
-  {
-    "Field Name": "OEPartitionID",
-    "FIX Tag": "21019",
-    "Use in Drop Copy": "Field used, and must be specified with OE Partition ID setup for the Drop Copy gateway ID. If not provided or provided with an incorrect Drop Copy gateway ID, then the Logon will not be accepted."
-  },
-  {
-    "Field Name": "LogicalAccessID",
-    "FIX Tag": "21021",
-    "Use in Drop Copy": "Field used, and must be specified with the Logical Access ID setup for the Drop Copy connection."
-  },
-  {
-    "Field Name": "NextExpectedMsgSeqNum",
-    "FIX Tag": "789",
-    "Use in Drop Copy": "Mandatory to be provided. The field always indicates the sequence number of the next message the client is expecting to receive from the Drop Copy gateway. For the first logon of the day the field must be set to one (1)."
-  },
-  {
-    "Field Name": "Queueing Indicator",
-    "FIX Tag": "21020",
-    "Use in Drop Copy": "Mandatory to be provided and while it won’t be functionally used for Drop Copy the value provided in the field must be set to one of the possible values for this field as described in the FIX specifications."
-  },
-  {
-    "Field Name": "DefaultApplVerID",
-    "FIX Tag": "1137",
-    "Use in Drop Copy": "Mandatory to be provided and should be set by default to 9 = FIX50SP2"
-  },
-  {
-    "Field Name": "Software Provider",
-    "FIX Tag": "21050",
-    "Use in Drop Copy": "Optional field in which clients may provide details of the software provider used for their solution. This field may be used by the Exchange for improved troubleshooting and service purposes."
-  }
-]
+      {
+        "FIX tag": "279",
+        "Field Name": "MDUpdateAction",
+        "Req’d": "Y",
+        "Field Format": "See 8.14",
+        "Description": "0= New ; always “new”"
+      },
+      {
+        "FIX tag": "48",
+        "Field Name": "SecurityID",
+        "Req’d": "Y",
+        "Field Format": "See 8.23",
+        "Description": "ISIN of instrument"
+      },
+      {
+        "FIX tag": "270",
+        "Field Name": "MDEntryPx",
+        "Req’d": "Y",
+        "Field Format": "See 8.8",
+        "Description": "Price or index value"
+      },
+      {
+        "FIX tag": "271",
+        "Field Name": "MDEntrySize",
+        "Req’d": "N",
+        "Field Format": "See 8.9",
+        "Description": "Quantity, not set for indices"
+      },
+      {
+        "FIX tag": "273",
+        "Field Name": "MDEntryTime",
+        "Req’d": "N",
+        "Field Format": "See 8.10",
+        "Description": "Time of market data entry"
+      },
+      {
+        "FIX tag": "15",
+        "Field Name": "Currency",
+        "Req’d": "N",
+        "Field Format": "See 8.1",
+        "Description": "Price currency"
+      },
+      {
+        "FIX tag": "1500",
+        "Field Name": "MDStreamID",
+        "Req’d": "Y",
+        "Field Format": "See 8.13",
+        "Description": "Name of the price source"
+      }
+    ]
 
 ### OUTPUT JSON ###

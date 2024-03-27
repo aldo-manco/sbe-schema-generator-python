@@ -1,0 +1,67 @@
+[
+  {
+    "field_id": 279,
+    "field_name": "MDUpdateAction",
+    "data_type": "MDUpdateAction_enum",
+    "encoding_type": "char",
+    "length": 1,
+    "presence": "mandatory",
+    "structure": {
+      "0": "New"
+    }
+  },
+  {
+    "field_id": 48,
+    "field_name": "SecurityID",
+    "data_type": "char",
+    "encoding_type": "char",
+    "length": 12,
+    "presence": "mandatory",
+    "structure": {}
+  },
+  {
+    "field_id": 270,
+    "field_name": "MDEntryPx",
+    "data_type": "float",
+    "encoding_type": "float",
+    "length": 4,
+    "presence": "mandatory",
+    "structure": {}
+  },
+  {
+    "field_id": 271,
+    "field_name": "MDEntrySize",
+    "data_type": "int32",
+    "encoding_type": "int32",
+    "length": 4,
+    "presence": "optional",
+    "structure": {}
+  },
+  {
+    "field_id": 273,
+    "field_name": "MDEntryTime",
+    "data_type": "char",
+    "encoding_type": "char",
+    "length": 8,
+    "presence": "optional",
+    "structure": {}
+  },
+  {
+    "field_id": 15,
+    "field_name": "Currency",
+    "data_type": "char",
+    "encoding_type": "char",
+    "length": 3,
+    "presence": "optional",
+    "structure": {}
+  },
+  {
+    "field_id": 1500,
+    "field_name": "MDStreamID",
+    "data_type": "char",
+    "encoding_type": "char",
+    "length": 10,
+    "presence": "mandatory",
+    "structure": {}
+  }
+]

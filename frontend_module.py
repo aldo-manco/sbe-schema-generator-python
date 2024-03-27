@@ -1,5 +1,5 @@
-# app.py
-import app
+# ai_engine_module.py
+import ai_engine_module
 import streamlit as st
 import json
 
@@ -185,8 +185,10 @@ def replace_newlines_with_space(input_string):
 
 
 def generate_sbe_data_type_definitions(json_handler, sbe_field):
+
     if sbe_field["data_type"].lower() == "char":
         json_handler.add_primitive_data_type("array_string_data_types", sbe_field)
+
     elif sbe_field["data_type"].lower() in ["int8", "int16",
                                             "int32", "int64",
                                             "uint8",
@@ -194,10 +196,12 @@ def generate_sbe_data_type_definitions(json_handler, sbe_field):
                                             "uint32",
                                             "uint64"] and sbe_field["presence"] == "optional":
         json_handler.add_primitive_data_type("array_number_data_types", sbe_field)
+
     elif sbe_field["data_type"].lower().endswith("_enum"):
         json_handler.add_custom_data_type("array_enum_data_types", sbe_field["encoding_type"],
                                           sbe_field["data_type"],
                                           sbe_field["structure"])
+
     elif sbe_field["data_type"].lower().endswith("_set"):
         json_handler.add_custom_data_type("array_set_data_types", sbe_field["encoding_type"],
                                           sbe_field["data_type"],
@@ -241,10 +245,12 @@ def generate_xml_schema_from_json_schema(json_handler, xml_handler):
 
 
 def add_sbe_field(json_handler, document_message, document_field):
+
     if document_field.get("group_id", -1) == -1:
         json_handler.add_sbe_field_to_message(
             document_message,
             json.loads(generate_sbe_field(document_field)))
+
     elif document_field.get("group_id", -1) != -1:
         json_handler.add_sbe_field_to_repeating_group(
             document_message,
@@ -390,10 +396,24 @@ def form_new_sbe_message():
 
                     if st.button(f"Generate SBE XML Schema \'{json_schema_name}\'"):
 
-                        array_sbe_fields = app.process(pdf_path, starting_page, ending_page)
+                        json_array_sbe_fields, json_array_repeating_groups = ai_engine_module.process(pdf_path, starting_page, ending_page)
 
-                        for sbe_field in array_sbe_fields:
+                        for sbe_field in json_array_sbe_fields:
                             json_handler.add_sbe_field_to_message(message_name, sbe_field)
+
+                        for repeating_group in json_array_repeating_groups:
+                            json_handler.add_repeating_group_to_message(
+                                message_name,
+                                repeating_group["group_name"],
+                                repeating_group["group_id"]
+                            )
+
+                            for sbe_field in repeating_group["items"]:
+                                json_handler.add_sbe_field_to_repeating_group(
+                                    message_name,
+                                    repeating_group["group_id"],
+                                    sbe_field
+                                )
 
                         st.success(json_handler.load_schema())
 

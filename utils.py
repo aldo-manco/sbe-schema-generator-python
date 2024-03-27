@@ -15,3 +15,7 @@ def save_uploaded_file(directory_path, file):
         f.write(file.getbuffer())
     return file_path
 
+
+def replace_newlines_with_space(input_string):
+    return input_string.replace('\n', ' ')
+
