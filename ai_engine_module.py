@@ -9,14 +9,16 @@ from PIL import Image
 import json
 import multiprocessing
 from functools import partial
-# from langchain_community.chat_models.openai import ChatOpenAI
+from langchain_community.chat_models.openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 import logging
+import utils
+
+from ai_model_handler import AIModelHandler
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-import utils
 
 
 def convert_pdf_pages_to_jpg(pdf_path, starting_page, ending_page, folder_path):
@@ -106,9 +108,10 @@ def thresholding(output_previous_function):
 
 def detect_tables(output_previous_function):
 
-    logging.info("det1")
+    image = output_previous_function["image"]
+    image_rgb = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
 
-    model_detectron2 = lp.Detectron2LayoutModel(
+    detectron2_model = lp.Detectron2LayoutModel(
         config_path='config.yaml',
         extra_config=["MODEL.ROI_HEADS.SCORE_THRESH_TEST", 0.65],
         label_map={
@@ -120,15 +123,8 @@ def detect_tables(output_previous_function):
         }
     )
 
-    logging.info("det2")
-
-    image = output_previous_function["image"]
-    image_rgb = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
-
-    layout = model_detectron2.detect(image_rgb)
+    layout = detectron2_model.detect(image_rgb)
     layout_tables = lp.Layout([element for element in layout if element.type == 'Table'])
-
-    logging.info("det3")
 
     return {
         "image": image,
@@ -138,24 +134,20 @@ def detect_tables(output_previous_function):
 
 def ocr_tables(output_previous_function):
 
-    model_tesseract = lp.TesseractAgent(languages='eng')
-
     image = output_previous_function["image"]
     layout_tables = output_previous_function["layout_tables"]
 
-    logging.info("ocr1")
+    tesseract_model = lp.TesseractAgent(languages='eng')
 
     for table in layout_tables:
-        segment_image = (
+        image_cropped = (
             table
             # .pad(left=5, right=5, top=5, bottom=5)
             .crop_image(image)
         )
 
-        text = model_tesseract.detect(segment_image)
+        text = tesseract_model.detect(image_cropped)
         table.set(text=text, inplace=True)
-
-    logging.info("ocr2")
 
     return {
         "text_tables": layout_tables.get_texts()
@@ -644,7 +636,12 @@ exclusive with (1616, 1547) and 1545.
     #     AIMessage(content=example_3_assistant_message),
     #     HumanMessage(content=utils.replace_newlines_with_space(human_message))
     # ])
-
+    #
+    # data = json.loads(json_array_document_fields.content)
+    #
+    # with open('document_fields_output.json', 'w') as file:
+    #     json.dump(data, file, indent=4)
+    #
     # return json.loads(json_array_document_fields.content)
 
     with open('document_fields.json', 'r') as file:
@@ -1218,7 +1215,14 @@ Segui gli esempi che ti sono stati forniti.
     #     HumanMessage(content=human_message
     # )
     # ])
+    #
+    # data = json.loads(json_array_repeating_groups.content)
+    #
+    # with open('repeating_groups_output.json', 'w') as file:
+    #     json.dump(data, file, indent=4)
+    #
     # return json.loads(json_array_repeating_groups.content)
+
     with open('repeating_groups.json', 'r') as file:
         data = json.load(file)
 
@@ -1251,14 +1255,14 @@ Assicurati di includere solo ed esclusivamente un array JSON nel codice fornito.
     example_1_human_message = """
 [
   {
-	"tag": "21005",
-	"field name": "ClientMessageSen dingTime",
-	"format": "uTCTimestam p",
-	"len": "27",
-	"possible values": "Timestamp",
-	"m/c": "c",
-	"short description, compatibility notes and conditions": "indicates the time of message transmission,  the consistency of the time provided is not  checked by the Exchange",
-	"value example": "20190214- 15:30:01.4 62743346"
+    "tag": "21005",
+    "field name": "ClientMessageSen dingTime",
+    "format": "uTCTimestam p",
+    "len": "27",
+    "possible values": "Timestamp",
+    "m/c": "c",
+    "short description, compatibility notes and conditions": "indicates the time of message transmission,  the consistency of the time provided is not  checked by the Exchange",
+    "value example": "20190214- 15:30:01.4 62743346"
   },
   {
     "Tag": "11",
@@ -1531,21 +1535,27 @@ Assicurati di includere solo ed esclusivamente un array JSON nel codice fornito.
     #     HumanMessage(content=human_message)
     # ])
     #
+    # data = json.loads(json_array_sbe_fields.content)
+    #
+    # with open('sbe_fields_output.json', 'w') as file:
+    #     json.dump(data, file, indent=4)
+    #
     # return json.loads(json_array_sbe_fields.content)
+
     with open('sbe_fields.json', 'r') as file:
         data = json.load(file)
 
     return data
 
 
-def execute_pipeline(file_name, folder_path, pipeline_functions):
+def execute_pipeline_filters(file_name, folder_path, pipeline_filters):
 
     image_path = os.path.join(folder_path, file_name)
     data = image_path
     logger.info(f"current image path: {image_path}")
 
     i = 1
-    for function in pipeline_functions:
+    for function in pipeline_filters:
         try:
             data = function(data)
             logger.info(f"num filter: {i}")
@@ -1557,14 +1567,13 @@ def execute_pipeline(file_name, folder_path, pipeline_functions):
 
     return data
 
-
 def process(pdf_path, starting_page, ending_page, folder_path="extracted_pdf_pages"):
 
     convert_pdf_pages_to_jpg(pdf_path, starting_page, ending_page, folder_path)
 
     array_file_names = [file for file in os.listdir(folder_path) if file.endswith(('.jpg', '.jpeg', '.png'))]
 
-    pipeline_functions = [
+    pipeline_filters = [
         convert_grayscale,
         increase_contrast,
         thresholding,
@@ -1573,13 +1582,10 @@ def process(pdf_path, starting_page, ending_page, folder_path="extracted_pdf_pag
         generate_document_fields
     ]
 
-    multi_cpu = multiprocessing.cpu_count()
-    single_cpu = 1
-    pool = multiprocessing.Pool(processes=single_cpu)
-    logger.info(f"number of cpu: {multiprocessing.cpu_count()}")
-
-    process_partial = partial(execute_pipeline, folder_path=folder_path, pipeline_functions=pipeline_functions)
-    array_document_fields_pages = pool.map(process_partial, array_file_names)
+    array_document_fields_pages = []
+    for file_name in array_file_names:
+        array_document_fields = execute_pipeline_filters(file_name, folder_path, pipeline_filters)
+        array_document_fields_pages.append(array_document_fields)
 
     sbe_message_components = generate_sbe_message_components(array_document_fields_pages)
 
@@ -1598,4 +1604,4 @@ def process(pdf_path, starting_page, ending_page, folder_path="extracted_pdf_pag
 
 
 if __name__ == "__main__":
-    process("pdf_documents/drop_copy_service.pdf", 23, 35, "extracted_pdf_pages")
+    process("pdf_documents/drop_copy_service.pdf", 24, 26, "extracted_pdf_pages")
