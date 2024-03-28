@@ -8,6 +8,7 @@ from pdf2image import convert_from_path
 from PIL import Image
 import json
 import multiprocessing
+from multiprocessing import Pool
 from functools import partial
 from langchain_community.chat_models.openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
@@ -15,7 +16,6 @@ import logging
 import utils
 
 from ai_model_handler import AIModelHandler
-
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -42,6 +42,16 @@ def convert_pdf_pages_to_jpg(pdf_path, starting_page, ending_page, folder_path):
         print(f"Error during PDF to JPEG conversion: {e}")
 
 
+def grayscale_batch_processing(array_image_paths):
+    number_processes = multiprocessing.cpu_count()
+    array_grayscale_images = []
+
+    with Pool(processes=number_processes) as pool:
+        array_grayscale_images = pool.map(convert_grayscale, array_image_paths)
+
+    return array_grayscale_images
+
+
 def convert_grayscale(image_path):
     try:
         image = cv2.imread(image_path)
@@ -61,7 +71,18 @@ def convert_grayscale(image_path):
         return None
 
 
+def increase_contrast_batch_processing(array_output_previous_function):
+    number_processes = multiprocessing.cpu_count()
+    array_contrast_images = []
+
+    with Pool(processes=number_processes) as pool:
+        array_contrast_images = pool.map(increase_contrast, array_output_previous_function)
+
+    return array_contrast_images
+
+
 def increase_contrast(output_previous_function):
+
     image_path = output_previous_function["image_path"]
     image = output_previous_function["image"]
 
@@ -75,6 +96,16 @@ def increase_contrast(output_previous_function):
         "image_path": image_path,
         "image": image_clahe
     }
+
+
+def thresholding_batch_processing(array_output_previous_function):
+    number_processes = multiprocessing.cpu_count()
+    array_binary_images = []
+
+    with Pool(processes=number_processes) as pool:
+        array_binary_images = pool.map(thresholding, array_output_previous_function)
+
+    return array_binary_images
 
 
 def thresholding(output_previous_function):
@@ -106,11 +137,7 @@ def thresholding(output_previous_function):
     }
 
 
-def detect_tables(output_previous_function):
-
-    image = output_previous_function["image"]
-    image_rgb = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
-
+def table_detection_batch_processing(array_output_previous_function):
     detectron2_model = lp.Detectron2LayoutModel(
         config_path='config.yaml',
         extra_config=["MODEL.ROI_HEADS.SCORE_THRESH_TEST", 0.65],
@@ -123,35 +150,58 @@ def detect_tables(output_previous_function):
         }
     )
 
-    layout = detectron2_model.detect(image_rgb)
-    layout_tables = lp.Layout([element for element in layout if element.type == 'Table'])
+    array_layout_tables = []
 
-    return {
-        "image": image,
-        "layout_tables": layout_tables
-    }
+    for output_previous_function in array_output_previous_function:
+        image = output_previous_function["image"]
+        image_rgb = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
+
+        layout = detectron2_model.detect(image_rgb)
+        layout_tables = lp.Layout([element for element in layout if element.type == 'Table'])
+
+        array_layout_tables.append({
+            "image": image,
+            "layout_tables": layout_tables
+        })
+
+    return array_layout_tables
 
 
-def ocr_tables(output_previous_function):
-
-    image = output_previous_function["image"]
-    layout_tables = output_previous_function["layout_tables"]
-
+def ocr_tables_batch_processing(array_output_previous_function):
     tesseract_model = lp.TesseractAgent(languages='eng')
 
-    for table in layout_tables:
-        image_cropped = (
-            table
-            # .pad(left=5, right=5, top=5, bottom=5)
-            .crop_image(image)
-        )
+    array_text_tables = []
 
-        text = tesseract_model.detect(image_cropped)
-        table.set(text=text, inplace=True)
+    for output_previous_function in array_output_previous_function:
 
-    return {
-        "text_tables": layout_tables.get_texts()
-    }
+        image = output_previous_function["image"]
+        layout_tables = output_previous_function["layout_tables"]
+
+        for table in layout_tables:
+            image_cropped = (
+                table
+                # .pad(left=5, right=5, top=5, bottom=5)
+                .crop_image(image)
+            )
+
+            text = tesseract_model.detect(image_cropped)
+            table.set(text=text, inplace=True)
+
+            array_text_tables.append({
+                "text_tables": layout_tables.get_texts()
+            })
+
+    return array_text_tables
+
+
+def document_fields_generation_batch_processing(array_output_previous_function):
+    number_processes = multiprocessing.cpu_count()
+    json_array_document_fields_pages = []
+
+    with Pool(processes=number_processes) as pool:
+        json_array_document_fields_pages = pool.map(generate_document_fields, array_output_previous_function)
+
+    return json_array_document_fields_pages
 
 
 def generate_document_fields(output_previous_function):
@@ -650,50 +700,87 @@ exclusive with (1616, 1547) and 1545.
     return data
 
 
-def generate_sbe_message_components(json_array_document_fields_pages):
-    json_array_repeating_groups = []
+def generate_sbe_message_components(array_json_array_document_fields):
+    json_array_distinct_repeating_groups = []
+    array_json_array_repeating_groups = []
 
-    for i in range(len(json_array_document_fields_pages) - 1):
-        current_json_array_document_fields_page = json_array_document_fields_pages[i]
-        next_json_array_document_fields_page = json_array_document_fields_pages[i + 1]
-        json_array_document_fields_of_adjacent_pages = current_json_array_document_fields_page + next_json_array_document_fields_page
-        print(f"- {i} {i + 1} #")
+    number_processes = multiprocessing.cpu_count()
+    with Pool(number_processes) as pool:
+        array_document_fields_adjacent_pages = [(array_json_array_document_fields[i] + array_json_array_document_fields[i + 1]) for i in range(len(array_json_array_document_fields) - 1)]
+        array_json_array_repeating_groups = pool.map(generate_repeating_groups, array_document_fields_adjacent_pages)
 
-        partial_json_array_repeating_groups = generate_repeating_groups(json_array_document_fields_of_adjacent_pages)
+    for json_array_repeating_group in array_json_array_repeating_groups:
+        for repeating_group in json_array_repeating_group:
+            if repeating_group["group_id"] not in json_array_distinct_repeating_groups:
+                o = repeating_group["group_id"]
+                logging.info(f"{o}")
+                json_array_distinct_repeating_groups.append(repeating_group)
 
-        for repeating_group in partial_json_array_repeating_groups:
-            if repeating_group["group_id"] not in json_array_repeating_groups:
-                json_array_repeating_groups.append(repeating_group)
+    # for i in range(len(array_json_array_document_fields) - 1):
+    #     current_json_array_document_fields_page = array_json_array_document_fields[i]
+    #     next_json_array_document_fields_page = array_json_array_document_fields[i + 1]
+    #     json_array_document_fields_of_adjacent_pages = current_json_array_document_fields_page + next_json_array_document_fields_page
+    #     print(f"- {i} {i + 1} #")
+    #
+    #     partial_json_array_repeating_groups = generate_repeating_groups(json_array_document_fields_of_adjacent_pages)
+    #
+    #     for repeating_group in partial_json_array_repeating_groups:
+    #         if repeating_group["group_id"] not in json_array_repeating_groups:
+    #             json_array_repeating_groups.append(repeating_group)
 
-    json_array_sbe_fields = []
+    json_array_full_sbe_fields = []
+    array_json_array_sbe_fields = []
 
-    for json_array_document_fields_page in json_array_document_fields_pages:
-        partial_json_array_sbe_fields = generate_sbe_fields(json_array_document_fields_page)
-        json_array_sbe_fields.extend(partial_json_array_sbe_fields)
+    with Pool(number_processes) as pool:
+        array_json_array_sbe_fields = pool.map(generate_sbe_fields, array_json_array_document_fields)
 
-    for repeating_group in json_array_repeating_groups:
-        repeating_group["items"] = generate_sbe_fields(repeating_group["items"])
+    for json_array_sbe_fields in array_json_array_sbe_fields:
+        json_array_full_sbe_fields.extend(json_array_sbe_fields)
+
+    # for json_array_document_fields_page in array_json_array_document_fields:
+    #     partial_json_array_sbe_fields = generate_sbe_fields(json_array_document_fields_page)
+    #     json_array_sbe_fields.extend(partial_json_array_sbe_fields)
+
+    array_json_array_repeating_groups_sbe_fields = []
+
+    with Pool(number_processes) as pool:
+        array_json_array_repeating_groups_document_fields = [repeating_group["items"] for repeating_group in json_array_distinct_repeating_groups]
+        array_json_array_repeating_groups_sbe_fields = pool.map(generate_sbe_fields, array_json_array_repeating_groups_document_fields)
+
+    for i, repeating_group in enumerate(json_array_distinct_repeating_groups):
+        repeating_group["items"] = array_json_array_repeating_groups_sbe_fields[i]
         with open('sbe_fields_repeating_group.json', 'r') as file:
             file_content = file.read()
             repeating_group["items"] = json.loads(file_content)
 
+    # for repeating_group in json_array_distinct_repeating_groups:
+    #     repeating_group["items"] = generate_sbe_fields(repeating_group["items"])
+    #     with open('sbe_fields_repeating_group.json', 'r') as file:
+    #         file_content = file.read()
+    #         repeating_group["items"] = json.loads(file_content)
+
     ids_to_remove = set()
     names_to_remove = set()
 
-    for repeating_group in json_array_repeating_groups:
+    for repeating_group in json_array_distinct_repeating_groups:
         for group_sbe_field in repeating_group["items"]:
             ids_to_remove.add(group_sbe_field["field_id"])
             names_to_remove.add(group_sbe_field["field_name"])
 
-    filtered_sbe_fields = []
+    json_array_filtered_sbe_fields = []
 
-    for field in json_array_sbe_fields:
+    for field in json_array_full_sbe_fields:
         if field["field_id"] not in ids_to_remove and field["field_name"] not in names_to_remove:
-            filtered_sbe_fields.append(field)
+            json_array_filtered_sbe_fields.append(field)
+
+    with open("json_array_sbe_fields.json", "w") as file:
+        json.dump(json_array_filtered_sbe_fields, file)
+    with open("json_array_repeating_groups.json", "w") as file:
+        json.dump(json_array_distinct_repeating_groups, file)
 
     return {
-        "json_array_sbe_fields": filtered_sbe_fields,
-        "json_array_repeating_groups": json_array_repeating_groups
+        "json_array_sbe_fields": json_array_filtered_sbe_fields,
+        "json_array_repeating_groups": json_array_distinct_repeating_groups
     }
 
 
@@ -1548,11 +1635,14 @@ Assicurati di includere solo ed esclusivamente un array JSON nel codice fornito.
     return data
 
 
-def execute_pipeline_filters(file_name, folder_path, pipeline_filters):
+def execute_pipeline_filters(array_file_names, folder_path, pipeline_filters):
 
-    image_path = os.path.join(folder_path, file_name)
-    data = image_path
-    logger.info(f"current image path: {image_path}")
+    array_image_paths = []
+    for file_name in array_file_names:
+        image_path = os.path.join(folder_path, file_name)
+        array_image_paths.append(image_path)
+
+    data = array_image_paths
 
     i = 1
     for function in pipeline_filters:
@@ -1567,27 +1657,25 @@ def execute_pipeline_filters(file_name, folder_path, pipeline_filters):
 
     return data
 
-def process(pdf_path, starting_page, ending_page, folder_path="extracted_pdf_pages"):
 
+def process(pdf_path, starting_page, ending_page, folder_path="extracted_pdf_pages"):
     convert_pdf_pages_to_jpg(pdf_path, starting_page, ending_page, folder_path)
 
     array_file_names = [file for file in os.listdir(folder_path) if file.endswith(('.jpg', '.jpeg', '.png'))]
 
     pipeline_filters = [
-        convert_grayscale,
-        increase_contrast,
-        thresholding,
-        detect_tables,
-        ocr_tables,
-        generate_document_fields
+        grayscale_batch_processing,
+        increase_contrast_batch_processing,
+        thresholding_batch_processing,
+        table_detection_batch_processing,
+        ocr_tables_batch_processing,
+        document_fields_generation_batch_processing,
+        generate_sbe_message_components
     ]
 
-    array_document_fields_pages = []
-    for file_name in array_file_names:
-        array_document_fields = execute_pipeline_filters(file_name, folder_path, pipeline_filters)
-        array_document_fields_pages.append(array_document_fields)
+    sbe_message_components = execute_pipeline_filters(array_file_names, folder_path, pipeline_filters)
 
-    sbe_message_components = generate_sbe_message_components(array_document_fields_pages)
+    logging.info("it works!!!")
 
     json_array_sbe_fields = sbe_message_components["json_array_sbe_fields"]
     json_array_repeating_groups = sbe_message_components["json_array_repeating_groups"]
@@ -1604,4 +1692,4 @@ def process(pdf_path, starting_page, ending_page, folder_path="extracted_pdf_pag
 
 
 if __name__ == "__main__":
-    process("pdf_documents/drop_copy_service.pdf", 24, 26, "extracted_pdf_pages")
+    process("pdf_documents/drop_copy_service.pdf", 23, 35, "extracted_pdf_pages")
