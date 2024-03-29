@@ -2,20 +2,16 @@
 
 import cv2
 import layoutparser as lp
-import numpy as np
 import os
 from pdf2image import convert_from_path
-from PIL import Image
 import json
 import multiprocessing
 from multiprocessing import Pool
-from functools import partial
-from langchain_community.chat_models.openai import ChatOpenAI
-from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
+from dotenv import load_dotenv
 import logging
-import utils
+import sys
 
-from ai_model_handler import AIModelHandler
+import utils
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -82,7 +78,6 @@ def increase_contrast_batch_processing(array_output_previous_function):
 
 
 def increase_contrast(output_previous_function):
-
     image_path = output_previous_function["image_path"]
     image = output_previous_function["image"]
 
@@ -170,7 +165,7 @@ def table_detection_batch_processing(array_output_previous_function):
 def ocr_tables_batch_processing(array_output_previous_function):
     tesseract_model = lp.TesseractAgent(languages='eng')
 
-    array_text_tables = []
+    array_text_tables_pages = []
 
     for output_previous_function in array_output_previous_function:
 
@@ -187,26 +182,24 @@ def ocr_tables_batch_processing(array_output_previous_function):
             text = tesseract_model.detect(image_cropped)
             table.set(text=text, inplace=True)
 
-            array_text_tables.append({
+            array_text_tables_pages.append({
                 "text_tables": layout_tables.get_texts()
             })
 
-    return array_text_tables
+    return array_text_tables_pages
 
 
 def document_fields_generation_batch_processing(array_output_previous_function):
     number_processes = multiprocessing.cpu_count()
-    json_array_document_fields_pages = []
+    array_json_array_document_fields = []
 
     with Pool(processes=number_processes) as pool:
-        json_array_document_fields_pages = pool.map(generate_document_fields, array_output_previous_function)
+        array_json_array_document_fields = pool.map(generate_document_fields, array_output_previous_function)
 
-    return json_array_document_fields_pages
+    return array_json_array_document_fields
 
 
-def generate_document_fields(output_previous_function):
-    text_tables = output_previous_function["text_tables"]
-
+def generate_document_fields(text_tables):
     system_message = """
 Sei un esperto in sistemi di trading elettronico con una conoscenza approfondita dei protocolli FIX e SBE. Ti verra fornita in input una trascrizione grezza ottenuta tramite OCR di una tabella che rappresenta i campi di un messaggio FIX o SBE. La tua missione e ricostruire la tabella step by step seguendo i seguenti passaggi:
 1. Definire quali sono le colonne della tabella.
@@ -658,46 +651,36 @@ exclusive with (1616, 1547) and 1545.
 ]
         """
 
-    human_message = """
-    ### INPUT ###
+    human_message = f"""
+### INPUT ###
+
+{text_tables["text_tables"]}
+
+### OUTPUT JSON ###
         """
 
-    for text_table in text_tables:
-        human_message += f"{text_table} "
+    output = utils.get_output_from_generative_ai(
+        system_message,
+        example_1_human_message,
+        example_1_assistant_message,
+        example_2_human_message,
+        example_2_assistant_message,
+        example_3_human_message,
+        example_3_assistant_message,
+        "",
+        "",
+        human_message
+    )
 
-    human_message += """
-    ### OUTPUT JSON ###
-        """
+    with open('ai_document_fields.txt', 'w') as file:
+        file.write(output)
 
-    # ai_model = ChatOpenAI(
-    #     openai_api_key=utils.openai_api_key,
-    #     model=utils.ai_model_name,
-    #     temperature=0,
-    #     top_p=0
-    # )
-    #
-    # json_array_document_fields = ai_model([
-    #     SystemMessage(content=utils.replace_newlines_with_space(system_message)),
-    #     HumanMessage(content=example_1_human_message),
-    #     AIMessage(content=example_1_assistant_message),
-    #     HumanMessage(content=example_2_human_message),
-    #     AIMessage(content=example_2_assistant_message),
-    #     HumanMessage(content=example_3_human_message),
-    #     AIMessage(content=example_3_assistant_message),
-    #     HumanMessage(content=utils.replace_newlines_with_space(human_message))
-    # ])
-    #
-    # data = json.loads(json_array_document_fields.content)
-    #
-    # with open('document_fields_output.json', 'w') as file:
-    #     json.dump(data, file, indent=4)
-    #
-    # return json.loads(json_array_document_fields.content)
+    return output
 
-    with open('document_fields.json', 'r') as file:
-        data = json.load(file)
-
-    return data
+    # with open('document_fields.json', 'r') as file:
+    #     data = json.load(file)
+    #
+    # return data
 
 
 def generate_sbe_message_components(array_json_array_document_fields):
@@ -706,14 +689,15 @@ def generate_sbe_message_components(array_json_array_document_fields):
 
     number_processes = multiprocessing.cpu_count()
     with Pool(number_processes) as pool:
-        array_document_fields_adjacent_pages = [(array_json_array_document_fields[i] + array_json_array_document_fields[i + 1]) for i in range(len(array_json_array_document_fields) - 1)]
+        array_document_fields_adjacent_pages = [
+            (array_json_array_document_fields[i] + array_json_array_document_fields[i + 1]) for i in
+            range(len(array_json_array_document_fields) - 1)]
         array_json_array_repeating_groups = pool.map(generate_repeating_groups, array_document_fields_adjacent_pages)
 
     for json_array_repeating_group in array_json_array_repeating_groups:
         for repeating_group in json_array_repeating_group:
-            if repeating_group["group_id"] not in json_array_distinct_repeating_groups:
-                o = repeating_group["group_id"]
-                logging.info(f"{o}")
+            if not utils.is_duplicate_in_json_array("group_id", repeating_group["group_id"],
+                                                    json_array_distinct_repeating_groups):
                 json_array_distinct_repeating_groups.append(repeating_group)
 
     # for i in range(len(array_json_array_document_fields) - 1):
@@ -734,8 +718,7 @@ def generate_sbe_message_components(array_json_array_document_fields):
     with Pool(number_processes) as pool:
         array_json_array_sbe_fields = pool.map(generate_sbe_fields, array_json_array_document_fields)
 
-    for json_array_sbe_fields in array_json_array_sbe_fields:
-        json_array_full_sbe_fields.extend(json_array_sbe_fields)
+    json_array_full_sbe_fields = utils.merge_unique_json_arrays(array_json_array_sbe_fields)
 
     # for json_array_document_fields_page in array_json_array_document_fields:
     #     partial_json_array_sbe_fields = generate_sbe_fields(json_array_document_fields_page)
@@ -744,8 +727,10 @@ def generate_sbe_message_components(array_json_array_document_fields):
     array_json_array_repeating_groups_sbe_fields = []
 
     with Pool(number_processes) as pool:
-        array_json_array_repeating_groups_document_fields = [repeating_group["items"] for repeating_group in json_array_distinct_repeating_groups]
-        array_json_array_repeating_groups_sbe_fields = pool.map(generate_sbe_fields, array_json_array_repeating_groups_document_fields)
+        array_json_array_repeating_groups_document_fields = [repeating_group["items"] for repeating_group in
+                                                             json_array_distinct_repeating_groups]
+        array_json_array_repeating_groups_sbe_fields = pool.map(generate_sbe_fields,
+                                                                array_json_array_repeating_groups_document_fields)
 
     for i, repeating_group in enumerate(json_array_distinct_repeating_groups):
         repeating_group["items"] = array_json_array_repeating_groups_sbe_fields[i]
@@ -1271,49 +1256,38 @@ Segui gli esempi che ti sono stati forniti.
 []
     """
 
-    human_message = """
-### INPUT DELLO SVILUPPATORE ###
-    """
+    string_array_document_fields = json.dumps(array_document_fields)
 
-    for document_field in array_document_fields:
-        human_message += f"{document_field} "
+    human_message = f"""
+### INPUT ###
 
-    human_message += """
+{string_array_document_fields}
+
 ### OUTPUT JSON ###
     """
 
-    # ai_model = ChatOpenAI(
-    #     openai_api_key=utils.openai_api_key,
-    #     model=utils.ai_model_name,
-    #     temperature=0,
-    #     top_p=0
-    # )
-    #
-    # json_array_repeating_groups = ai_model([
-    #     SystemMessage(content=utils.replace_newlines_with_space(system_message)),
-    #     HumanMessage(content=example_1_human_message),
-    #     AIMessage(content=example_1_assistant_message),
-    #     HumanMessage(content=example_2_human_message),
-    #     AIMessage(content=example_2_assistant_message),
-    #     HumanMessage(content=example_3_human_message),
-    #     AIMessage(content=example_3_assistant_message),
-    #     HumanMessage(content=example_4_human_message),
-    #     AIMessage(content=example_4_assistant_message),
-    #     HumanMessage(content=human_message
-    # )
-    # ])
-    #
-    # data = json.loads(json_array_repeating_groups.content)
-    #
-    # with open('repeating_groups_output.json', 'w') as file:
-    #     json.dump(data, file, indent=4)
-    #
-    # return json.loads(json_array_repeating_groups.content)
+    output = utils.get_output_from_generative_ai(
+        system_message,
+        example_1_human_message,
+        example_1_assistant_message,
+        example_2_human_message,
+        example_2_assistant_message,
+        example_3_human_message,
+        example_3_assistant_message,
+        example_4_human_message,
+        example_4_assistant_message,
+        human_message
+    )
 
-    with open('repeating_groups.json', 'r') as file:
-        data = json.load(file)
+    with open('ai_repeating_groups.txt', 'w') as file:
+        file.write(output)
 
-    return data
+    return output
+
+    # with open('repeating_groups.json', 'r') as file:
+    #     data = json.load(file)
+    #
+    # return data
 
 
 def generate_sbe_fields(array_document_fields):
@@ -1593,50 +1567,41 @@ Assicurati di includere solo ed esclusivamente un array JSON nel codice fornito.
 ]
     """
 
-    human_message = """
+    string_array_document_fields = json.dumps(array_document_fields)
+
+    human_message = f"""
 ### INPUT ###
-        """
 
-    for document_field in array_document_fields:
-        human_message += f"{document_field} "
+{string_array_document_fields}
 
-    human_message += """
 ### OUTPUT JSON ###
         """
 
-    # ai_model = ChatOpenAI(
-    #     openai_api_key=utils.openai_api_key,
-    #     model=utils.ai_model_name,
-    #     temperature=0,
-    #     top_p=0
-    # )
-    #
-    # json_array_sbe_fields = ai_model([
-    #     SystemMessage(content=utils.replace_newlines_with_space(system_message)),
-    #     HumanMessage(content=example_1_human_message),
-    #     AIMessage(content=example_1_assistant_message),
-    #     HumanMessage(content=example_2_human_message),
-    #     AIMessage(content=example_2_assistant_message),
-    #     HumanMessage(content=example_3_human_message),
-    #     AIMessage(content=example_3_assistant_message),
-    #     HumanMessage(content=human_message)
-    # ])
-    #
-    # data = json.loads(json_array_sbe_fields.content)
-    #
-    # with open('sbe_fields_output.json', 'w') as file:
-    #     json.dump(data, file, indent=4)
-    #
-    # return json.loads(json_array_sbe_fields.content)
+    output = utils.get_output_from_generative_ai(
+        system_message,
+        example_1_human_message,
+        example_1_assistant_message,
+        example_2_human_message,
+        example_2_assistant_message,
+        example_3_human_message,
+        example_3_assistant_message,
+        "",
+        "",
+        human_message
+    )
 
-    with open('sbe_fields.json', 'r') as file:
-        data = json.load(file)
+    with open('ai_sbe_fields.txt', 'w') as file:
+        file.write(output)
 
-    return data
+    return output
+
+    # with open('sbe_fields.json', 'r') as file:
+    #     data = json.load(file)
+    #
+    # return data
 
 
 def execute_pipeline_filters(array_file_names, folder_path, pipeline_filters):
-
     array_image_paths = []
     for file_name in array_file_names:
         image_path = os.path.join(folder_path, file_name)
@@ -1653,15 +1618,21 @@ def execute_pipeline_filters(array_file_names, folder_path, pipeline_filters):
         except FileNotFoundError as e:
             print(e)
         except Exception as e:
-            print(f"Errore nel processare l'immagine {file_name}: {e}")
+            print(f"Errore nel processare il #{i} filtro: {e}")
 
     return data
 
 
 def process(pdf_path, starting_page, ending_page, folder_path="extracted_pdf_pages"):
+    load_dotenv()
+
     convert_pdf_pages_to_jpg(pdf_path, starting_page, ending_page, folder_path)
 
     array_file_names = [file for file in os.listdir(folder_path) if file.endswith(('.jpg', '.jpeg', '.png'))]
+
+    # output = utils.get_output_from_generative_ai("sei un esperto di altezze dei grattacieli. ", "","","","","","","","", "quanto e alto il burj khalifa?")
+    # with open("ai.txt", "w") as file:
+    #     file.write(output)
 
     pipeline_filters = [
         grayscale_batch_processing,
@@ -1692,4 +1663,4 @@ def process(pdf_path, starting_page, ending_page, folder_path="extracted_pdf_pag
 
 
 if __name__ == "__main__":
-    process("pdf_documents/drop_copy_service.pdf", 23, 35, "extracted_pdf_pages")
+    process("pdf_documents/drop_copy_service.pdf", 24, 25, "extracted_pdf_pages")

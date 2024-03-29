@@ -1,0 +1,104 @@
+```json
+[
+  {
+    "Tag": 21004,
+    "Field Name": "OrderPriority",
+    "Format": "Int",
+    "Len": 20,
+    "Possible Values": "From 0 to 2464-1",
+    "M/C": "C",
+    "Short Description, Compatibility Notes, Value & Conditions": "Rank / priority of an order. Order with lowest value in OrderPriority has the highest priority. Value that can be used to reconcile orders between private and public messages.",
+    "Value Example": "2"
+  },
+  {
+    "Tag": 20052,
+    "Field Name": "DarkExecutionInstruction",
+    "Format": "MultipleCharValue",
+    "Len": 9,
+    "Possible Values": "First Position = Dark Indicator (0: No ; 1: Yes) Forth Position = Sweep Order Indicator (0: No ; 1: Yes) Fifth Position = Minimum Quantity Type (0: MAQ ; 1: MES)",
+    "M/C": "C",
+    "Short Description, Compatibility Notes, Value & Conditions": "Field used as instruction for dark order handling.",
+    "Value Example": "000"
+  },
+  {
+    "Tag": 44,
+    "Field Name": "Price",
+    "Format": "Price",
+    "Len": 20,
+    "Possible Values": "From -2463 to 2463-1",
+    "M/C": "C",
+    "Short Description, Compatibility Notes, Value & Conditions": "Instrument price per quantity unit. Field populated for Limit, Iceberg (Cash) and Stop Limit (Cash) orders. Not provided for Market, Stop-market (Cash), Peg (Cash) and MTL orders.",
+    "Value Example": "25"
+  },
+  {
+    "Tag": 38,
+    "Field Name": "OrderQty",
+    "Format": "Qty",
+    "Len": 20,
+    "Possible Values": "From 0 to 2464-1",
+    "M/C": "C",
+    "Short Description, Compatibility Notes, Value & Conditions": "Total order quantity, per quantity unit",
+    "Value Example": "1050"
+  },
+  {
+    "Tag": 151,
+    "Field Name": "LeavesQty",
+    "Format": "Qty",
+    "Len": 20,
+    "Possible Values": "From -1 to 264-2",
+    "M/C": "M",
+    "Short Description, Compatibility Notes, Value & Conditions": "Indicates the remaining quantity of an order (quantity open for further execution). For RFQ Ack field populated with value -1",
+    "Value Example": "1050"
+  },
+  {
+    "Tag": 17,
+    "Field Name": "ExecID",
+    "Format": "String",
+    "Len": 10,
+    "Possible Values": "From 0 to 2432-2",
+    "M/C": "M",
+    "Short Description, Compatibility Notes, Value & Conditions": "Set to NA for non-trade related messages",
+    "Value Example": "NA"
+  },
+  {
+    "Tag": 150,
+    "Field Name": "ExecType",
+    "Format": "Char",
+    "Len": 1,
+    "Possible Values": "O=New, i = Order Creation By Market Operations, j = RFQ Ack, e = Refilled Iceberg Ack, h = Iceberg Transformed to Limit due to Minimum size",
+    "M/C": "M",
+    "Short Description, Compatibility Notes, Value & Conditions": "Describes the specific type of ExecutionReport (8) message while OrdStatus (39) always identifies the current order status (e.g. Partially Filled).",
+    "Value Example": "O"
+  },
+  {
+    "Tag": 99,
+    "Field Name": "StopPx",
+    "Format": "Price",
+    "Len": 20,
+    "Possible Values": "From -2463+1 to 2*63-1",
+    "M/C": "C",
+    "Short Description, Compatibility Notes, Value & Conditions": "Stop Trigger Price / Mandatory for Stop orders",
+    "Value Example": "CASH ONLY"
+  },
+  {
+    "Tag": 20004,
+    "Field Name": "UndisclosedPrice",
+    "Format": "Price",
+    "Len": 20,
+    "Possible Values": "Future Use",
+    "M/C": "F",
+    "Short Description, Compatibility Notes, Value & Conditions": "CASH ONLY",
+    "Value Example": ""
+  },
+  {
+    "Tag": 1138,
+    "Field Name": "DisplayQty",
+    "Format": "Qty",
+    "Len": 20,
+    "Possible Values": "From 0 to 264-1",
+    "M/C": "C",
+    "Short Description, Compatibility Notes, Value & Conditions": "Maximum quantity shown to market participants (for Iceberg Order only)",
+    "Value Example": ""
+  }
+]
+```

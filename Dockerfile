@@ -25,8 +25,11 @@ RUN pip3 install --upgrade pip && \
     pdf2image \
     layoutparser[ocr] \
     opencv-python \
+    python-dotenv \
     openai \
     langchain \
+    langchain-community \
+    langchain-core \
     langchain-openai
 
 RUN python -m pip install \

@@ -1,0 +1,112 @@
+```json
+[
+  {
+    "field_id": 21005,
+    "field_name": "ClientMessageSendingTime",
+    "data_type": "char",
+    "encoding_type": "char",
+    "length": 27,
+    "presence": "optional",
+    "structure": {}
+  },
+  {
+    "field_id": 5979,
+    "field_name": "OEGINFromMember",
+    "data_type": "char",
+    "encoding_type": "char",
+    "length": 27,
+    "presence": "optional",
+    "structure": {}
+  },
+  {
+    "field_id": 7764,
+    "field_name": "OEGOUTTOME",
+    "data_type": "char",
+    "encoding_type": "char",
+    "length": 27,
+    "presence": "optional",
+    "structure": {}
+  },
+  {
+    "field_id": 21002,
+    "field_name": "BookINTime",
+    "data_type": "char",
+    "encoding_type": "char",
+    "length": 27,
+    "presence": "mandatory",
+    "structure": {}
+  },
+  {
+    "field_id": 21003,
+    "field_name": "BookOUTTime",
+    "data_type": "char",
+    "encoding_type": "char",
+    "length": 27,
+    "presence": "optional",
+    "structure": {}
+  },
+  {
+    "field_id": 7765,
+    "field_name": "OEGINFromME",
+    "data_type": "char",
+    "encoding_type": "char",
+    "length": 27,
+    "presence": "optional",
+    "structure": {}
+  },
+  {
+    "field_id": 11,
+    "field_name": "ClOrdID",
+    "data_type": "char",
+    "encoding_type": "char",
+    "length": 20,
+    "presence": "mandatory",
+    "structure": {}
+  },
+  {
+    "field_id": 48,
+    "field_name": "SecurityID",
+    "data_type": "char",
+    "encoding_type": "char",
+    "length": 10,
+    "presence": "mandatory",
+    "structure": {}
+  },
+  {
+    "field_id": 22,
+    "field_name": "SecurityIDSource",
+    "data_type": "char",
+    "encoding_type": "char",
+    "length": 1,
+    "presence": "mandatory",
+    "structure": {}
+  },
+  {
+    "field_id": 20020,
+    "field_name": "EMM",
+    "data_type": "int32",
+    "encoding_type": "int32",
+    "length": 2,
+    "presence": "mandatory",
+    "structure": {}
+  },
+  {
+    "field_id": 37,
+    "field_name": "OrderID",
+    "data_type": "char",
+    "encoding_type": "char",
+    "length": 20,
+    "presence": "mandatory",
+    "structure": {}
+  },
+  {
+    "field_id": 39,
+    "field_name": "OrdStatus",
+    "data_type": "char",
+    "encoding_type": "char",
+    "length": 1,
+    "presence": "mandatory",
+    "structure": {}
+  }
+]
+```
