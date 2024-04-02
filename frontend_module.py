@@ -1,14 +1,11 @@
 # ai_engine_module.py
-import ai_engine_module
+
 import streamlit as st
-import json
 
-from langchain_community.chat_models.openai import ChatOpenAI
-from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
-
-import utils
+import ai_engine_module
 from json_schema_handler import JsonSchemaHandler
 from xml_sbe_schema_handler import XmlSbeSchemaHandler
+import utils
 
 tab_new_json_schema = "Add New JSON Schema File"
 tab_new_document_message = "Add New Document Message"
@@ -17,245 +14,6 @@ tab_new_document_message_field = "Add New Document Message Field"
 tab_new_document_repeating_group = "Add New Document Repeating Group"
 tab_new_document_composite = "Add New Document Composite"
 tab_generate_sbe_xml_schema = "Generate SBE XML Schema"
-
-ai_model_name = "gpt-4-0125-preview"
-openai_api_key = ""
-
-
-def generate_sbe_field(document_field):
-    system_message = """
-Sei un esperto di electronic trading systems con una profonda conoscenza dei protocolli FIX e SBE. La tua missione è assistere un utente nell'identificare varie caratteristiche riguardo un campo di un messaggio, basandoti sulle informazioni fornite dalla documentazione di un mercato.
-
-Ecco i passaggi per determinare le informazioni richieste su ogni campo:
-1. ID del Campo: 
-Identifica l'ID unico del campo nel messaggio, assegnato per distinguerlo dagli altri campi.
-2. Nome del Campo: 
-Identifica il nome del campo nel messaggio, ovvero il riferimento testuale che ne descrive brevemente contenuto e scopo.
-3. Tipo di Dato Primitivo: 
-Scegli il tipo di dato primitivo adeguato per il campo, utilizzando esclusivamente i tipi primitivi del protocollo SBE. Ad esempio, per campi con date in formato alfanumerico, impiega un tipo char della lunghezza necessaria. Se il campo presenta un numero limitato di opzioni, usa un'enumerazione (nome del campo in camelCase + "_enum") se si può selezionare solo un valore, o un set (nome del campo in camelCase + "_set") se sono selezionabili più valori.
-4. Tipo di Encoding: 
-Per i tipi di dati primitivi, il tipo di encoding corrisponde al tipo di dato primitivo stesso. Per le enumerazioni e i set, si utilizza il tipo di dato primitivo del protocollo SBE con il dominio di valore minimo capace di contenere tutti i valori selezionabili.
-5. Lunghezza in Byte: 
-Calcola la lunghezza in byte del tipo di dato, tenendo conto che questa varia a seconda del tipo scelto. Ad esempio, un char occupa generalmente 1 byte. Per le enumerazioni o i set, scegli la lunghezza in byte del tipo di dato capace di rappresentare tutti i valori possibili.
-6. Obbligatorio/Facoltativo: 
-Determina se il campo è obbligatorio o facoltativo, stabilendo se deve essere sempre incluso o se può essere omesso in alcuni messaggi.
-7. Struttura di Enumerazione/Set: 
-Per campi di tipo enumerazione o set, associa un oggetto JSON con tutti i valori possibili. Se il tipo di dato è primitivo, usa un JSON vuoto {}.
-
-Assicurati di includere solo ed esclusivamente il codice JSON con le informazioni richieste seguendo gli esempi forniti.
-    """
-
-    example_1_human_message = """
-### ESEMPIO 1: INPUT ###
-
-{
-  "tag": "21005",
-  "field name": "ClientMessageSen dingTime",
-  "format": "uTCTimestam p",
-  "len": "27",
-  "possible values": "Timestamp",
-  "m/c": "c",
-  "short description, compatibility notes and conditions": "indicates the time of message transmission,  the consistency of the time provided is not  checked by the Exchange",
-  "value example": "20190214- 15:30:01.4 62743346"
-}
-    """
-
-    example_1_assistant_message = """
-### ESEMPIO 1: OUTPUT ###
-
-{
-  "field_id": 21005,
-  "field_name": "ClientMessageSendingTime",
-  "data_type": "char",
-  "encoding_type": "char",
-  "length": 27,
-  "presence": "optional",
-  "structure": {}
-}
-    """
-
-    example_2_human_message = """
-### ESEMPIO 2: INPUT ###
-
-{
-    "tag": "21013",
-    "field name": "AckPhase",
-    "format": "Char",
-    "len": "1",
-    "possible values": "1 = Continuous Trading Phase 2 = Call Phase 3 = Halt Phase 5 = Trading At Last Phase 6 = Reserved 7 = Suspended 8 = Random Uncrossing Phase",
-    "m/c": "a",
-    "short description, compatibility notes and conditions": "indicates the trading phase during which  the Matching Engine has received the order Values 5 and 8 apply only for Cash markets",
-    "value example": "1"
-}
-    """
-
-    example_2_assistant_message = """
-### ESEMPIO 2: OUTPUT ###
-
-{
-  "field_id": 21013,
-  "field_name": "AckPhase",
-  "data_type": "AckPhase_enum",
-  "encoding_type": "int8",
-  "length": 1,
-  "presence": "mandatory",
-  "structure": {
-    "1": "Continuous Trading Phase",
-    "2": "Call Phase",
-    "3": "Halt Phase",
-    "5": "Trading At Last Phase",
-    "6": "Reserved",
-    "7": "Suspended",
-    "8": "Random"
-  }
-}
-    """
-
-    example_3_human_message = """
-### ESEMPIO 3: INPUT ###
-
-{
-    "tag": "7443",
-    "field name": "PostingAction",
-    "format": "MultipleCharV alue",
-    "len": "19",
-    "possible values": "0 = Field Actively Used 1 = Leg 1 2 = Leg 2 3 = Leg 3 4 = Leg 4 5 = Leg 5 6 = Leg 6 7 = Leg 7 8 = Leg 8 9 = Leg 9",
-    "m/c": "o",
-    "short description, compatibility notes and conditions": "posting action code (Open/Close) for the  order.  Populated in Drop Copy only if provided on  order entry by the client. Only positions 0 and 1 apply for the Cash  markets",
-    "value example": "0 0 0 0 0 0  0 0 0 0"
-}
-    """
-
-    example_3_assistant_message = """
-### ESEMPIO 3: OUTPUT ###
-
-{
-  "field_id": 7443,
-  "field_name": "PostingAction",
-  "data_type": "PostingAction_set",
-  "encoding_type": "int8",
-  "length": 1,
-  "presence": "optional",
-  "structure": {
-    "0": "Field Actively Used",
-    "1": "Leg 1",
-    "2": "Leg 2",
-    "3": "Leg 3",
-    "4": "Leg 4",
-    "5": "Leg 5",
-    "6": "Leg 6",
-    "7": "Leg 7",
-    "8": "Leg 8",
-    "9": "Leg 9"
-  }
-}
-    """
-
-    human_message = f"""
-### INPUT DELLO SVILUPPATORE ###
-
-{document_field}
-
-### OUTPUT JSON CON LE INFORMAZIONI RICHIESTE ###
-    """
-
-    ai_model = ChatOpenAI(
-        openai_api_key=openai_api_key,
-        model=ai_model_name,
-        temperature=0,
-        top_p=0
-    )
-
-    formatted_report_text = ai_model([
-        SystemMessage(content=system_message),
-        HumanMessage(content=example_1_human_message),
-        AIMessage(content=example_1_assistant_message),
-        HumanMessage(content=example_2_human_message),
-        AIMessage(content=example_2_assistant_message),
-        HumanMessage(content=example_3_human_message),
-        AIMessage(content=example_3_assistant_message),
-        HumanMessage(content=human_message)
-    ])
-
-    return replace_newlines_with_space(formatted_report_text.content)
-
-
-def replace_newlines_with_space(input_string):
-    return input_string.replace('\n', ' ')
-
-
-def generate_sbe_data_type_definitions(json_handler, sbe_field):
-
-    if sbe_field["data_type"].lower() == "char":
-        json_handler.add_primitive_data_type("array_string_data_types", sbe_field)
-
-    elif sbe_field["data_type"].lower() in ["int8", "int16",
-                                            "int32", "int64",
-                                            "uint8",
-                                            "uint16",
-                                            "uint32",
-                                            "uint64"] and sbe_field["presence"] == "optional":
-        json_handler.add_primitive_data_type("array_number_data_types", sbe_field)
-
-    elif sbe_field["data_type"].lower().endswith("_enum"):
-        json_handler.add_custom_data_type("array_enum_data_types", sbe_field["encoding_type"],
-                                          sbe_field["data_type"],
-                                          sbe_field["structure"])
-
-    elif sbe_field["data_type"].lower().endswith("_set"):
-        json_handler.add_custom_data_type("array_set_data_types", sbe_field["encoding_type"],
-                                          sbe_field["data_type"],
-                                          sbe_field["structure"])
-
-
-def generate_xml_schema_from_json_schema(json_handler, xml_handler):
-    number_data_types = json_handler.get_schema_array_iterator("array_number_data_types")
-    for number_data_type in number_data_types:
-        xml_handler.generate_sbe_number_definition(number_data_type["name_type"], number_data_type["data_type"],
-                                                   number_data_type["presence"])
-
-    string_data_types = json_handler.get_schema_array_iterator("array_string_data_types")
-    for string_data_type in string_data_types:
-        xml_handler.generate_sbe_string_definition(string_data_type["name_type"], string_data_type["data_type"],
-                                                   string_data_type["length"],
-                                                   string_data_type["presence"])
-
-    enum_data_types = json_handler.get_schema_array_iterator("array_enum_data_types")
-    for enum_data_type in enum_data_types:
-        xml_handler.generate_sbe_enum_definition(enum_data_type["encoding_type"], enum_data_type["data_type"],
-                                                 enum_data_type["structure"])
-
-    set_data_types = json_handler.get_schema_array_iterator("array_set_data_types")
-    for set_data_type in set_data_types:
-        xml_handler.generate_sbe_set_definition(set_data_type["encoding_type"], set_data_type["data_type"],
-                                                set_data_type["structure"])
-
-    xml_handler.generate_sbe_default_composites()
-
-    document_messages = json_handler.get_schema_array_iterator("array_document_messages")
-    for document_message in document_messages:
-        xml_handler.generate_sbe_message_xml(
-            document_message["message_name"],
-            document_message["template_id"],
-            json_handler.get_message_array_iterator(document_message["message_name"],
-                                                    "array_sbe_fields"),
-            json_handler.get_message_array_iterator(document_message["message_name"],
-                                                    "array_sbe_repeating_groups")
-        )
-
-
-def add_sbe_field(json_handler, document_message, document_field):
-
-    if document_field.get("group_id", -1) == -1:
-        json_handler.add_sbe_field_to_message(
-            document_message,
-            json.loads(generate_sbe_field(document_field)))
-
-    elif document_field.get("group_id", -1) != -1:
-        json_handler.add_sbe_field_to_repeating_group(
-            document_message,
-            document_field.get("group_id"),
-            json.loads(generate_sbe_field(document_field)))
 
 
 def form_new_sbe_schema():
@@ -357,7 +115,7 @@ def form_new_sbe_message():
 
         if st.button(f"Create Message in {json_schema_name}"):
             json_handler.add_document_message(message_name, template_id)
-            st.success(json_handler.load_schema())
+            # st.success(json_handler.load_schema())
 
             if "upload_pdf_document" not in st.session_state:
                 st.session_state["upload_pdf_document"] = True
@@ -392,39 +150,48 @@ def form_new_sbe_message():
                         st.session_state["generate_sbe_xml_schema"] = True
                     st.session_state["generate_sbe_xml_schema"] = True
 
-                if "generate_sbe_xml_schema" in st.session_state and st.session_state["generate_sbe_xml_schema"] == True:
+                if "generate_sbe_xml_schema" in st.session_state and st.session_state[
+                    "generate_sbe_xml_schema"] == True:
 
                     if st.button(f"Generate SBE XML Schema \'{json_schema_name}\'"):
 
-                        json_array_sbe_fields, json_array_repeating_groups = ai_engine_module.process(pdf_path, starting_page, ending_page)
+                        with st.spinner('Creazione dello Schema SBE XML in corso...'):
 
-                        for sbe_field in json_array_sbe_fields:
-                            json_handler.add_sbe_field_to_message(message_name, sbe_field)
+                            json_array_sbe_fields, json_array_repeating_groups = ai_engine_module.process(pdf_path,
+                                                                                                          starting_page,
+                                                                                                          ending_page)
 
-                        for repeating_group in json_array_repeating_groups:
-                            json_handler.add_repeating_group_to_message(
-                                message_name,
-                                repeating_group["group_name"],
-                                repeating_group["group_id"]
-                            )
+                            for sbe_field in json_array_sbe_fields:
+                                json_handler.add_sbe_field_to_message(message_name, sbe_field)
 
-                            for sbe_field in repeating_group["items"]:
-                                json_handler.add_sbe_field_to_repeating_group(
+                            for repeating_group in json_array_repeating_groups:
+                                json_handler.add_repeating_group_to_message(
                                     message_name,
-                                    repeating_group["group_id"],
-                                    sbe_field
+                                    repeating_group["group_name"],
+                                    repeating_group["group_id"]
                                 )
 
-                        st.success(json_handler.load_schema())
+                                for sbe_field in repeating_group["items"]:
+                                    json_handler.add_sbe_field_to_repeating_group(
+                                        message_name,
+                                        repeating_group["group_id"],
+                                        sbe_field
+                                    )
 
-                        lambda_generate_sbe_data_type_definitions = lambda sbe_field: (
-                            generate_sbe_data_type_definitions(json_handler, sbe_field)
-                        )
+                            # st.success(json_handler.load_schema())
 
-                        json_handler.iterate_sbe_fields_of_document_messages(lambda_generate_sbe_data_type_definitions)
+                            lambda_generate_sbe_data_type_definitions = lambda sbe_field: (
+                                json_handler.generate_sbe_data_type_definitions(sbe_field)
+                            )
 
-                        xml_handler = XmlSbeSchemaHandler(json_schema_name)
-                        generate_xml_schema_from_json_schema(json_handler, xml_handler)
+                            json_handler.iterate_sbe_fields_of_document_messages(
+                                lambda_generate_sbe_data_type_definitions)
+
+                            xml_handler = XmlSbeSchemaHandler(json_schema_name)
+                            xml_handler.generate_xml_schema_from_json_schema(json_handler)
+
+                        st.session_state["generate_sbe_xml_schema"] = False
+                        st.success('Schema SBE XML Generato con successo.')
 
             else:
                 st.error("Per favore, seleziona un file PDF.")
@@ -537,19 +304,19 @@ def main():
                     json_handler = JsonSchemaHandler(json_schema_name)
                     xml_handler = XmlSbeSchemaHandler(json_schema_name)
 
-                    # lambda_add_sbe_field = lambda document_message, document_field: (
-                    #     add_sbe_field(json_handler, document_message, document_field)
-                    # )
-                    #
-                    # json_handler.iterate_document_fields_of_document_messages(lambda_add_sbe_field)
+                    lambda_generate_sbe_fields = lambda document_message, document_fields: (
+                        json_handler.generate_sbe_fields(document_message, document_fields)
+                    )
+
+                    json_handler.iterate_document_messages(lambda_generate_sbe_fields)
 
                     lambda_generate_sbe_data_type_definitions = lambda sbe_field: (
-                        generate_sbe_data_type_definitions(json_handler, sbe_field)
+                        json_handler.generate_sbe_data_type_definitions(sbe_field)
                     )
 
                     json_handler.iterate_sbe_fields_of_document_messages(lambda_generate_sbe_data_type_definitions)
 
-                    generate_xml_schema_from_json_schema(json_handler, xml_handler)
+                    xml_handler.generate_xml_schema_from_json_schema(json_handler)
 
 
 # This checks if the script is being run directly (and not imported)

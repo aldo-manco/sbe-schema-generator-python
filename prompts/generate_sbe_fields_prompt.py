@@ -1,3 +1,6 @@
+# generate_sbe_fields_prompt.py
+
+system_message = """
 Sei un esperto in sistemi di trading elettronico con una profonda conoscenza dei protocolli FIX e SBE. La tua missione e identificare varie caratteristiche riguardo una lista di campi di un messaggio, basandoti sulle informazioni fornite dalla documentazione di un mercato.
 
 Ecco i passaggi per determinare le informazioni richieste per ogni campo:
@@ -17,19 +20,19 @@ Determina se il campo e obbligatorio o facoltativo, stabilendo se deve essere se
 Per campi di tipo enumerazione o set, associa un oggetto JSON con tutti i valori possibili. Se il tipo di dato e primitivo, usa un JSON vuoto {}.
 
 Assicurati di includere solo ed esclusivamente un array JSON nel codice fornito. Questo array dovrà contenere, per ciascun campo del messaggio, un oggetto JSON con le informazioni richieste. Segui gli esempi che ti sono stati forniti.
+    """
 
-### ESEMPIO 1: INPUT ###
-
+example_1_human_message = """
 [
   {
-	"tag": "21005",
-	"field name": "ClientMessageSen dingTime",
-	"format": "uTCTimestam p",
-	"len": "27",
-	"possible values": "Timestamp",
-	"m/c": "c",
-	"short description, compatibility notes and conditions": "indicates the time of message transmission,  the consistency of the time provided is not  checked by the Exchange",
-	"value example": "20190214- 15:30:01.4 62743346"
+    "tag": "21005",
+    "field name": "ClientMessageSen dingTime",
+    "format": "uTCTimestam p",
+    "len": "27",
+    "possible values": "Timestamp",
+    "m/c": "c",
+    "short description, compatibility notes and conditions": "indicates the time of message transmission,  the consistency of the time provided is not  checked by the Exchange",
+    "value example": "20190214- 15:30:01.4 62743346"
   },
   {
     "Tag": "11",
@@ -62,9 +65,9 @@ Assicurati di includere solo ed esclusivamente un array JSON nel codice fornito.
     "Value Example": "0 0 0 0 0 0 0 0"
   }
 ]
+    """
 
-### ESEMPIO 1: OUTPUT ###
-
+example_1_assistant_message = """
 [
   {
     "field_id": 21005,
@@ -120,9 +123,9 @@ Assicurati di includere solo ed esclusivamente un array JSON nel codice fornito.
     }
   }
 ]
+    """
 
-### ESEMPIO 2: INPUT ###
-
+example_2_human_message = """
 [
   {
     "Offset": "0",
@@ -149,9 +152,9 @@ Assicurati di includere solo ed esclusivamente un array JSON nel codice fornito.
     "Values": "Please refer to the TradingPhaseCode information in SSE market data of this security for details. N/A for SZSE Instruments"
   }
 ]
+    """
 
-### ESEMPIO 2: OUTPUT ###
-
+example_2_assistant_message = """
 [
   {
     "field_id": 0,
@@ -184,9 +187,9 @@ Assicurati di includere solo ed esclusivamente un array JSON nel codice fornito.
     "structure": {}
   }
 ]
+    """
 
-### ESEMPIO 3: INPUT ###
-
+example_3_human_message = """
 [
   {
     "Field": "SEDOL",
@@ -217,9 +220,9 @@ Assicurati di includere solo ed esclusivamente un array JSON nel codice fornito.
     "Description": "Settlement system type: Value Meaning 1 RRG 2 Express I 3 Express II 4 Clear stream 5 Undefined value 6 T2S"
   }
 ]
+    """
 
-### ESEMPIO 3: OUTPUT ###
-
+example_3_assistant_message = """
 [
   {
     "field_id": 31,
@@ -271,126 +274,8 @@ Assicurati di includere solo ed esclusivamente un array JSON nel codice fornito.
     }
   }
 ]
+    """
 
-### INPUT ###
+example_4_human_message = ""
 
-20175 TriggeredStopTim
-eInForce
-Char 1 0 = Day
-1 = Good Till Cancel
-6 = Good till Date
-C CASH ONLY
-Specifies the maximum validity of an
-triggered stop order. On triggering of a Stop
-order the value in this field is populated in
-the field TimeInForce (59).
-131 QuoteReqID String 20 From 0 to 2^64-2 C Numerical RFQ identifier assigned by the
-matching engine, unique per instrument
-and EMM.
-21037 RFQAnswerIndicat
-or
-Int 1 0 = No
-1 = Yes
-C CASH ONLY
-Indicates whether the message is, or not, a
-quote sent as an answer to a QuoteRequest
-(R) message.
-21038 RFQConfirmationI
-ndicator
-Int 1 0 = No
-1 = Yes
-C CASH ONLY
-Indicates whether the message is, or not, an
-order sent as a confirmation of a
-QuoteRequest (R) message.
-21800 ConditionalOrderF
-lag
-Int 1 0 = Firm (default)
-1 = Conditional
-C CASH ONLY
-Indicates if the order is a conditional or a
-firm order
-453 NoPartyIDs NumInGroup 1 Always set to 1 A Number of PartyID entries 1
-448 PartyID String 11 Alphanumeric A In this case provides the
-ExecutionWithinFirmShortCode
-59786
-447 PartyIDSource Char 1 P = Short code identifier A Source of PartyID value P
-452 PartyRole Int 3 3 = Client ID
-12 = Executing Trader
-999 = Not Applicable
-A Identifies the type or role of the PartyID
-(448) specified.
-For Execution with Firm short code in Drop
-Copy where the values in the original
-trading OEG message:
-• were received in SBE protocol the
-value will be set to 999 (Not
-Applicable);
-• were received in FIX protocol, the
-value will be set to 3 (Client ID) or
-12 (Executing Trader)
-Tag Field Name Format Len Possible Values M/C Short Description, Compatibility Notes
-& Conditions
-Value
-Example
-2376 PartyRoleQualifier Int 2 22 = Algorithm
-23 = Firm or legal entity
-24 = Natural person
-99 = Not Applicable
-C Used to further qualify the value of
-PartyRole (452)
-For ExecutionWithinFirmShortCode in Drop
-Copy where the values in the original
-trading OEG message:
-• were received in SBE protocol the
-value will be set to 99 (Not
-Applicable);
-• were received in FIX protocol, the
-value will be set to 22 (Algorithm)
-or 23 (Firm or Legal Entity) or 24
-(Natural Person);
-23
-1724 OrderOrigination Int 1 5 = Order received from a direct access or
-sponsored access customer
-C Identifies the origin of the order
-2593 NoOrderAttribute
-s
-NumInGroup 1 If provided, from 1 to 2 C Number of order attribute entries
-2594 OrderAttributeTyp
-e
-Int 1 0 = Aggregated order
-1 = Pending allocation
-3 = Risk reduction order
-C Used in case client needs to indicate values
-of AGGR or PNAL, OR in Risk Reduction
-order
-2595 OrderAttributeVal
-ue
-String 1 Y = Yes C Always set to Yes if OrderAttributeType
-(2594) if provided
-29 LastCapacity Char 1 7 = Dealing on own account (DEAL)
-8 = Matched principal (MTCH)
-9 = Any other capacity (AOTC)
-A Indicates whether the order submission
-results from trading as matched principal,
-on own account or as any other capacity.
-7
-110 MinQty Qty 20 Value '0' by default and depending to a minimum
-value for the given instrument and/or market type
-C Minimum quantity to be executed upon
-order entry (else the order is rejected).
-Only provided when submitted in the
-original order entry message
-21013 AckPhase Char 1 1 = Continuous Trading Phase
-2 = Call Phase
-3 = Halt Phase
-5 = Trading At Last Phase
-6 = Reserved
-7 = Suspended
-8 = Random Uncrossing Phase
-A Indicates the trading phase during which
-the Matching Engine has received the order
-Values 5 and 8 apply only for Cash markets
-1
-
-### OUTPUT JSON ###
+example_4_assistant_message = ""

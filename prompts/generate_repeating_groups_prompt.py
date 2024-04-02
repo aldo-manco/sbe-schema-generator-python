@@ -1,3 +1,6 @@
+# generate_repeating_groups_prompt.py
+
+system_message = """
 Sei esperto in sistemi di trading elettronico e conosci approfonditamente i protocolli FIX e SBE. Devi analizzare un array JSON contenente informazioni sui campi di un messaggio SBE per identificare se alcuni di essi formano un repeating group, basandoti su criteri specifici:
 - Pattern nei Nomi: Campi con nomi simili, come PartyID, PartyIDSource, PartyRole, PartyRoleQualifier, indicano un insieme comune.
 - Sequenza Numerica: I campi di un repeating group sono tipicamente in sequenza numerica continua o raggruppati senza interruzioni.
@@ -14,9 +17,9 @@ Assicurati di includere solo ed esclusivamente un array JSON nel codice fornito.
 Qualora non siano presenti gruppi ripetuti, l'output sarà un array JSON vuoto.
 
 Segui gli esempi che ti sono stati forniti.
+    """
 
-### ESEMPIO 1: INPUT ###
-
+example_1_human_message = """
 [
   {
     "Tag": "21038",
@@ -129,9 +132,9 @@ Segui gli esempi che ti sono stati forniti.
     "Value Example": ""
   }
 ]
+    """
 
-### ESEMPIO 1: OUTPUT ###
-
+example_1_assistant_message = """
 [
   {
     "group_id": "453",
@@ -206,9 +209,9 @@ Segui gli esempi che ti sono stati forniti.
     ]
   }
 ]
+    """
 
-### ESEMPIO 2: INPUT ###
-
+example_2_human_message = """
 [
   {
     "Tag": "454",
@@ -254,9 +257,9 @@ Segui gli esempi che ti sono stati forniti.
     }
   }
 ]
+    """
 
-### ESEMPIO 2: OUTPUT ###
-
+example_2_assistant_message = """
 [
   {
     "group_id": "454",
@@ -280,9 +283,9 @@ Segui gli esempi che ti sono stati forniti.
     ]
   }
 ]
+    """
 
-### ESEMPIO 3: INPUT ###
-
+example_3_human_message = """
 [
   {
     "FIX tag": "35",
@@ -362,9 +365,9 @@ Segui gli esempi che ti sono stati forniti.
     "Description": "Name of the price source"
   }
 ]
+    """
 
-### ESEMPIO 3: OUTPUT ###
-
+example_3_assistant_message = """
 [
   {
     "group_id": "268",
@@ -422,9 +425,9 @@ Segui gli esempi che ti sono stati forniti.
     ]
   }
 ]
+    """
 
-### ESEMPIO 4: INPUT ###
-
+example_4_human_message = """
 [
   {
     "Tag": "20175",
@@ -477,209 +480,8 @@ Segui gli esempi che ti sono stati forniti.
     "Value Example": "CASH ONLY - Indicates if the order is a conditional or a firm order"
   }
 ]
+    """
 
-### ESEMPIO 4: OUTPUT ###
-
+example_4_assistant_message = """
 []
-
-### INPUT ###
-
-[
-  {
-        "field_id": 20175,
-        "field_name": "TriggeredStopTimeInForce",
-        "data_type": "triggeredStopTimeInForce_enum",
-        "encoding_type": "char",
-        "length": 1,
-        "presence": "optional",
-        "structure": {
-            "0": "Day",
-            "1": "Good Till Cancel",
-            "6": "Good till Date"
-        }
-    },
-    {
-        "field_id": 131,
-        "field_name": "QuoteReqID",
-        "data_type": "char",
-        "encoding_type": "char",
-        "length": 20,
-        "presence": "optional",
-        "structure": {}
-    },
-    {
-        "field_id": 21037,
-        "field_name": "RFQAnswerIndicator",
-        "data_type": "rfqAnswerIndicator_enum",
-        "encoding_type": "int8",
-        "length": 1,
-        "presence": "optional",
-        "structure": {
-            "0": "No",
-            "1": "Yes"
-        }
-    },
-    {
-        "field_id": 21038,
-        "field_name": "RFQConfirmationIndicator",
-        "data_type": "rfqConfirmationIndicator_enum",
-        "encoding_type": "int8",
-        "length": 1,
-        "presence": "optional",
-        "structure": {
-            "0": "No",
-            "1": "Yes"
-        }
-    },
-    {
-        "field_id": 21800,
-        "field_name": "ConditionalOrderFlag",
-        "data_type": "conditionalOrderFlag_enum",
-        "encoding_type": "int8",
-        "length": 1,
-        "presence": "optional",
-        "structure": {
-            "0": "Firm",
-            "1": "Conditional"
-        }
-    },
-    {
-        "field_id": 453,
-        "field_name": "NoPartyIDs",
-        "data_type": "int32",
-        "encoding_type": "int32",
-        "length": 1,
-        "presence": "mandatory",
-        "structure": {}
-    },
-    {
-        "field_id": 448,
-        "field_name": "PartyID",
-        "data_type": "char",
-        "encoding_type": "char",
-        "length": 11,
-        "presence": "mandatory",
-        "structure": {}
-    },
-    {
-        "field_id": 447,
-        "field_name": "PartyIDSource",
-        "data_type": "char",
-        "encoding_type": "char",
-        "length": 1,
-        "presence": "mandatory",
-        "structure": {}
-    },
-    {
-        "field_id": 452,
-        "field_name": "PartyRole",
-        "data_type": "partyRole_enum",
-        "encoding_type": "int32",
-        "length": 3,
-        "presence": "mandatory",
-        "structure": {
-            "3": "Client ID",
-            "12": "Executing Trader",
-            "999": "Not Applicable"
-        }
-    },
-    {
-        "field_id": 2376,
-        "field_name": "PartyRoleQualifier",
-        "data_type": "partyRoleQualifier_enum",
-        "encoding_type": "int32",
-        "length": 2,
-        "presence": "optional",
-        "structure": {
-            "22": "Algorithm",
-            "23": "Firm or legal entity",
-            "24": "Natural person",
-            "99": "Not Applicable"
-        }
-    },
-    {
-        "field_id": 1724,
-        "field_name": "OrderOrigination",
-        "data_type": "orderOrigination_enum",
-        "encoding_type": "int8",
-        "length": 1,
-        "presence": "optional",
-        "structure": {
-            "5": "Order received from a direct access or sponsored access customer"
-        }
-    },
-    {
-        "field_id": 2593,
-        "field_name": "NoOrderAttributes",
-        "data_type": "int32",
-        "encoding_type": "int32",
-        "length": 1,
-        "presence": "optional",
-        "structure": {}
-    },
-    {
-        "field_id": 2594,
-        "field_name": "OrderAttributeType",
-        "data_type": "orderAttributeType_enum",
-        "encoding_type": "int8",
-        "length": 1,
-        "presence": "optional",
-        "structure": {
-            "0": "Aggregated order",
-            "1": "Pending allocation",
-            "3": "Risk reduction order"
-        }
-    },
-    {
-    "field_id": 2595,
-    "field_name": "OrderAttributeValue",
-    "data_type": "char",
-    "encoding_type": "char",
-    "length": 1,
-    "presence": "optional",
-    "structure": {
-        "Y": "Yes"
-    }
-},
-{
-    "field_id": 29,
-    "field_name": "LastCapacity",
-    "data_type": "lastCapacity_enum",
-    "encoding_type": "char",
-    "length": 1,
-    "presence": "mandatory",
-    "structure": {
-        "7": "Dealing on own account (DEAL)",
-        "8": "Matched principal (MTCH)",
-        "9": "Any other capacity (AOTC)"
-    }
-},
-{
-    "field_id": 110,
-    "field_name": "MinQty",
-    "data_type": "int64",
-    "encoding_type": "int64",
-    "length": 8,
-    "presence": "optional",
-    "structure": {}
-},
-{
-    "field_id": 21013,
-    "field_name": "AckPhase",
-    "data_type": "ackPhase_enum",
-    "encoding_type": "char",
-    "length": 1,
-    "presence": "mandatory",
-    "structure": {
-        "1": "Continuous Trading Phase",
-        "2": "Call Phase",
-        "3": "Halt Phase",
-        "5": "Trading At Last Phase",
-        "6": "Reserved",
-        "7": "Suspended",
-        "8": "Random Uncrossing Phase"
-    }
-}
-]
-
-### OUTPUT JSON ###
+    """

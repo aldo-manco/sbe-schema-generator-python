@@ -1,0 +1,266 @@
+[
+  {
+    "field_id": 20175,
+    "field_name": "TriggeredStopTimeInForce",
+    "data_type": "TriggeredStopTimeInForce_enum",
+    "encoding_type": "char",
+    "length": 1,
+    "presence": "optional",
+    "structure": {
+      "0": "Day",
+      "1": "Good Till Cancel",
+      "6": "Good till Date"
+    }
+  },
+  {
+    "field_id": 131,
+    "field_name": "QuoteReqID",
+    "data_type": "char",
+    "encoding_type": "char",
+    "length": 20,
+    "presence": "optional",
+    "structure": {}
+  },
+  {
+    "field_id": 21037,
+    "field_name": "RFQAnswerIndicator",
+    "data_type": "RFQAnswerIndicator_enum",
+    "encoding_type": "int8",
+    "length": 1,
+    "presence": "optional",
+    "structure": {
+      "0": "No",
+      "1": "Yes"
+    }
+  },
+  {
+    "field_id": 21038,
+    "field_name": "RFQConfirmationIndicator",
+    "data_type": "RFQConfirmationIndicator_enum",
+    "encoding_type": "int8",
+    "length": 1,
+    "presence": "optional",
+    "structure": {
+      "0": "No",
+      "1": "Yes"
+    }
+  },
+  {
+    "field_id": 21800,
+    "field_name": "ConditionalOrderFlag",
+    "data_type": "ConditionalOrderFlag_enum",
+    "encoding_type": "int8",
+    "length": 1,
+    "presence": "optional",
+    "structure": {
+      "0": "Firm",
+      "1": "Conditional"
+    }
+  },
+  {
+    "field_id": 453,
+    "field_name": "NoPartyIDs",
+    "data_type": "int8",
+    "encoding_type": "int8",
+    "length": 1,
+    "presence": "mandatory",
+    "structure": {}
+  },
+  {
+    "field_id": 448,
+    "field_name": "PartyID",
+    "data_type": "char",
+    "encoding_type": "char",
+    "length": 11,
+    "presence": "mandatory",
+    "structure": {}
+  },
+  {
+    "field_id": 447,
+    "field_name": "PartyIDSource",
+    "data_type": "char",
+    "encoding_type": "char",
+    "length": 1,
+    "presence": "mandatory",
+    "structure": {}
+  },
+  {
+    "field_id": 452,
+    "field_name": "PartyRole",
+    "data_type": "PartyRole_enum",
+    "encoding_type": "int32",
+    "length": 3,
+    "presence": "mandatory",
+    "structure": {
+      "3": "Client ID",
+      "12": "Executing Trader",
+      "999": "Not Applicable"
+    }
+  },
+  {
+    "field_id": 2376,
+    "field_name": "PartyRoleQualifier",
+    "data_type": "PartyRoleQualifier_enum",
+    "encoding_type": "int16",
+    "length": 2,
+    "presence": "optional",
+    "structure": {
+      "22": "Algorithm",
+      "23": "Firm or legal entity",
+      "24": "Natural person",
+      "99": "Not Applicable"
+    }
+  },
+  {
+    "field_id": 1724,
+    "field_name": "OrderOrigination",
+    "data_type": "OrderOrigination_enum",
+    "encoding_type": "int8",
+    "length": 1,
+    "presence": "optional",
+    "structure": {
+      "5": "Order received from a direct access or sponsored access customer"
+    }
+  },
+  {
+    "field_id": 2593,
+    "field_name": "NoOrderAttributes",
+    "data_type": "int8",
+    "encoding_type": "int8",
+    "length": 1,
+    "presence": "optional",
+    "structure": {}
+  },
+  {
+    "field_id": 2594,
+    "field_name": "OrderAttributeType",
+    "data_type": "OrderAttributeType_enum",
+    "encoding_type": "int8",
+    "length": 1,
+    "presence": "optional",
+    "structure": {
+      "0": "Aggregated order",
+      "1": "Pending allocation",
+      "3": "Risk reduction order"
+    }
+  },
+  {
+    "field_id": 2595,
+    "field_name": "OrderAttributeValue",
+    "data_type": "char",
+    "encoding_type": "char",
+    "length": 1,
+    "presence": "optional",
+    "structure": {}
+  },
+  {
+    "field_id": 29,
+    "field_name": "LastCapacity",
+    "data_type": "LastCapacity_enum",
+    "encoding_type": "char",
+    "length": 1,
+    "presence": "mandatory",
+    "structure": {
+      "7": "Dealing on own account",
+      "8": "Matched principal",
+      "9": "Any other capacity"
+    }
+  },
+  {
+    "field_id": 110,
+    "field_name": "MinQty",
+    "data_type": "int64",
+    "encoding_type": "int64",
+    "length": 8,
+    "presence": "optional",
+    "structure": {}
+  },
+  {
+    "field_id": 21013,
+    "field_name": "AckPhase",
+    "data_type": "AckPhase_enum",
+    "encoding_type": "char",
+    "length": 1,
+    "presence": "mandatory",
+    "structure": {
+      "1": "Continuous Trading Phase",
+      "2": "Call Phase",
+      "3": "Halt Phase",
+      "5": "Trading At Last Phase",
+      "6": "Reserved",
+      "7": "Suspended",
+      "8": "Random Uncrossing Phase"
+    }
+  },
+  {
+    "field_id": 448,
+    "field_name": "PartyID",
+    "data_type": "char",
+    "encoding_type": "char",
+    "length": 11,
+    "presence": "mandatory",
+    "structure": {}
+  },
+  {
+    "field_id": 447,
+    "field_name": "PartyIDSource",
+    "data_type": "char",
+    "encoding_type": "char",
+    "length": 1,
+    "presence": "mandatory",
+    "structure": {
+      "P": "Short code identifier"
+    }
+  },
+  {
+    "field_id": 452,
+    "field_name": "PartyRole",
+    "data_type": "PartyRole_enum",
+    "encoding_type": "int32",
+    "length": 4,
+    "presence": "mandatory",
+    "structure": {
+      "3": "Client ID",
+      "12": "Executing Trader",
+      "999": "Not Applicable"
+    }
+  },
+  {
+    "field_id": 2376,
+    "field_name": "PartyRoleQualifier",
+    "data_type": "PartyRoleQualifier_enum",
+    "encoding_type": "int32",
+    "length": 4,
+    "presence": "optional",
+    "structure": {
+      "22": "Algorithm",
+      "23": "Firm or legal entity",
+      "24": "Natural person",
+      "99": "Not Applicable"
+    }
+  },
+  {
+    "field_id": 2594,
+    "field_name": "OrderAttributeType",
+    "data_type": "orderAttributeType_enum",
+    "encoding_type": "int8",
+    "length": 1,
+    "presence": "optional",
+    "structure": {
+      "0": "Aggregated order",
+      "1": "Pending allocation",
+      "3": "Risk reduction order"
+    }
+  },
+  {
+    "field_id": 2595,
+    "field_name": "OrderAttributeValue",
+    "data_type": "char",
+    "encoding_type": "char",
+    "length": 1,
+    "presence": "optional",
+    "structure": {
+      "Y": "Yes"
+    }
+  }
+]

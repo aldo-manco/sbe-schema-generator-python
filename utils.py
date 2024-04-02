@@ -1,4 +1,5 @@
 import os
+import shutil
 import json
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
@@ -18,6 +19,15 @@ from langchain.prompts import (
 def create_directory_if_not_exists(directory_path):
     if not os.path.exists(directory_path):
         os.makedirs(directory_path)
+
+
+def empty_folder(folder_path):
+    for file_name in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, file_name)
+        if os.path.isfile(file_path) or os.path.islink(file_path):
+            os.remove(file_path)
+        elif os.path.isdir(file_path):
+            shutil.rmtree(file_path)
 
 
 def save_uploaded_file(directory_path, file):
@@ -58,6 +68,14 @@ def replace_newlines_with_space(input_string):
     return input_string.replace('\n', ' ')
 
 
+def clean_json_string(json_string):
+    cleaned_str = json_string.strip()
+    cleaned_str = cleaned_str.replace("```json\n", "", 1)
+    cleaned_str = cleaned_str.rsplit("\n```", 1)[0]
+
+    return cleaned_str
+
+
 def escape_braces_for_formatting(input_string):
     return (input_string
             .replace('{', '{{')
@@ -92,22 +110,22 @@ def get_output_from_generative_ai(
     )
 
     array_examples = []
-    add_example_in_prompt(
+    add_example_in_array(
         array_examples,
         example_1_human_message,
         example_1_assistant_message
     )
-    add_example_in_prompt(
+    add_example_in_array(
         array_examples,
         example_2_human_message,
         example_2_assistant_message
     )
-    add_example_in_prompt(
+    add_example_in_array(
         array_examples,
         example_3_human_message,
         example_3_assistant_message
     )
-    add_example_in_prompt(
+    add_example_in_array(
         array_examples,
         example_4_human_message,
         example_4_assistant_message
@@ -127,10 +145,10 @@ def get_output_from_generative_ai(
 
     chain = llm | output_parser
 
-    return chain.invoke(prompt)
+    return clean_json_string(chain.invoke(prompt))
 
 
-def add_example_in_prompt(array_examples, example_human_message, example_assistant_message):
+def add_example_in_array(array_examples, example_human_message, example_assistant_message):
     if example_human_message != "" and example_assistant_message != "":
         array_examples.append({
             "human_message": example_human_message,

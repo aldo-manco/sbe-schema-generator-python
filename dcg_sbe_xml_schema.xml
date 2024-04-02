@@ -1,0 +1,116 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<sbe:messageSchema xmlns:sbe="http://fixprotocol.io/2016/sbe" xmlns:enx="enx" xmlns:str="http://exslt.org/strings" xmlns:ext="http://exslt.org/common" package="dcg.euronext.com" id="25" version="306" semanticVersion="4.6.0" description="desc" byteOrder="littleEndian">
+  <types>
+    <type name="int8_t" primitiveType="int8" nullValue="-128" presence="optional" minValue="-127" maxValue="127"/>
+    <type name="int64_t" primitiveType="int64" nullValue="-9223372036854775808" presence="optional" minValue="-9223372036854775807" maxValue="9223372036854775807"/>
+    <type name="char20_optional" length="20" primitiveType="char" presence="optional"/>
+    <type name="char11" length="11" primitiveType="char"/>
+    <type name="char1" length="1" primitiveType="char"/>
+    <type name="char1_optional" length="1" primitiveType="char" presence="optional"/>
+    <enum encodingType="char" name="TriggeredStopTimeInForce_enum">
+      <validValue name="Day">0</validValue>
+      <validValue name="Good Till Cancel">1</validValue>
+      <validValue name="Good till Date">6</validValue>
+    </enum>
+    <enum encodingType="int8" name="RFQAnswerIndicator_enum">
+      <validValue name="No">0</validValue>
+      <validValue name="Yes">1</validValue>
+    </enum>
+    <enum encodingType="int8" name="RFQConfirmationIndicator_enum">
+      <validValue name="No">0</validValue>
+      <validValue name="Yes">1</validValue>
+    </enum>
+    <enum encodingType="int8" name="ConditionalOrderFlag_enum">
+      <validValue name="Firm">0</validValue>
+      <validValue name="Conditional">1</validValue>
+    </enum>
+    <enum encodingType="int32" name="PartyRole_enum">
+      <validValue name="Client ID">3</validValue>
+      <validValue name="Executing Trader">12</validValue>
+      <validValue name="Not Applicable">999</validValue>
+    </enum>
+    <enum encodingType="int16" name="PartyRoleQualifier_enum">
+      <validValue name="Algorithm">22</validValue>
+      <validValue name="Firm or legal entity">23</validValue>
+      <validValue name="Natural person">24</validValue>
+      <validValue name="Not Applicable">99</validValue>
+    </enum>
+    <enum encodingType="int8" name="OrderOrigination_enum">
+      <validValue name="Order received from a direct access or sponsored access customer">5</validValue>
+    </enum>
+    <enum encodingType="int8" name="OrderAttributeType_enum">
+      <validValue name="Aggregated order">0</validValue>
+      <validValue name="Pending allocation">1</validValue>
+      <validValue name="Risk reduction order">3</validValue>
+    </enum>
+    <enum encodingType="char" name="LastCapacity_enum">
+      <validValue name="Dealing on own account">7</validValue>
+      <validValue name="Matched principal">8</validValue>
+      <validValue name="Any other capacity">9</validValue>
+    </enum>
+    <enum encodingType="char" name="AckPhase_enum">
+      <validValue name="Continuous Trading Phase">1</validValue>
+      <validValue name="Call Phase">2</validValue>
+      <validValue name="Halt Phase">3</validValue>
+      <validValue name="Trading At Last Phase">5</validValue>
+      <validValue name="Reserved">6</validValue>
+      <validValue name="Suspended">7</validValue>
+      <validValue name="Random Uncrossing Phase">8</validValue>
+    </enum>
+    <composite name="messageHeader" description="Message identifiers and length of message root">
+      <type name="blockLength" primitiveType="uint16"/>
+      <type name="templateId" primitiveType="uint16"/>
+      <type name="schemaId" primitiveType="uint16"/>
+      <type name="version" primitiveType="uint16"/>
+    </composite>
+    <composite name="groupSizeEncoding" description="Repeating group dimensions">
+      <type name="blockLength" primitiveType="uint8"/>
+      <type name="numInGroup" primitiveType="uint8" semanticType="NumInGroup"/>
+    </composite>
+    <composite name="groupSizeEncoding16" description="Repeating group dimensions">
+      <type name="blockLength" primitiveType="uint16"/>
+      <type name="numInGroup" primitiveType="uint8" semanticType="NumInGroup"/>
+    </composite>
+  </types>
+  <sbe:message name="DCOrder" id="21">
+    <field id="20007" name="FixHeader" type="fixHeader"/>
+    <group dimensionType="groupSizeEncoding" name="PartyIDsGroup" id="453">
+      <field name="TriggeredStopTimeInForce" id="20175" type="TriggeredStopTimeInForce_enum"/>
+      <field name="QuoteReqID" id="131" type="char20_optional"/>
+      <field name="RFQAnswerIndicator" id="21037" type="RFQAnswerIndicator_enum"/>
+      <field name="RFQConfirmationIndicator" id="21038" type="RFQConfirmationIndicator_enum"/>
+      <field name="ConditionalOrderFlag" id="21800" type="ConditionalOrderFlag_enum"/>
+      <field name="NoPartyIDs" id="453" type="int8"/>
+      <field name="PartyID" id="448" type="char11"/>
+      <field name="PartyIDSource" id="447" type="char1"/>
+      <field name="PartyRole" id="452" type="PartyRole_enum"/>
+      <field name="PartyRoleQualifier" id="2376" type="PartyRoleQualifier_enum"/>
+      <field name="OrderOrigination" id="1724" type="OrderOrigination_enum"/>
+      <field name="NoOrderAttributes" id="2593" type="int8_t"/>
+      <field name="OrderAttributeType" id="2594" type="OrderAttributeType_enum"/>
+      <field name="OrderAttributeValue" id="2595" type="char1_optional"/>
+      <field name="LastCapacity" id="29" type="LastCapacity_enum"/>
+      <field name="MinQty" id="110" type="int64_t"/>
+      <field name="AckPhase" id="21013" type="AckPhase_enum"/>
+    </group>
+    <group dimensionType="groupSizeEncoding" name="OrderAttributesGroup" id="2593">
+      <field name="TriggeredStopTimeInForce" id="20175" type="TriggeredStopTimeInForce_enum"/>
+      <field name="QuoteReqID" id="131" type="char20_optional"/>
+      <field name="RFQAnswerIndicator" id="21037" type="RFQAnswerIndicator_enum"/>
+      <field name="RFQConfirmationIndicator" id="21038" type="RFQConfirmationIndicator_enum"/>
+      <field name="ConditionalOrderFlag" id="21800" type="ConditionalOrderFlag_enum"/>
+      <field name="NoPartyIDs" id="453" type="int8"/>
+      <field name="PartyID" id="448" type="char11"/>
+      <field name="PartyIDSource" id="447" type="char1"/>
+      <field name="PartyRole" id="452" type="PartyRole_enum"/>
+      <field name="PartyRoleQualifier" id="2376" type="PartyRoleQualifier_enum"/>
+      <field name="OrderOrigination" id="1724" type="OrderOrigination_enum"/>
+      <field name="NoOrderAttributes" id="2593" type="int8_t"/>
+      <field name="OrderAttributeType" id="2594" type="OrderAttributeType_enum"/>
+      <field name="OrderAttributeValue" id="2595" type="char1_optional"/>
+      <field name="LastCapacity" id="29" type="LastCapacity_enum"/>
+      <field name="MinQty" id="110" type="int64_t"/>
+      <field name="AckPhase" id="21013" type="AckPhase_enum"/>
+    </group>
+  </sbe:message>
+</sbe:messageSchema>

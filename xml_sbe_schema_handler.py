@@ -63,7 +63,7 @@ class XmlSbeSchemaHandler:
             name=name_enum
         )
 
-        for name, value in enum_structure.items():
+        for value, name in enum_structure.items():
             valid_value_element = etree.SubElement(
                 enum_element,
                 'validValue',
@@ -83,7 +83,7 @@ class XmlSbeSchemaHandler:
             name=name_set
         )
 
-        for name, value in set_structure.items():
+        for value, name in set_structure.items():
             valid_value_element = etree.SubElement(
                 set_element,
                 'choice',
@@ -249,3 +249,38 @@ class XmlSbeSchemaHandler:
 
         self.append_to_sbe_schema_root(message_element)
         return etree.tostring(message_element, pretty_print=True, encoding='UTF-8').decode()
+
+    def generate_xml_schema_from_json_schema(self, json_handler):
+        number_data_types = json_handler.get_schema_array_iterator("array_number_data_types")
+        for number_data_type in number_data_types:
+            self.generate_sbe_number_definition(number_data_type["name_type"], number_data_type["data_type"],
+                                                       number_data_type["presence"])
+
+        string_data_types = json_handler.get_schema_array_iterator("array_string_data_types")
+        for string_data_type in string_data_types:
+            self.generate_sbe_string_definition(string_data_type["name_type"], string_data_type["data_type"],
+                                                       string_data_type["length"],
+                                                       string_data_type["presence"])
+
+        enum_data_types = json_handler.get_schema_array_iterator("array_enum_data_types")
+        for enum_data_type in enum_data_types:
+            self.generate_sbe_enum_definition(enum_data_type["encoding_type"], enum_data_type["data_type"],
+                                                     enum_data_type["structure"])
+
+        set_data_types = json_handler.get_schema_array_iterator("array_set_data_types")
+        for set_data_type in set_data_types:
+            self.generate_sbe_set_definition(set_data_type["encoding_type"], set_data_type["data_type"],
+                                                    set_data_type["structure"])
+
+        self.generate_sbe_default_composites()
+
+        document_messages = json_handler.get_schema_array_iterator("array_document_messages")
+        for document_message in document_messages:
+            self.generate_sbe_message_xml(
+                document_message["message_name"],
+                document_message["template_id"],
+                json_handler.get_message_array_iterator(document_message["message_name"],
+                                                        "array_sbe_fields"),
+                json_handler.get_message_array_iterator(document_message["message_name"],
+                                                        "array_sbe_repeating_groups")
+            )
