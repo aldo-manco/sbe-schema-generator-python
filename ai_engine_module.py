@@ -9,7 +9,6 @@ import multiprocessing
 from multiprocessing import Pool
 from dotenv import load_dotenv
 import logging
-import sys
 import fitz
 
 import utils
@@ -32,7 +31,7 @@ def extract_pdf_text(input_pipeline):
     array_text_tables_pages = []
 
     with multiprocessing.Pool(num_processes) as pool:
-        params = [(pdf_path, page) for page in range(starting_page, ending_page + 1)]
+        params = [(pdf_path, page) for page in range(starting_page - 1, ending_page)]
         array_text_tables_pages.append({
             "text_tables": pool.map(extract_page_text, params)
         })
@@ -231,6 +230,7 @@ def ocr_tables_batch_processing(array_output_previous_function):
 
 
 def document_fields_generation_batch_processing(array_output_previous_function):
+
     number_processes = min(multiprocessing.cpu_count(), len(array_output_previous_function))
     array_json_array_document_fields = []
 
@@ -249,30 +249,31 @@ def generate_document_fields(text_tables):
 ### OUTPUT JSON ###
         """
 
-    # output = utils.get_output_from_generative_ai(
-    #     generate_document_fields_prompt.system_message,
-    #     generate_document_fields_prompt.example_1_human_message,
-    #     generate_document_fields_prompt.example_1_assistant_message,
-    #     generate_document_fields_prompt.example_2_human_message,
-    #     generate_document_fields_prompt.example_2_assistant_message,
-    #     generate_document_fields_prompt.example_3_human_message,
-    #     generate_document_fields_prompt.example_3_assistant_message,
-    #     generate_document_fields_prompt.example_4_human_message,
-    #     generate_document_fields_prompt.example_4_assistant_message,
-    #     human_message
-    # )
-    #
+    output = utils.get_output_from_generative_ai(
+        generate_document_fields_prompt.system_message,
+        generate_document_fields_prompt.example_1_human_message,
+        generate_document_fields_prompt.example_1_assistant_message,
+        generate_document_fields_prompt.example_2_human_message,
+        generate_document_fields_prompt.example_2_assistant_message,
+        generate_document_fields_prompt.example_3_human_message,
+        generate_document_fields_prompt.example_3_assistant_message,
+        generate_document_fields_prompt.example_4_human_message,
+        generate_document_fields_prompt.example_4_assistant_message,
+        human_message
+    )
+    # output = "[]"
+
     # with open('ai_document_fields.json', 'w') as file:
     #     file.write(output)
-    #
-    # logging.info(f"\noutput: {output}\n\n")
-    #
-    # return json.loads(output)
 
-    with open('ai_document_fields.json', 'r') as file:
-        data = json.load(file)
+    logging.info(f"\n\nDOCUMENT FIELDS: {output}\n\n")
 
-    return data
+    return json.loads(output)
+
+    # with open('ai_document_fields.json', 'r') as file:
+    #     data = json.load(file)
+    #
+    # return data
 
 
 def generate_repeating_groups(array_document_fields):
@@ -286,28 +287,31 @@ def generate_repeating_groups(array_document_fields):
 ### OUTPUT JSON ###
     """
 
-    # output = utils.get_output_from_generative_ai(
-    #     generate_repeating_groups_prompt.system_message,
-    #     generate_repeating_groups_prompt.example_1_human_message,
-    #     generate_repeating_groups_prompt.example_1_assistant_message,
-    #     generate_repeating_groups_prompt.example_2_human_message,
-    #     generate_repeating_groups_prompt.example_2_assistant_message,
-    #     generate_repeating_groups_prompt.example_3_human_message,
-    #     generate_repeating_groups_prompt.example_3_assistant_message,
-    #     generate_repeating_groups_prompt.example_4_human_message,
-    #     generate_repeating_groups_prompt.example_4_assistant_message,
-    #     human_message
-    # )
-    #
+    output = utils.get_output_from_generative_ai(
+        generate_repeating_groups_prompt.system_message,
+        generate_repeating_groups_prompt.example_1_human_message,
+        generate_repeating_groups_prompt.example_1_assistant_message,
+        generate_repeating_groups_prompt.example_2_human_message,
+        generate_repeating_groups_prompt.example_2_assistant_message,
+        generate_repeating_groups_prompt.example_3_human_message,
+        generate_repeating_groups_prompt.example_3_assistant_message,
+        generate_repeating_groups_prompt.example_4_human_message,
+        generate_repeating_groups_prompt.example_4_assistant_message,
+        human_message
+    )
+    # output = "[]"
+
+    logging.info(f"\n\nREPEATING GROUPS: {output}\n\n")
+
     # with open('ai_repeating_groups.json', 'a') as file:
     #     file.write(output)
+
+    return json.loads(output)
+
+    # with open('ai_repeating_groups.json', 'r') as file:
+    #     data = json.load(file)
     #
-    # return json.loads(output)
-
-    with open('ai_repeating_groups.json', 'r') as file:
-        data = json.load(file)
-
-    return data
+    # return data
 
 
 def generate_sbe_fields(array_document_fields):
@@ -321,28 +325,31 @@ def generate_sbe_fields(array_document_fields):
 ### OUTPUT JSON ###
         """
 
-    # output = utils.get_output_from_generative_ai(
-    #     generate_sbe_fields_prompt.system_message,
-    #     generate_sbe_fields_prompt.example_1_human_message,
-    #     generate_sbe_fields_prompt.example_1_assistant_message,
-    #     generate_sbe_fields_prompt.example_2_human_message,
-    #     generate_sbe_fields_prompt.example_2_assistant_message,
-    #     generate_sbe_fields_prompt.example_3_human_message,
-    #     generate_sbe_fields_prompt.example_3_assistant_message,
-    #     generate_sbe_fields_prompt.example_4_human_message,
-    #     generate_sbe_fields_prompt.example_4_assistant_message,
-    #     human_message
-    # )
-    #
+    output = utils.get_output_from_generative_ai(
+        generate_sbe_fields_prompt.system_message,
+        generate_sbe_fields_prompt.example_1_human_message,
+        generate_sbe_fields_prompt.example_1_assistant_message,
+        generate_sbe_fields_prompt.example_2_human_message,
+        generate_sbe_fields_prompt.example_2_assistant_message,
+        generate_sbe_fields_prompt.example_3_human_message,
+        generate_sbe_fields_prompt.example_3_assistant_message,
+        generate_sbe_fields_prompt.example_4_human_message,
+        generate_sbe_fields_prompt.example_4_assistant_message,
+        human_message
+    )
+    # output = "[]"
+
     # with open('ai_sbe_fields.json', 'a') as file:
     #     file.write(output)
+
+    logging.info(f"\n\nSBE FIELDS: {output}\n\n")
+
+    return json.loads(output)
+
+    # with open('ai_sbe_fields.json', 'r') as file:
+    #     data = json.load(file)
     #
-    # return json.loads(output)
-
-    with open('ai_sbe_fields.json', 'r') as file:
-        data = json.load(file)
-
-    return data
+    # return data
 
 
 def generate_sbe_message_components(array_json_array_document_fields):
@@ -359,13 +366,21 @@ def generate_sbe_message_components(array_json_array_document_fields):
             array_json_array_repeating_groups = pool.map(generate_repeating_groups,
                                                          array_document_fields_adjacent_pages)
 
+    logging.info("1")
+
     for json_array_repeating_group in array_json_array_repeating_groups:
+        logging.info("2")
         for repeating_group in json_array_repeating_group:
+            logging.info("3")
             if not utils.is_duplicate_in_json_array("group_id", repeating_group["group_id"],
                                                     json_array_repeating_groups):
+                logging.info("4")
                 json_array_repeating_groups.append(repeating_group)
+                logging.info("5")
+    logging.info("6")
 
     with Pool(number_processes) as pool:
+        logging.info("7")
         array_json_array_sbe_fields = pool.map(generate_sbe_fields, array_json_array_document_fields)
 
     json_array_full_sbe_fields = utils.merge_unique_json_arrays(array_json_array_sbe_fields)
@@ -381,11 +396,13 @@ def generate_sbe_message_components(array_json_array_document_fields):
                                                                 array_json_array_repeating_groups_document_fields)
         logging.info(f"array_json_array_repeating_groups_sbe_fields: {array_json_array_repeating_groups_sbe_fields}")
 
-    for i, repeating_group in enumerate(json_array_repeating_groups):
-        repeating_group["items"] = array_json_array_repeating_groups_sbe_fields[i]
-
     ids_to_remove = set()
     names_to_remove = set()
+
+    for i, repeating_group in enumerate(json_array_repeating_groups):
+        repeating_group["items"] = array_json_array_repeating_groups_sbe_fields[i]
+        ids_to_remove.add(repeating_group["group_id"])
+        names_to_remove.add(repeating_group["group_name"])
 
     logging.info(f"json_array_repeating_groups: {json_array_repeating_groups}")
 
@@ -407,7 +424,7 @@ def generate_sbe_message_components(array_json_array_document_fields):
     return json_array_sbe_fields, json_array_repeating_groups
 
 
-def execute_pipeline_filters(pipeline_filters, input_pipeline):
+def execute_pipeline_filters(pipeline_filters, input_pipeline, folder_path="NONE"):
     data = input_pipeline
     i = 1
     for function in pipeline_filters:
@@ -423,7 +440,7 @@ def execute_pipeline_filters(pipeline_filters, input_pipeline):
     return data
 
 
-def process(pdf_path, starting_page, ending_page, folder_path="extracted_pdf_pages"):
+def process(pdf_path, starting_page, ending_page, folder_path="NONE"):
     load_dotenv()
 
     input_pipeline = {
@@ -433,19 +450,24 @@ def process(pdf_path, starting_page, ending_page, folder_path="extracted_pdf_pag
         "folder_path": folder_path
     }
 
-    pipeline_filters = [
-        extract_pdf_text,
-        #convert_pdf_pages_to_jpg,
-        #grayscale_batch_processing,
-        #increase_contrast_batch_processing,
-        #thresholding_batch_processing,
-        #table_detection_batch_processing,
-        #ocr_tables_batch_processing,
+    read_only_pdf_pipeline_filters = [
+        convert_pdf_pages_to_jpg,
+        grayscale_batch_processing,
+        increase_contrast_batch_processing,
+        thresholding_batch_processing,
+        table_detection_batch_processing,
+        ocr_tables_batch_processing,
         document_fields_generation_batch_processing,
         generate_sbe_message_components
     ]
 
-    return execute_pipeline_filters(pipeline_filters, input_pipeline)
+    editable_pdf_pipeline_filters = [
+        extract_pdf_text,
+        document_fields_generation_batch_processing,
+        generate_sbe_message_components
+    ]
+
+    return execute_pipeline_filters(editable_pdf_pipeline_filters, input_pipeline) if folder_path == "NONE" else execute_pipeline_filters(read_only_pdf_pipeline_filters, input_pipeline, folder_path)
 
 
 if __name__ == "__main__":

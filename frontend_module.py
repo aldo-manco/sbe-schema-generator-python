@@ -2,7 +2,6 @@
 
 import streamlit as st
 
-import ai_engine_module
 from json_schema_handler import JsonSchemaHandler
 from xml_sbe_schema_handler import XmlSbeSchemaHandler
 import utils
@@ -14,6 +13,11 @@ tab_new_document_message_field = "Add New Document Message Field"
 tab_new_document_repeating_group = "Add New Document Repeating Group"
 tab_new_document_composite = "Add New Document Composite"
 tab_generate_sbe_xml_schema = "Generate SBE XML Schema"
+
+if 'toggle_state' not in st.session_state:
+    st.session_state['toggle_state'] = False
+if 'pdf_uploaded_state' not in st.session_state:
+    st.session_state['pdf_uploaded_state'] = False
 
 
 def form_new_sbe_schema():
@@ -92,6 +96,10 @@ def form_new_sbe_schema():
                 st.error(f"Error saving file: {str(e)}")
 
 
+def toggle_action():
+    st.session_state['toggle_state'] = not st.session_state['toggle_state']
+
+
 def form_new_sbe_message():
     st.subheader(tab_new_document_message)
 
@@ -109,108 +117,127 @@ def form_new_sbe_message():
         value=0,
         format="%d"
     )
+    starting_page = st.number_input(
+        "Pagina di inizio della tabella",
+        key="starting_page_form_new_sbe_message",
+        min_value=1,
+        format="%d"
+    )
+    ending_page = st.number_input(
+        "Pagina di fine della tabella",
+        key="ending_page_form_new_sbe_message",
+        min_value=1,
+        format="%d"
+    )
 
-    if json_schema_name and message_name and template_id >= 0:
+    if json_schema_name and message_name and template_id >= 0 and starting_page >= 0 and ending_page >= 0:
+        st.write(f"Name SBE Message: {message_name}")
+        st.write(f"Template ID: {template_id}")
+        st.write(f"Starting Page of Table: {starting_page}")
+        st.write(f"Ending Page of Table: {ending_page}")
+
         json_handler = JsonSchemaHandler(json_schema_name)
 
         if st.button(f"Create Message in {json_schema_name}"):
-            json_handler.add_document_message(message_name, template_id)
-            # st.success(json_handler.load_schema())
+            json_handler.add_document_message(message_name, template_id, starting_page, ending_page)
 
-            if "upload_pdf_document" not in st.session_state:
-                st.session_state["upload_pdf_document"] = True
-            st.session_state["upload_pdf_document"] = True
+        st.success(f"SBE Message \'{message_name}\' is in the SBE Schema \'{json_schema_name}\'")
 
-        if "upload_pdf_document" in st.session_state and st.session_state["upload_pdf_document"] == True:
-            uploaded_file = st.file_uploader("Carica un file PDF", type="pdf")
 
-            if uploaded_file is not None:
-                pdf_path = utils.save_uploaded_file("pdf_documents", uploaded_file)
-                st.success(f"File salvato in: {pdf_path}")
+def form_generate_sbe_xml_schema():
+    st.subheader(tab_generate_sbe_xml_schema)
 
-                starting_page = st.number_input(
-                    "Pagina di inizio della tabella",
-                    key="starting_page_form_new_sbe_message",
-                    min_value=1,
-                    format="%d"
-                )
-                ending_page = st.number_input(
-                    "Pagina di fine della tabella",
-                    key="ending_page_form_new_sbe_message",
-                    min_value=1,
-                    format="%d"
-                )
+    uploaded_file = st.file_uploader("Carica un file PDF", type="pdf")
 
-                if starting_page and ending_page:
-                    st.write(f"Percorso del file: {pdf_path}")
-                    st.write(f"Pagina di inizio della tabella: {starting_page}")
-                    st.write(f"Pagina di fine della tabella: {ending_page}")
+    if uploaded_file is not None:
+        pdf_path = utils.save_uploaded_file("pdf_documents", uploaded_file)
+        st.success(f"File salvato in: {pdf_path}")
 
-                    if "generate_sbe_xml_schema" not in st.session_state:
-                        st.session_state["generate_sbe_xml_schema"] = True
-                    st.session_state["generate_sbe_xml_schema"] = True
+        checkbox_label = "Editable PDF" if st.session_state.toggle_state else "Read Only PDF"
+        st.checkbox(checkbox_label, key='toggle_state', value=st.session_state.toggle_state)
 
-                if "generate_sbe_xml_schema" in st.session_state and st.session_state[
-                    "generate_sbe_xml_schema"] == True:
+        json_schema_name = st.text_input(
+            "Name JSON Schema",
+            key="json_schema_name_form_new_sbe_message"
+        )
 
-                    if st.button(f"Generate SBE XML Schema \'{json_schema_name}\'"):
+        if json_schema_name:
+            json_handler = JsonSchemaHandler(json_schema_name)
+            st.session_state['pdf_uploaded_state'] = True
 
-                        with st.spinner('Creazione dello Schema SBE XML in corso...'):
+        if st.session_state['pdf_uploaded_state']:
+            if st.button(f"Generate SBE XML Schema \'{json_schema_name}\'"):
+                with (st.spinner('Creazione dello Schema SBE XML in corso...')):
 
-                            json_array_sbe_fields, json_array_repeating_groups = ai_engine_module.process(pdf_path,
-                                                                                                          starting_page,
-                                                                                                          ending_page)
+                    if not st.session_state['toggle_state']:
+                        is_pdf_editable = False
+                    elif st.session_state['toggle_state']:
+                        is_pdf_editable = True
 
-                            for sbe_field in json_array_sbe_fields:
-                                json_handler.add_sbe_field_to_message(message_name, sbe_field)
+                    lambda_generate_sbe_message = lambda document_message: (
+                        json_handler.generate_sbe_message(document_message, pdf_path, is_pdf_editable)
+                    )
 
-                            for repeating_group in json_array_repeating_groups:
-                                json_handler.add_repeating_group_to_message(
-                                    message_name,
-                                    repeating_group["group_name"],
-                                    repeating_group["group_id"]
-                                )
+                    json_handler.iterate_document_messages(lambda_generate_sbe_message)
 
-                                for sbe_field in repeating_group["items"]:
-                                    json_handler.add_sbe_field_to_repeating_group(
-                                        message_name,
-                                        repeating_group["group_id"],
-                                        sbe_field
-                                    )
+                    lambda_generate_sbe_data_type_definitions = lambda sbe_field: (
+                        json_handler.generate_sbe_data_type_definitions(sbe_field)
+                    )
 
-                            # st.success(json_handler.load_schema())
+                    json_handler.iterate_sbe_fields_of_document_messages(
+                        lambda_generate_sbe_data_type_definitions)
 
-                            lambda_generate_sbe_data_type_definitions = lambda sbe_field: (
-                                json_handler.generate_sbe_data_type_definitions(sbe_field)
-                            )
+                    xml_handler = XmlSbeSchemaHandler(json_schema_name)
+                    xml_handler.generate_xml_schema_from_json_schema(json_handler)
 
-                            json_handler.iterate_sbe_fields_of_document_messages(
-                                lambda_generate_sbe_data_type_definitions)
+                st.success('Schema SBE XML Generato con successo.')
 
-                            xml_handler = XmlSbeSchemaHandler(json_schema_name)
-                            xml_handler.generate_xml_schema_from_json_schema(json_handler)
+    else:
+        st.info("Per favore, seleziona un file PDF.")
 
-                        st.session_state["generate_sbe_xml_schema"] = False
-                        st.success('Schema SBE XML Generato con successo.')
 
-            else:
-                st.error("Per favore, seleziona un file PDF.")
+def load_and_display_json():
+    name_sbe_schema = st.text_input("Name SBE Schema")
+
+    if name_sbe_schema:
+        try:
+            json_schema_handler = JsonSchemaHandler(name_sbe_schema)
+
+            edited_content = st.text_area(
+                "Modifica JSON Schema:",
+                value=json_schema_handler.load_string_schema(),
+                height=300,
+                key=f"edit_{name_sbe_schema}"
+            )
+
+            if st.button("Salva modifiche", key=f"save_{name_sbe_schema}"):
+                success, message = json_schema_handler.save_edited_json_schema(edited_content)
+                if success:
+                    st.success(message)
+                else:
+                    st.error(message)
+        except Exception as e:
+            st.error(str(e))
+    else:
+        st.error("Inserisci un nome valido per lo schema.")
 
 
 def main():
     st.title("SBE XML Schema Generator")
 
-    tab1, tab2 = st.tabs(["Automatic", "Manual"])
+    tab1, tab2, tab3 = st.tabs(["Automatic", "Manual", "Viewer"])
 
     with tab1:
         st.header("AI Automatic Generator")
-        tabs = [tab_new_json_schema, tab_new_document_message]
+        tabs = [tab_new_json_schema, tab_new_document_message, tab_generate_sbe_xml_schema]
         default_index = tabs.index(tab_new_document_message)
         tab = st.selectbox("Select Tab", tabs, index=default_index)
         if tab == tab_new_json_schema:
             form_new_sbe_schema()
         elif tab == tab_new_document_message:
             form_new_sbe_message()
+        elif tab == tab_generate_sbe_xml_schema:
+            form_generate_sbe_xml_schema()
 
     with tab2:
         st.header("Manual Generator")
@@ -304,8 +331,8 @@ def main():
                     json_handler = JsonSchemaHandler(json_schema_name)
                     xml_handler = XmlSbeSchemaHandler(json_schema_name)
 
-                    lambda_generate_sbe_fields = lambda document_message, document_fields: (
-                        json_handler.generate_sbe_fields(document_message, document_fields)
+                    lambda_generate_sbe_fields = lambda document_message: (
+                        json_handler.generate_sbe_fields(document_message)
                     )
 
                     json_handler.iterate_document_messages(lambda_generate_sbe_fields)
@@ -317,6 +344,9 @@ def main():
                     json_handler.iterate_sbe_fields_of_document_messages(lambda_generate_sbe_data_type_definitions)
 
                     xml_handler.generate_xml_schema_from_json_schema(json_handler)
+
+    with tab3:
+        load_and_display_json()
 
 
 # This checks if the script is being run directly (and not imported)

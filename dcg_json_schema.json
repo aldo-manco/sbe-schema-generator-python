@@ -12,9 +12,9 @@
         "byte_order": "littleEndian",
         "array_number_data_types": [
             {
-                "name_type": "int8_t",
-                "data_type": "int8",
-                "length": 1,
+                "name_type": "uint64_t",
+                "data_type": "uint64",
+                "length": 8,
                 "presence": "optional"
             },
             {
@@ -26,15 +26,27 @@
         ],
         "array_string_data_types": [
             {
-                "name_type": "char20_optional",
+                "name_type": "char27_optional",
                 "data_type": "char",
-                "length": 20,
+                "length": 27,
                 "presence": "optional"
             },
             {
-                "name_type": "char11",
+                "name_type": "char27",
                 "data_type": "char",
-                "length": 11,
+                "length": 27,
+                "presence": "mandatory"
+            },
+            {
+                "name_type": "char20",
+                "data_type": "char",
+                "length": 20,
+                "presence": "mandatory"
+            },
+            {
+                "name_type": "char10",
+                "data_type": "char",
+                "length": 10,
                 "presence": "mandatory"
             },
             {
@@ -42,107 +54,35 @@
                 "data_type": "char",
                 "length": 1,
                 "presence": "mandatory"
-            },
-            {
-                "name_type": "char1_optional",
-                "data_type": "char",
-                "length": 1,
-                "presence": "optional"
             }
         ],
         "array_enum_data_types": [
             {
                 "encoding_type": "char",
-                "data_type": "TriggeredStopTimeInForce_enum",
+                "data_type": "execType_enum",
                 "structure": {
-                    "0": "Day",
-                    "1": "Good Till Cancel",
-                    "6": "Good till Date"
-                }
-            },
-            {
-                "encoding_type": "int8",
-                "data_type": "RFQAnswerIndicator_enum",
-                "structure": {
-                    "0": "No",
-                    "1": "Yes"
-                }
-            },
-            {
-                "encoding_type": "int8",
-                "data_type": "RFQConfirmationIndicator_enum",
-                "structure": {
-                    "0": "No",
-                    "1": "Yes"
-                }
-            },
-            {
-                "encoding_type": "int8",
-                "data_type": "ConditionalOrderFlag_enum",
-                "structure": {
-                    "0": "Firm",
-                    "1": "Conditional"
-                }
-            },
-            {
-                "encoding_type": "int32",
-                "data_type": "PartyRole_enum",
-                "structure": {
-                    "3": "Client ID",
-                    "12": "Executing Trader",
-                    "999": "Not Applicable"
-                }
-            },
-            {
-                "encoding_type": "int16",
-                "data_type": "PartyRoleQualifier_enum",
-                "structure": {
-                    "22": "Algorithm",
-                    "23": "Firm or legal entity",
-                    "24": "Natural person",
-                    "99": "Not Applicable"
-                }
-            },
-            {
-                "encoding_type": "int8",
-                "data_type": "OrderOrigination_enum",
-                "structure": {
-                    "5": "Order received from a direct access or sponsored access customer"
-                }
-            },
-            {
-                "encoding_type": "int8",
-                "data_type": "OrderAttributeType_enum",
-                "structure": {
-                    "0": "Aggregated order",
-                    "1": "Pending allocation",
-                    "3": "Risk reduction order"
-                }
-            },
-            {
-                "encoding_type": "char",
-                "data_type": "LastCapacity_enum",
-                "structure": {
-                    "7": "Dealing on own account",
-                    "8": "Matched principal",
-                    "9": "Any other capacity"
-                }
-            },
-            {
-                "encoding_type": "char",
-                "data_type": "AckPhase_enum",
-                "structure": {
-                    "1": "Continuous Trading Phase",
-                    "2": "Call Phase",
-                    "3": "Halt Phase",
-                    "5": "Trading At Last Phase",
-                    "6": "Reserved",
-                    "7": "Suspended",
-                    "8": "Random Uncrossing Phase"
+                    "0": "New",
+                    "i": "Order Creation By Market Operations",
+                    "j": "RFQ Ack",
+                    "e": "Refilled Iceberg Ack",
+                    "h": "Iceberg Transformed to Limit due to Minimum size"
                 }
             }
         ],
-        "array_set_data_types": [],
+        "array_set_data_types": [
+            {
+                "encoding_type": "char",
+                "data_type": "darkExecutionInstruction_set",
+                "structure": {
+                    "0": "No Dark Indicator",
+                    "1": "Yes Dark Indicator",
+                    "4": "No Sweep Order Indicator",
+                    "5": "Yes Sweep Order Indicator",
+                    "6": "MAQ Minimum Quantity Type",
+                    "7": "MES Minimum Quantity Type"
+                }
+            }
+        ],
         "array_composite_data_types": [],
         "array_document_messages": [
             {
@@ -150,413 +90,383 @@
                 "template_id": 21,
                 "array_document_columns": [],
                 "array_document_fields": [],
-                "array_sbe_fields": [],
-                "array_sbe_repeating_groups": [
+                "array_sbe_fields": [
                     {
-                        "group_id": "453",
-                        "group_name": "PartyIDsGroup",
-                        "items": [
-                            {
-                                "field_id": 20175,
-                                "field_name": "TriggeredStopTimeInForce",
-                                "data_type": "TriggeredStopTimeInForce_enum",
-                                "encoding_type": "char",
-                                "length": 1,
-                                "presence": "optional",
-                                "structure": {
-                                    "0": "Day",
-                                    "1": "Good Till Cancel",
-                                    "6": "Good till Date"
-                                }
-                            },
-                            {
-                                "field_id": 131,
-                                "field_name": "QuoteReqID",
-                                "data_type": "char",
-                                "encoding_type": "char",
-                                "length": 20,
-                                "presence": "optional",
-                                "structure": {},
-                                "custom_type": "char20_optional"
-                            },
-                            {
-                                "field_id": 21037,
-                                "field_name": "RFQAnswerIndicator",
-                                "data_type": "RFQAnswerIndicator_enum",
-                                "encoding_type": "int8",
-                                "length": 1,
-                                "presence": "optional",
-                                "structure": {
-                                    "0": "No",
-                                    "1": "Yes"
-                                }
-                            },
-                            {
-                                "field_id": 21038,
-                                "field_name": "RFQConfirmationIndicator",
-                                "data_type": "RFQConfirmationIndicator_enum",
-                                "encoding_type": "int8",
-                                "length": 1,
-                                "presence": "optional",
-                                "structure": {
-                                    "0": "No",
-                                    "1": "Yes"
-                                }
-                            },
-                            {
-                                "field_id": 21800,
-                                "field_name": "ConditionalOrderFlag",
-                                "data_type": "ConditionalOrderFlag_enum",
-                                "encoding_type": "int8",
-                                "length": 1,
-                                "presence": "optional",
-                                "structure": {
-                                    "0": "Firm",
-                                    "1": "Conditional"
-                                }
-                            },
-                            {
-                                "field_id": 453,
-                                "field_name": "NoPartyIDs",
-                                "data_type": "int8",
-                                "encoding_type": "int8",
-                                "length": 1,
-                                "presence": "mandatory",
-                                "structure": {}
-                            },
-                            {
-                                "field_id": 448,
-                                "field_name": "PartyID",
-                                "data_type": "char",
-                                "encoding_type": "char",
-                                "length": 11,
-                                "presence": "mandatory",
-                                "structure": {},
-                                "custom_type": "char11"
-                            },
-                            {
-                                "field_id": 447,
-                                "field_name": "PartyIDSource",
-                                "data_type": "char",
-                                "encoding_type": "char",
-                                "length": 1,
-                                "presence": "mandatory",
-                                "structure": {},
-                                "custom_type": "char1"
-                            },
-                            {
-                                "field_id": 452,
-                                "field_name": "PartyRole",
-                                "data_type": "PartyRole_enum",
-                                "encoding_type": "int32",
-                                "length": 3,
-                                "presence": "mandatory",
-                                "structure": {
-                                    "3": "Client ID",
-                                    "12": "Executing Trader",
-                                    "999": "Not Applicable"
-                                }
-                            },
-                            {
-                                "field_id": 2376,
-                                "field_name": "PartyRoleQualifier",
-                                "data_type": "PartyRoleQualifier_enum",
-                                "encoding_type": "int16",
-                                "length": 2,
-                                "presence": "optional",
-                                "structure": {
-                                    "22": "Algorithm",
-                                    "23": "Firm or legal entity",
-                                    "24": "Natural person",
-                                    "99": "Not Applicable"
-                                }
-                            },
-                            {
-                                "field_id": 1724,
-                                "field_name": "OrderOrigination",
-                                "data_type": "OrderOrigination_enum",
-                                "encoding_type": "int8",
-                                "length": 1,
-                                "presence": "optional",
-                                "structure": {
-                                    "5": "Order received from a direct access or sponsored access customer"
-                                }
-                            },
-                            {
-                                "field_id": 2593,
-                                "field_name": "NoOrderAttributes",
-                                "data_type": "int8",
-                                "encoding_type": "int8",
-                                "length": 1,
-                                "presence": "optional",
-                                "structure": {},
-                                "custom_type": "int8_t"
-                            },
-                            {
-                                "field_id": 2594,
-                                "field_name": "OrderAttributeType",
-                                "data_type": "OrderAttributeType_enum",
-                                "encoding_type": "int8",
-                                "length": 1,
-                                "presence": "optional",
-                                "structure": {
-                                    "0": "Aggregated order",
-                                    "1": "Pending allocation",
-                                    "3": "Risk reduction order"
-                                }
-                            },
-                            {
-                                "field_id": 2595,
-                                "field_name": "OrderAttributeValue",
-                                "data_type": "char",
-                                "encoding_type": "char",
-                                "length": 1,
-                                "presence": "optional",
-                                "structure": {},
-                                "custom_type": "char1_optional"
-                            },
-                            {
-                                "field_id": 29,
-                                "field_name": "LastCapacity",
-                                "data_type": "LastCapacity_enum",
-                                "encoding_type": "char",
-                                "length": 1,
-                                "presence": "mandatory",
-                                "structure": {
-                                    "7": "Dealing on own account",
-                                    "8": "Matched principal",
-                                    "9": "Any other capacity"
-                                }
-                            },
-                            {
-                                "field_id": 110,
-                                "field_name": "MinQty",
-                                "data_type": "int64",
-                                "encoding_type": "int64",
-                                "length": 8,
-                                "presence": "optional",
-                                "structure": {},
-                                "custom_type": "int64_t"
-                            },
-                            {
-                                "field_id": 21013,
-                                "field_name": "AckPhase",
-                                "data_type": "AckPhase_enum",
-                                "encoding_type": "char",
-                                "length": 1,
-                                "presence": "mandatory",
-                                "structure": {
-                                    "1": "Continuous Trading Phase",
-                                    "2": "Call Phase",
-                                    "3": "Halt Phase",
-                                    "5": "Trading At Last Phase",
-                                    "6": "Reserved",
-                                    "7": "Suspended",
-                                    "8": "Random Uncrossing Phase"
-                                }
-                            }
-                        ]
+                        "field_id": 21005,
+                        "field_name": "ClientMessageSendingTime",
+                        "data_type": "char",
+                        "encoding_type": "char",
+                        "length": 27,
+                        "presence": "optional",
+                        "structure": {},
+                        "custom_type": "char27_optional"
                     },
                     {
-                        "group_id": "2593",
-                        "group_name": "OrderAttributesGroup",
-                        "items": [
-                            {
-                                "field_id": 20175,
-                                "field_name": "TriggeredStopTimeInForce",
-                                "data_type": "TriggeredStopTimeInForce_enum",
-                                "encoding_type": "char",
-                                "length": 1,
-                                "presence": "optional",
-                                "structure": {
-                                    "0": "Day",
-                                    "1": "Good Till Cancel",
-                                    "6": "Good till Date"
-                                }
-                            },
-                            {
-                                "field_id": 131,
-                                "field_name": "QuoteReqID",
-                                "data_type": "char",
-                                "encoding_type": "char",
-                                "length": 20,
-                                "presence": "optional",
-                                "structure": {}
-                            },
-                            {
-                                "field_id": 21037,
-                                "field_name": "RFQAnswerIndicator",
-                                "data_type": "RFQAnswerIndicator_enum",
-                                "encoding_type": "int8",
-                                "length": 1,
-                                "presence": "optional",
-                                "structure": {
-                                    "0": "No",
-                                    "1": "Yes"
-                                }
-                            },
-                            {
-                                "field_id": 21038,
-                                "field_name": "RFQConfirmationIndicator",
-                                "data_type": "RFQConfirmationIndicator_enum",
-                                "encoding_type": "int8",
-                                "length": 1,
-                                "presence": "optional",
-                                "structure": {
-                                    "0": "No",
-                                    "1": "Yes"
-                                }
-                            },
-                            {
-                                "field_id": 21800,
-                                "field_name": "ConditionalOrderFlag",
-                                "data_type": "ConditionalOrderFlag_enum",
-                                "encoding_type": "int8",
-                                "length": 1,
-                                "presence": "optional",
-                                "structure": {
-                                    "0": "Firm",
-                                    "1": "Conditional"
-                                }
-                            },
-                            {
-                                "field_id": 453,
-                                "field_name": "NoPartyIDs",
-                                "data_type": "int8",
-                                "encoding_type": "int8",
-                                "length": 1,
-                                "presence": "mandatory",
-                                "structure": {}
-                            },
-                            {
-                                "field_id": 448,
-                                "field_name": "PartyID",
-                                "data_type": "char",
-                                "encoding_type": "char",
-                                "length": 11,
-                                "presence": "mandatory",
-                                "structure": {}
-                            },
-                            {
-                                "field_id": 447,
-                                "field_name": "PartyIDSource",
-                                "data_type": "char",
-                                "encoding_type": "char",
-                                "length": 1,
-                                "presence": "mandatory",
-                                "structure": {}
-                            },
-                            {
-                                "field_id": 452,
-                                "field_name": "PartyRole",
-                                "data_type": "PartyRole_enum",
-                                "encoding_type": "int32",
-                                "length": 3,
-                                "presence": "mandatory",
-                                "structure": {
-                                    "3": "Client ID",
-                                    "12": "Executing Trader",
-                                    "999": "Not Applicable"
-                                }
-                            },
-                            {
-                                "field_id": 2376,
-                                "field_name": "PartyRoleQualifier",
-                                "data_type": "PartyRoleQualifier_enum",
-                                "encoding_type": "int16",
-                                "length": 2,
-                                "presence": "optional",
-                                "structure": {
-                                    "22": "Algorithm",
-                                    "23": "Firm or legal entity",
-                                    "24": "Natural person",
-                                    "99": "Not Applicable"
-                                }
-                            },
-                            {
-                                "field_id": 1724,
-                                "field_name": "OrderOrigination",
-                                "data_type": "OrderOrigination_enum",
-                                "encoding_type": "int8",
-                                "length": 1,
-                                "presence": "optional",
-                                "structure": {
-                                    "5": "Order received from a direct access or sponsored access customer"
-                                }
-                            },
-                            {
-                                "field_id": 2593,
-                                "field_name": "NoOrderAttributes",
-                                "data_type": "int8",
-                                "encoding_type": "int8",
-                                "length": 1,
-                                "presence": "optional",
-                                "structure": {}
-                            },
-                            {
-                                "field_id": 2594,
-                                "field_name": "OrderAttributeType",
-                                "data_type": "OrderAttributeType_enum",
-                                "encoding_type": "int8",
-                                "length": 1,
-                                "presence": "optional",
-                                "structure": {
-                                    "0": "Aggregated order",
-                                    "1": "Pending allocation",
-                                    "3": "Risk reduction order"
-                                }
-                            },
-                            {
-                                "field_id": 2595,
-                                "field_name": "OrderAttributeValue",
-                                "data_type": "char",
-                                "encoding_type": "char",
-                                "length": 1,
-                                "presence": "optional",
-                                "structure": {}
-                            },
-                            {
-                                "field_id": 29,
-                                "field_name": "LastCapacity",
-                                "data_type": "LastCapacity_enum",
-                                "encoding_type": "char",
-                                "length": 1,
-                                "presence": "mandatory",
-                                "structure": {
-                                    "7": "Dealing on own account",
-                                    "8": "Matched principal",
-                                    "9": "Any other capacity"
-                                }
-                            },
-                            {
-                                "field_id": 110,
-                                "field_name": "MinQty",
-                                "data_type": "int64",
-                                "encoding_type": "int64",
-                                "length": 8,
-                                "presence": "optional",
-                                "structure": {}
-                            },
-                            {
-                                "field_id": 21013,
-                                "field_name": "AckPhase",
-                                "data_type": "AckPhase_enum",
-                                "encoding_type": "char",
-                                "length": 1,
-                                "presence": "mandatory",
-                                "structure": {
-                                    "1": "Continuous Trading Phase",
-                                    "2": "Call Phase",
-                                    "3": "Halt Phase",
-                                    "5": "Trading At Last Phase",
-                                    "6": "Reserved",
-                                    "7": "Suspended",
-                                    "8": "Random Uncrossing Phase"
-                                }
-                            }
-                        ]
+                        "field_id": 5979,
+                        "field_name": "OEGINFromMember",
+                        "data_type": "char",
+                        "encoding_type": "char",
+                        "length": 27,
+                        "presence": "optional",
+                        "structure": {},
+                        "custom_type": "char27_optional"
+                    },
+                    {
+                        "field_id": 7764,
+                        "field_name": "OEGOUTToME",
+                        "data_type": "char",
+                        "encoding_type": "char",
+                        "length": 27,
+                        "presence": "optional",
+                        "structure": {},
+                        "custom_type": "char27_optional"
+                    },
+                    {
+                        "field_id": 21002,
+                        "field_name": "BookINTime",
+                        "data_type": "char",
+                        "encoding_type": "char",
+                        "length": 27,
+                        "presence": "mandatory",
+                        "structure": {},
+                        "custom_type": "char27"
+                    },
+                    {
+                        "field_id": 21003,
+                        "field_name": "BookOUTTime",
+                        "data_type": "char",
+                        "encoding_type": "char",
+                        "length": 27,
+                        "presence": "optional",
+                        "structure": {},
+                        "custom_type": "char27_optional"
+                    },
+                    {
+                        "field_id": 7765,
+                        "field_name": "OEGINFromME",
+                        "data_type": "char",
+                        "encoding_type": "char",
+                        "length": 27,
+                        "presence": "optional",
+                        "structure": {},
+                        "custom_type": "char27_optional"
+                    },
+                    {
+                        "field_id": 11,
+                        "field_name": "ClOrdID",
+                        "data_type": "char",
+                        "encoding_type": "char",
+                        "length": 20,
+                        "presence": "mandatory",
+                        "structure": {},
+                        "custom_type": "char20"
+                    },
+                    {
+                        "field_id": 48,
+                        "field_name": "SecurityID",
+                        "data_type": "char",
+                        "encoding_type": "char",
+                        "length": 10,
+                        "presence": "mandatory",
+                        "structure": {},
+                        "custom_type": "char10"
+                    },
+                    {
+                        "field_id": 22,
+                        "field_name": "SecurityIDSource",
+                        "data_type": "char",
+                        "encoding_type": "char",
+                        "length": 1,
+                        "presence": "mandatory",
+                        "structure": {},
+                        "custom_type": "char1"
+                    },
+                    {
+                        "field_id": 20020,
+                        "field_name": "EMM",
+                        "data_type": "int32",
+                        "encoding_type": "int32",
+                        "length": 2,
+                        "presence": "mandatory",
+                        "structure": {}
+                    },
+                    {
+                        "field_id": 37,
+                        "field_name": "OrderID",
+                        "data_type": "char",
+                        "encoding_type": "char",
+                        "length": 20,
+                        "presence": "mandatory",
+                        "structure": {},
+                        "custom_type": "char20"
+                    },
+                    {
+                        "field_id": 39,
+                        "field_name": "OrdStatus",
+                        "data_type": "char",
+                        "encoding_type": "char",
+                        "length": 1,
+                        "presence": "mandatory",
+                        "structure": {},
+                        "custom_type": "char1"
+                    },
+                    {
+                        "field_id": 21005,
+                        "field_name": "ClientMessageSendingTime",
+                        "data_type": "char",
+                        "encoding_type": "char",
+                        "length": 27,
+                        "presence": "optional",
+                        "structure": {}
+                    },
+                    {
+                        "field_id": 5979,
+                        "field_name": "OEGINFromMember",
+                        "data_type": "char",
+                        "encoding_type": "char",
+                        "length": 27,
+                        "presence": "optional",
+                        "structure": {}
+                    },
+                    {
+                        "field_id": 7764,
+                        "field_name": "OEGOUTToME",
+                        "data_type": "char",
+                        "encoding_type": "char",
+                        "length": 27,
+                        "presence": "optional",
+                        "structure": {}
+                    },
+                    {
+                        "field_id": 21002,
+                        "field_name": "BookINTime",
+                        "data_type": "char",
+                        "encoding_type": "char",
+                        "length": 27,
+                        "presence": "mandatory",
+                        "structure": {}
+                    },
+                    {
+                        "field_id": 21003,
+                        "field_name": "BookOUTTime",
+                        "data_type": "char",
+                        "encoding_type": "char",
+                        "length": 27,
+                        "presence": "optional",
+                        "structure": {}
+                    },
+                    {
+                        "field_id": 7765,
+                        "field_name": "OEGINFromME",
+                        "data_type": "char",
+                        "encoding_type": "char",
+                        "length": 27,
+                        "presence": "optional",
+                        "structure": {}
+                    },
+                    {
+                        "field_id": 11,
+                        "field_name": "ClOrdID",
+                        "data_type": "char",
+                        "encoding_type": "char",
+                        "length": 20,
+                        "presence": "mandatory",
+                        "structure": {}
+                    },
+                    {
+                        "field_id": 48,
+                        "field_name": "SecurityID",
+                        "data_type": "char",
+                        "encoding_type": "char",
+                        "length": 10,
+                        "presence": "mandatory",
+                        "structure": {}
+                    },
+                    {
+                        "field_id": 22,
+                        "field_name": "SecurityIDSource",
+                        "data_type": "char",
+                        "encoding_type": "char",
+                        "length": 1,
+                        "presence": "mandatory",
+                        "structure": {}
+                    },
+                    {
+                        "field_id": 37,
+                        "field_name": "OrderID",
+                        "data_type": "char",
+                        "encoding_type": "char",
+                        "length": 20,
+                        "presence": "mandatory",
+                        "structure": {}
+                    },
+                    {
+                        "field_id": 39,
+                        "field_name": "OrdStatus",
+                        "data_type": "char",
+                        "encoding_type": "char",
+                        "length": 1,
+                        "presence": "mandatory",
+                        "structure": {}
                     }
-                ]
+                ],
+                "array_sbe_repeating_groups": [],
+                "starting_page": 24,
+                "ending_page": 24
+            },
+            {
+                "message_name": "DCTrade",
+                "template_id": 32,
+                "array_document_columns": [],
+                "array_document_fields": [],
+                "array_sbe_fields": [
+                    {
+                        "field_id": 21004,
+                        "field_name": "OrderPriority",
+                        "data_type": "uint64",
+                        "encoding_type": "uint64",
+                        "length": 8,
+                        "presence": "optional",
+                        "structure": {},
+                        "custom_type": "uint64_t"
+                    },
+                    {
+                        "field_id": 20052,
+                        "field_name": "DarkExecutionInstruction",
+                        "data_type": "darkExecutionInstruction_set",
+                        "encoding_type": "char",
+                        "length": 9,
+                        "presence": "optional",
+                        "structure": {
+                            "0": "No Dark Indicator",
+                            "1": "Yes Dark Indicator",
+                            "4": "No Sweep Order Indicator",
+                            "5": "Yes Sweep Order Indicator",
+                            "6": "MAQ Minimum Quantity Type",
+                            "7": "MES Minimum Quantity Type"
+                        }
+                    },
+                    {
+                        "field_id": 44,
+                        "field_name": "Price",
+                        "data_type": "int64",
+                        "encoding_type": "int64",
+                        "length": 8,
+                        "presence": "optional",
+                        "structure": {},
+                        "custom_type": "int64_t"
+                    },
+                    {
+                        "field_id": 38,
+                        "field_name": "OrderQty",
+                        "data_type": "uint64",
+                        "encoding_type": "uint64",
+                        "length": 8,
+                        "presence": "optional",
+                        "structure": {},
+                        "custom_type": "uint64_t"
+                    },
+                    {
+                        "field_id": 151,
+                        "field_name": "LeavesQty",
+                        "data_type": "int64",
+                        "encoding_type": "int64",
+                        "length": 8,
+                        "presence": "mandatory",
+                        "structure": {}
+                    },
+                    {
+                        "field_id": 17,
+                        "field_name": "ExecID",
+                        "data_type": "char",
+                        "encoding_type": "char",
+                        "length": 10,
+                        "presence": "mandatory",
+                        "structure": {},
+                        "custom_type": "char10"
+                    },
+                    {
+                        "field_id": 150,
+                        "field_name": "ExecType",
+                        "data_type": "execType_enum",
+                        "encoding_type": "char",
+                        "length": 1,
+                        "presence": "mandatory",
+                        "structure": {
+                            "0": "New",
+                            "i": "Order Creation By Market Operations",
+                            "j": "RFQ Ack",
+                            "e": "Refilled Iceberg Ack",
+                            "h": "Iceberg Transformed to Limit due to Minimum size"
+                        }
+                    },
+                    {
+                        "field_id": 99,
+                        "field_name": "StopPx",
+                        "data_type": "int64",
+                        "encoding_type": "int64",
+                        "length": 8,
+                        "presence": "optional",
+                        "structure": {}
+                    },
+                    {
+                        "field_id": 20004,
+                        "field_name": "UndisclosedPrice",
+                        "data_type": "int64",
+                        "encoding_type": "int64",
+                        "length": 8,
+                        "presence": "forbidden",
+                        "structure": {}
+                    },
+                    {
+                        "field_id": 1138,
+                        "field_name": "DisplayQty",
+                        "data_type": "uint64",
+                        "encoding_type": "uint64",
+                        "length": 8,
+                        "presence": "optional",
+                        "structure": {}
+                    },
+                    {
+                        "field_id": 21004,
+                        "field_name": "OrderPriority",
+                        "data_type": "uint64",
+                        "encoding_type": "uint64",
+                        "length": 8,
+                        "presence": "optional",
+                        "structure": {}
+                    },
+                    {
+                        "field_id": 44,
+                        "field_name": "Price",
+                        "data_type": "int64",
+                        "encoding_type": "int64",
+                        "length": 8,
+                        "presence": "optional",
+                        "structure": {}
+                    },
+                    {
+                        "field_id": 38,
+                        "field_name": "OrderQty",
+                        "data_type": "uint64",
+                        "encoding_type": "uint64",
+                        "length": 8,
+                        "presence": "optional",
+                        "structure": {}
+                    },
+                    {
+                        "field_id": 17,
+                        "field_name": "ExecID",
+                        "data_type": "char",
+                        "encoding_type": "char",
+                        "length": 10,
+                        "presence": "mandatory",
+                        "structure": {}
+                    }
+                ],
+                "array_sbe_repeating_groups": [],
+                "starting_page": 25,
+                "ending_page": 25
             }
         ]
     }
