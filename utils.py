@@ -1,18 +1,14 @@
+# utils.py
+
 import os
-import shutil
 import json
-from dotenv import load_dotenv
+import multiprocessing
 from langchain_openai import ChatOpenAI
-from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.messages import (
     SystemMessage,
     HumanMessage,
     AIMessage
-)
-from langchain.prompts import (
-    ChatPromptTemplate,
-    FewShotChatMessagePromptTemplate
 )
 
 
@@ -24,7 +20,7 @@ def create_directory_if_not_exists(directory_path):
 def empty_folder(folder_path):
     for file_name in os.listdir(folder_path):
         file_path = os.path.join(folder_path, file_name)
-        if file_path.endswith('.png') or file_path.endswith('.jpg'):
+        if file_path.endswith(('.jpg', '.jpeg', '.png')):
             try:
                 os.remove(file_path)
                 print(f"File {file_name} cancellato con successo.")
@@ -156,3 +152,7 @@ def add_example_in_array(array_examples, example_human_message, example_assistan
             "human_message": example_human_message,
             "ai_message": example_assistant_message,
         })
+
+
+def get_number_processes(array):
+    return max(min(multiprocessing.cpu_count(), len(array)), 1)

@@ -140,8 +140,7 @@ def form_new_sbe_message():
 
         if st.button(f"Create Message in {json_schema_name}"):
             json_handler.add_document_message(message_name, template_id, starting_page, ending_page)
-
-        st.success(f"SBE Message \'{message_name}\' is in the SBE Schema \'{json_schema_name}\'")
+            st.success(f"SBE Message \'{message_name}\' is in the SBE Schema \'{json_schema_name}\'")
 
 
 def form_generate_sbe_xml_schema():
@@ -162,7 +161,6 @@ def form_generate_sbe_xml_schema():
         )
 
         if json_schema_name:
-            json_handler = JsonSchemaHandler(json_schema_name)
             st.session_state['pdf_uploaded_state'] = True
 
         if st.session_state['pdf_uploaded_state']:
@@ -173,6 +171,8 @@ def form_generate_sbe_xml_schema():
                         is_pdf_editable = False
                     elif st.session_state['toggle_state']:
                         is_pdf_editable = True
+
+                    json_handler = JsonSchemaHandler(json_schema_name)
 
                     lambda_generate_sbe_message = lambda document_message: (
                         json_handler.generate_sbe_message(document_message, pdf_path, is_pdf_editable)
@@ -244,7 +244,7 @@ def main():
 
         tabs = [tab_new_json_schema, tab_new_document_message, tab_new_document_message_column,
                 tab_new_document_message_field, tab_new_document_repeating_group, tab_generate_sbe_xml_schema]
-        default_index = tabs.index(tab_new_document_message)  # This will dynamically find the index
+        default_index = tabs.index(tab_new_document_message)
         tab = st.selectbox("Select Tab", tabs, index=default_index)
 
         if tab == tab_new_json_schema:
@@ -349,6 +349,5 @@ def main():
         load_and_display_json()
 
 
-# This checks if the script is being run directly (and not imported)
 if __name__ == "__main__":
     main()
