@@ -156,3 +156,32 @@ def add_example_in_array(array_examples, example_human_message, example_assistan
 
 def get_number_processes(array):
     return max(min(multiprocessing.cpu_count(), len(array)), 1)
+
+
+def group_texts_in_array(array_strings, number_elements):
+    array_grouped_strings = []
+
+    grouped_strings = [array_strings[i:i + number_elements] for i in range(0, len(array_strings), number_elements)]
+
+    for group in grouped_strings:
+        concatenated_string = ''.join(group)
+        array_grouped_strings.append(concatenated_string)
+
+    return array_grouped_strings
+
+
+def split_json_arrays(array_of_json_arrays):
+    array_splitted_json_arrays = []
+    for json_array in array_of_json_arrays:
+        if not isinstance(json_array, list):
+            raise ValueError("Each item in the array must be a list.")
+
+        split_index = len(json_array) // 2 + len(json_array) % 2
+
+        first_part = json_array[:split_index]
+        second_part = json_array[split_index:]
+
+        array_splitted_json_arrays.append(first_part)
+        array_splitted_json_arrays.append(second_part)
+
+    return array_splitted_json_arrays

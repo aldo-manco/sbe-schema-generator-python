@@ -242,31 +242,40 @@ def ocr_tables_batch_processing(output_previous_function):
             text = tesseract_model.detect(image_table)
             layout_table.set(text=text, inplace=True)
 
-            array_text_tables_pages.append(array_layout_tables.get_texts())
+        array_text_tables_pages.append('\n'.join(array_layout_tables.get_texts()))
 
     return {
         "array_text_pages": array_text_tables_pages
     }
 
 
-def document_fields_generation_batch_processing(output_previous_function):
-    array_text_tables_pages = output_previous_function["array_text_pages"]
+def group_multiple_pages_texts(output_previous_function):
+    array_text_pages = output_previous_function["array_text_pages"]
+    array_grouped_text_tables_pages = utils.group_texts_in_array(array_text_pages, 2)
 
-    number_processes = utils.get_number_processes(array_text_tables_pages)
+    return {
+        "array_text_pages": array_grouped_text_tables_pages
+    }
+
+
+def document_fields_generation_batch_processing(output_previous_function):
+    array_text_pages = output_previous_function["array_text_pages"]
+
+    number_processes = utils.get_number_processes(array_text_pages)
 
     with Pool(processes=number_processes) as pool:
-        array_json_array_document_fields = pool.map(generate_document_fields, array_text_tables_pages)
+        array_json_array_document_fields = pool.map(generate_document_fields, array_text_pages)
 
     return {
         "array_json_array_document_fields": array_json_array_document_fields
     }
 
 
-def generate_document_fields(array_text_tables_page):
+def generate_document_fields(array_text_pages):
     human_message = f"""
 ### INPUT ###
 
-{array_text_tables_page}
+{array_text_pages}
 
 ### OUTPUT JSON ###
         """
@@ -386,9 +395,10 @@ def generate_sbe_message_components(output_previous_function):
                 array_json_array_document_fields
             )
         else:
+            array_splitted_json_array_document_fields = utils.split_json_arrays(array_json_array_document_fields)
             array_document_fields_adjacent_pages = [
-                (array_json_array_document_fields[i] + array_json_array_document_fields[i + 1]) for i in
-                range(len(array_json_array_document_fields) - 1)]
+                (array_splitted_json_array_document_fields[i] + array_splitted_json_array_document_fields[i + 1]) for i in
+                range(len(array_splitted_json_array_document_fields) - 1)]
             array_json_array_repeating_groups = pool.map(
                 generate_repeating_groups,
                 array_document_fields_adjacent_pages
@@ -469,12 +479,14 @@ def process(pdf_path, starting_page, ending_page, is_pdf_editable):
         thresholding_batch_processing,
         table_detection_batch_processing,
         ocr_tables_batch_processing,
+        group_multiple_pages_texts,
         document_fields_generation_batch_processing,
         generate_sbe_message_components
     ]
 
     editable_pdf_pipeline_filters = [
         extract_pdf_text,
+        group_multiple_pages_texts,
         document_fields_generation_batch_processing,
         generate_sbe_message_components
     ]
@@ -492,4 +504,4 @@ def process(pdf_path, starting_page, ending_page, is_pdf_editable):
 
 
 if __name__ == "__main__":
-    process("pdf_documents/drop_copy_service.pdf", 24, 24, True)
+    process("pdf_documents/drop_copy_service.pdf", 24, 26, False)

@@ -274,123 +274,129 @@ Assicurati di includere solo ed esclusivamente un array JSON nel codice fornito.
 
 ### INPUT ###
 
-20175 TriggeredStopTim
-eInForce
-Char 1 0 = Day
-1 = Good Till Cancel
-6 = Good till Date
-C CASH ONLY
-Specifies the maximum validity of an
-triggered stop order. On triggering of a Stop
-order the value in this field is populated in
-the field TimeInForce (59).
-131 QuoteReqID String 20 From 0 to 2^64-2 C Numerical RFQ identifier assigned by the
-matching engine, unique per instrument
-and EMM.
-21037 RFQAnswerIndicat
-or
-Int 1 0 = No
-1 = Yes
-C CASH ONLY
-Indicates whether the message is, or not, a
-quote sent as an answer to a QuoteRequest
-(R) message.
-21038 RFQConfirmationI
-ndicator
-Int 1 0 = No
-1 = Yes
-C CASH ONLY
-Indicates whether the message is, or not, an
-order sent as a confirmation of a
-QuoteRequest (R) message.
-21800 ConditionalOrderF
-lag
-Int 1 0 = Firm (default)
-1 = Conditional
-C CASH ONLY
-Indicates if the order is a conditional or a
-firm order
-453 NoPartyIDs NumInGroup 1 Always set to 1 A Number of PartyID entries 1
-448 PartyID String 11 Alphanumeric A In this case provides the
-ExecutionWithinFirmShortCode
-59786
-447 PartyIDSource Char 1 P = Short code identifier A Source of PartyID value P
-452 PartyRole Int 3 3 = Client ID
-12 = Executing Trader
-999 = Not Applicable
-A Identifies the type or role of the PartyID
-(448) specified.
-For Execution with Firm short code in Drop
-Copy where the values in the original
-trading OEG message:
-• were received in SBE protocol the
-value will be set to 999 (Not
-Applicable);
-• were received in FIX protocol, the
-value will be set to 3 (Client ID) or
-12 (Executing Trader)
-Tag Field Name Format Len Possible Values M/C Short Description, Compatibility Notes
-& Conditions
-Value
-Example
-2376 PartyRoleQualifier Int 2 22 = Algorithm
-23 = Firm or legal entity
-24 = Natural person
-99 = Not Applicable
-C Used to further qualify the value of
-PartyRole (452)
-For ExecutionWithinFirmShortCode in Drop
-Copy where the values in the original
-trading OEG message:
-• were received in SBE protocol the
-value will be set to 99 (Not
-Applicable);
-• were received in FIX protocol, the
-value will be set to 22 (Algorithm)
-or 23 (Firm or Legal Entity) or 24
-(Natural Person);
-23
-1724 OrderOrigination Int 1 5 = Order received from a direct access or
-sponsored access customer
-C Identifies the origin of the order
-2593 NoOrderAttribute
-s
-NumInGroup 1 If provided, from 1 to 2 C Number of order attribute entries
-2594 OrderAttributeTyp
-e
-Int 1 0 = Aggregated order
-1 = Pending allocation
-3 = Risk reduction order
-C Used in case client needs to indicate values
-of AGGR or PNAL, OR in Risk Reduction
-order
-2595 OrderAttributeVal
-ue
-String 1 Y = Yes C Always set to Yes if OrderAttributeType
-(2594) if provided
-29 LastCapacity Char 1 7 = Dealing on own account (DEAL)
-8 = Matched principal (MTCH)
-9 = Any other capacity (AOTC)
-A Indicates whether the order submission
-results from trading as matched principal,
-on own account or as any other capacity.
-7
-110 MinQty Qty 20 Value '0' by default and depending to a minimum
-value for the given instrument and/or market type
-C Minimum quantity to be executed upon
-order entry (else the order is rejected).
-Only provided when submitted in the
-original order entry message
-21013 AckPhase Char 1 1 = Continuous Trading Phase
-2 = Call Phase
-3 = Halt Phase
-5 = Trading At Last Phase
-6 = Reserved
-7 = Suspended
-8 = Random Uncrossing Phase
-A Indicates the trading phase during which
-the Matching Engine has received the order
-Values 5 and 8 apply only for Cash markets
-1
+[
+  {
+    "Tag": 21005,
+    "Field Name": "ClientMessageSendingTime",
+    "Format": "UTCTimestamp",
+    "Len": 27,
+    "Possible Values": "Timestamp",
+    "M/C": "C",
+    "Short Description, Compatibility Notes & Conditions": "Indicates the time of message transmission, the consistency of the time provided is not checked by the Exchange.",
+    "Value Example": "20190214-15:30:01.462743346"
+  },
+  {
+    "Tag": 5979,
+    "Field Name": "OEGINFromMember",
+    "Format": "UTCTimestamp",
+    "Len": 27,
+    "Possible Values": "Timestamp",
+    "M/C": "C",
+    "Short Description, Compatibility Notes & Conditions": "Order Entry Gateway IN time from member (in ns), measured when inbound message enters the gateway.",
+    "Value Example": "20190214-15:28:52.833883664"
+  },
+  {
+    "Tag": 7764,
+    "Field Name": "OEGOUTToME",
+    "Format": "UTCTimestamp",
+    "Len": 27,
+    "Possible Values": "Timestamp",
+    "M/C": "C",
+    "Short Description, Compatibility Notes & Conditions": "Gateway OUT time to ME (in ns), measured when inbound message leaves the gateway.",
+    "Value Example": "20190214-15:28:52.834193232"
+  },
+  {
+    "Tag": 21002,
+    "Field Name": "BookINTime",
+    "Format": "UTCTimestamp",
+    "Len": 27,
+    "Possible Values": "Timestamp",
+    "M/C": "A",
+    "Short Description, Compatibility Notes & Conditions": "Time of order creation in ME.",
+    "Value Example": "20190214-15:28:52.840530924"
+  },
+  {
+    "Tag": 21003,
+    "Field Name": "BookOUTTime",
+    "Format": "UTCTimestamp",
+    "Len": 27,
+    "Possible Values": "Timestamp",
+    "M/C": "C",
+    "Short Description, Compatibility Notes & Conditions": "Matching Engine OUT time (in ns), when message leaves the Matching Engine (ME).",
+    "Value Example": "20190214-15:28:52.840568733"
+  },
+  {
+    "Tag": 7765,
+    "Field Name": "OEGINFromME",
+    "Format": "UTCTimestamp",
+    "Len": 27,
+    "Possible Values": "Timestamp",
+    "M/C": "C",
+    "Short Description, Compatibility Notes & Conditions": "Gateway IN time from ME (in ns), measured when outbound message enters the gateway.",
+    "Value Example": "20190214-15:28:52.833883664"
+  },
+  {
+    "Tag": 11,
+    "Field Name": "ClOrdID",
+    "Format": "String",
+    "Len": 20,
+    "Possible Values": "From -2^63 to 2^63-1",
+    "M/C": "A",
+    "Short Description, Compatibility Notes & Conditions": "Identifier of an Order assigned by the Client when submitting an order to the Exchange.",
+    "Value Example": "10"
+  },
+  {
+    "Tag": 48,
+    "Field Name": "SecurityID",
+    "Format": "String",
+    "Len": 10,
+    "Possible Values": "From 0 to 2^32-2",
+    "M/C": "M",
+    "Short Description, Compatibility Notes & Conditions": "Exchange defined ID of an instrument/contract.",
+    "Value Example": "1110530"
+  },
+  {
+    "Tag": 22,
+    "Field Name": "SecurityIDSource",
+    "Format": "String",
+    "Len": 1,
+    "Possible Values": "8 = Symbol Index",
+    "M/C": "M",
+    "Short Description, Compatibility Notes & Conditions": "Type of the SecurityID. Always set to 8.",
+    "Value Example": "8"
+  },
+  {
+    "Tag": 20020,
+    "Field Name": "EMM",
+    "Format": "Int",
+    "Len": 2,
+    "Possible Values": "1 = Cash and Derivative Central Order Book (COB), 7 = Derivative On Exchange Off book, 8 = ETF MTF - NAV Central Order Book",
+    "M/C": "A",
+    "Short Description, Compatibility Notes & Conditions": "Exchange Market Mechanism.",
+    "Value Example": "1"
+  },
+  {
+    "Tag": 37,
+    "Field Name": "OrderID",
+    "Format": "String",
+   
+
+ "Len": 20,
+    "Possible Values": "From 0 to 2^64-2",
+    "M/C": "M",
+    "Short Description, Compatibility Notes & Conditions": "Numerical order identifier assigned by ME. For acknowledgement of RFQ populated with the same value as in field QuoteReqID (131).",
+    "Value Example": "5"
+  },
+  {
+    "Tag": 39,
+    "Field Name": "OrdStatus",
+    "Format": "Char",
+    "Len": 1,
+    "Possible Values": "0 = New",
+    "M/C": "M",
+    "Short Description, Compatibility Notes & Conditions": "Order status.",
+    "Value Example": "0"
+  }
+]
 
 ### OUTPUT JSON ###
