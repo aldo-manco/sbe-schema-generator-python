@@ -1,4 +1,4 @@
-# Usa come base l'immagine ufficiale di Ubuntu
+# Usa come base l'immagine ufficiale di PyTorch
 #FROM pytorch/pytorch:1.13.1-cuda11.6-cudnn8-runtime
 FROM pytorch/pytorch:latest
 
@@ -37,10 +37,10 @@ RUN python -m pip install \
     'git+https://github.com/facebookresearch/detectron2.git'
 
 # Imposta il workspace
-WORKDIR /container
+#WORKDIR /container
 
 # Copia il codice sorgente nel container, assicurati di avere il codice sorgente nella stessa cartella di questo Dockerfile
 #COPY . /container
 
-# Comando di default per eseguire lo script python (adattalo al nome del tuo script)
-CMD ["python3", "app.py"]
+# Comando per eseguire lo script python
+#CMD ["streamlit", "run", "frontend_module.py"]

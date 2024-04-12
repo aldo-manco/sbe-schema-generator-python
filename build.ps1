@@ -1,0 +1,1 @@
+docker build --build-arg http_proxy="http://10.15.20.251:8181" --build-arg https_proxy="http://10.15.20.251:8181" -t recognizer-image .

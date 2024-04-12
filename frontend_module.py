@@ -223,12 +223,12 @@ def load_and_display_json():
 
 
 def main():
-    st.title("SBE XML Schema Generator")
+    st.title("Gatelab AI Engine")
 
     tab1, tab2, tab3 = st.tabs(["Automatic", "Manual", "Viewer"])
 
     with tab1:
-        st.header("AI Automatic Generator")
+        st.header("SBE XML Schema AI Generator")
         tabs = [tab_new_json_schema, tab_new_document_message, tab_generate_sbe_xml_schema]
         default_index = tabs.index(tab_new_document_message)
         tab = st.selectbox("Select Tab", tabs, index=default_index)
@@ -240,7 +240,7 @@ def main():
             form_generate_sbe_xml_schema()
 
     with tab2:
-        st.header("Manual Generator")
+        st.header("SBE XML Schema Manual Generator")
 
         tabs = [tab_new_json_schema, tab_new_document_message, tab_new_document_message_column,
                 tab_new_document_message_field, tab_new_document_repeating_group, tab_generate_sbe_xml_schema]
@@ -346,6 +346,7 @@ def main():
                     xml_handler.generate_xml_schema_from_json_schema(json_handler)
 
     with tab3:
+        st.header("SBE JSON Schema Viewer")
         load_and_display_json()
 
 
