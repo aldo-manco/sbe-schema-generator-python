@@ -2,6 +2,8 @@
 
 import os
 import json
+import math
+from itertools import chain
 import multiprocessing
 from langchain_openai import ChatOpenAI
 from langchain_core.output_parsers import StrOutputParser
@@ -185,3 +187,29 @@ def split_json_arrays(array_of_json_arrays):
         array_splitted_json_arrays.append(second_part)
 
     return array_splitted_json_arrays
+
+
+def merge_json_arrays(json_array_of_arrays):
+    return list(chain.from_iterable(json_array_of_arrays))
+
+
+def compute_optimal_group_size(total_items, max_group_size):
+    number_group = math.ceil(total_items / max_group_size)
+    minimum_group_size = max_group_size
+    for i in range(max_group_size - 1, 0, -1):
+        if math.ceil(total_items / i) == number_group:
+            minimum_group_size = i
+        else:
+            break
+    return minimum_group_size
+
+
+def group_json_objects(json_objects, group_size):
+    return [json_objects[i:i + group_size] for i in range(0, len(json_objects), group_size)]
+
+
+def generate_optimal_array_of_json_array(json_array_of_arrays, max_group_size):
+    merged_json_objects = merge_json_arrays(json_array_of_arrays)
+    optimal_group_size = compute_optimal_group_size(len(merged_json_objects), max_group_size)
+    grouped_json_objects = group_json_objects(merged_json_objects, optimal_group_size)
+    return grouped_json_objects

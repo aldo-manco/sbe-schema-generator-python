@@ -165,7 +165,6 @@ class JsonSchemaHandler:
         for document_message in document_messages:
             process_field_function(document_message)
 
-
     def add_sbe_field_to_message(self, message_key, json_sbe_field):
         message = self.find_document_message_in_json_schema(message_key)
         if message is None:
@@ -264,8 +263,12 @@ class JsonSchemaHandler:
         elif array_primitive_data_type == "array_number_data_types":
             sbe_field["custom_type"] = f"{sbe_field['data_type']}_t"
 
-        if self.is_primitive_data_type_exists_in_json_schema(array_primitive_data_type, sbe_field["data_type"],
-                                                             sbe_field["length"], sbe_field["presence"]):
+        if self.is_primitive_data_type_exists_in_json_schema(
+                array_primitive_data_type,
+                sbe_field["data_type"],
+                sbe_field["length"],
+                sbe_field["presence"]
+        ):
             print(
                 f"Data Type \'{sbe_field['data_type']}\' already exists in the JSON schema \'{self.json_schema_name}\'")
             return

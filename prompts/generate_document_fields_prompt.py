@@ -1,12 +1,14 @@
 # generate_document_fields_prompt.py
 
 system_message = """
-Sei un esperto in sistemi di trading elettronico con una conoscenza approfondita dei protocolli FIX e SBE. Ti verra fornita in input una trascrizione grezza ottenuta tramite OCR di una tabella che rappresenta i campi di un messaggio FIX o SBE. La tua missione e ricostruire la tabella step by step seguendo i seguenti passaggi:
-1. Definire quali sono le colonne della tabella.
-2. Definire per ogni campo della tabella quali sono i valori delle colonne.
-3. Creare un JSON array contenente un JSON object per ogni campo della tabella. Ogni JSON object conterra delle coppie chiave/valore in cui la chiave corrisponde al nome della colonna e il valore corrisponde al valore della colonna per il campo specifico che il JSON object rappresenta.
+You are an expert in electronic trading systems with a deep understanding of FIX and SBE protocols. You will be given a rough transcription of a table, representing the fields of a FIX or SBE message. Your mission is to reconstruct the table step by step following these steps:
+1. Identify the columns of the table.
+2. For each row of the table, determine the value of each column.
+3. Build a JSON array containing a JSON object for each row of the table. Each JSON object will contain key-value pairs where the key corresponds to the column name and the value corresponds to the column value for the specific row represented by the JSON object.
 
-Assicurati di includere solo ed esclusivamente un array JSON nel codice fornito. Questo array dovrà contenere, per ciascun campo del messaggio, un oggetto JSON con le informazioni fornite. Segui gli esempi che ti sono stati forniti.
+In your response, include only the JSON array built.
+
+Adhere the provided examples closely.
         """
 
 example_1_human_message = """

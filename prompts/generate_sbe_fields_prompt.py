@@ -1,25 +1,36 @@
 # generate_sbe_fields_prompt.py
 
 system_message = """
-Sei un esperto in sistemi di trading elettronico con una profonda conoscenza dei protocolli FIX e SBE. La tua missione e identificare varie caratteristiche riguardo una lista di campi di un messaggio, basandoti sulle informazioni fornite dalla documentazione di un mercato.
+You are an expert in electronic trading systems with a deep understanding of FIX and SBE protocols. Your mission is to identify various features regarding each message field of the given list of message fields, provided by a market documentation. For each message field, determine each of the following features step by step:
+1. Field ID: 
+Unique identifier for the field in the message, distinguishing it from others.
+2. Field Name: 
+Textual reference briefly describing the content and purpose of the field.
+3. Data Type:
+Choose the appropriate data type for the field, using only the types defined in the SBE protocol. Here is a guide on the different available data types:
+- char
+- int8
+- uint8
+- int16
+- uint16
+- int32
+- uint32
+- int64
+- uint64
+- Field Name in camelCase + "_enum" (For fields with a limited number of options where only one value can be selected)
+- Field Name in camelCase + "_set" (For fields with a limited number of options where multiple values can be selected)
+4. Encoding Type: 
+For primitive data types, encoding type corresponds to the primitive data type itself. For enumerations and sets, use the smallest data type capable of containing all selectable values.
+5. Length in Byte: 
+Calculate the byte length of the chosen data type. For enumerations or sets, calculate the byte length of the chosen encoding type capable of representing all possible values.
+6. Presence: 
+Determine if the field is mandatory or optional, indicating whether it must always be included or can be omitted in some messages.
+7. Enumerazione/Set Structure: 
+For enumeration or set fields, associate a JSON object with all possible values. For primitive data types, associate an empty JSON {}.
 
-Ecco i passaggi per determinare le informazioni richieste per ogni campo:
-1. ID del Campo: 
-Identifica l'ID unico del campo nel messaggio, assegnato per distinguerlo dagli altri campi.
-2. Nome del Campo: 
-Identifica il nome del campo nel messaggio, ovvero il riferimento testuale che ne descrive brevemente contenuto e scopo.
-3. Tipo di Dato Primitivo: 
-Scegli il tipo di dato primitivo adeguato per il campo, utilizzando esclusivamente i tipi primitivi del protocollo SBE. Ad esempio, per campi con date in formato alfanumerico, impiega un tipo char della lunghezza necessaria. Se il campo presenta un numero limitato di opzioni, usa un'enumerazione (nome del campo in camelCase + "_enum") se si puo selezionare solo un valore, o un set (nome del campo in camelCase + "_set") se sono selezionabili piu valori.
-4. Tipo di Encoding: 
-Per i tipi di dati primitivi, il tipo di encoding corrisponde al tipo di dato primitivo stesso. Per le enumerazioni e i set, si utilizza il tipo di dato primitivo del protocollo SBE con il dominio di valore minimo capace di contenere tutti i valori selezionabili.
-5. Lunghezza in Byte: 
-Calcola la lunghezza in byte del tipo di dato, tenendo conto che questa varia a seconda del tipo scelto. Ad esempio, un char occupa generalmente 1 byte. Per le enumerazioni o i set, scegli la lunghezza in byte del tipo di dato capace di rappresentare tutti i valori possibili.
-6. Obbligatorio/Facoltativo: 
-Determina se il campo e obbligatorio o facoltativo, stabilendo se deve essere sempre incluso o se puo essere omesso in alcuni messaggi.
-7. Struttura di Enumerazione/Set: 
-Per campi di tipo enumerazione o set, associa un oggetto JSON con tutti i valori possibili. Se il tipo di dato e primitivo, usa un JSON vuoto {}.
+In your response, include only a JSON array. This array must contain a JSON object with the requested features for each message field. 
 
-Assicurati di includere solo ed esclusivamente un array JSON nel codice fornito. Questo array dovrà contenere, per ciascun campo del messaggio, un oggetto JSON con le informazioni richieste. Segui gli esempi che ti sono stati forniti.
+Adhere the provided examples closely.
     """
 
 example_1_human_message = """

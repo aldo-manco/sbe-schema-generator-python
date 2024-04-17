@@ -251,7 +251,10 @@ def ocr_tables_batch_processing(output_previous_function):
 
 def group_multiple_pages_texts(output_previous_function):
     array_text_pages = output_previous_function["array_text_pages"]
-    array_grouped_text_tables_pages = utils.group_texts_in_array(array_text_pages, 2)
+    array_grouped_text_tables_pages = utils.group_texts_in_array(
+        array_text_pages,
+        2
+    )
 
     return {
         "array_text_pages": array_grouped_text_tables_pages
@@ -266,8 +269,13 @@ def document_fields_generation_batch_processing(output_previous_function):
     with Pool(processes=number_processes) as pool:
         array_json_array_document_fields = pool.map(generate_document_fields, array_text_pages)
 
+    optimized_array_json_array_document_fields = utils.generate_optimal_array_of_json_array(
+        array_json_array_document_fields,
+        15
+    )
+
     return {
-        "array_json_array_document_fields": array_json_array_document_fields
+        "array_json_array_document_fields": optimized_array_json_array_document_fields
     }
 
 
