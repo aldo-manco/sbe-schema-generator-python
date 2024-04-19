@@ -224,130 +224,17 @@ def load_and_display_json():
 
 def main():
     st.title("Gatelab AI Engine")
+    st.header("SBE XML Schema AI Generator")
+    tabs = [tab_new_json_schema, tab_new_document_message, tab_generate_sbe_xml_schema]
+    default_index = tabs.index(tab_new_document_message)
+    tab = st.selectbox("Select Tab", tabs, index=default_index)
 
-    tab1, tab2, tab3 = st.tabs(["Automatic", "Manual", "Viewer"])
-
-    with tab1:
-        st.header("SBE XML Schema AI Generator")
-        tabs = [tab_new_json_schema, tab_new_document_message, tab_generate_sbe_xml_schema]
-        default_index = tabs.index(tab_new_document_message)
-        tab = st.selectbox("Select Tab", tabs, index=default_index)
-        if tab == tab_new_json_schema:
-            form_new_sbe_schema()
-        elif tab == tab_new_document_message:
-            form_new_sbe_message()
-        elif tab == tab_generate_sbe_xml_schema:
-            form_generate_sbe_xml_schema()
-
-    with tab2:
-        st.header("SBE XML Schema Manual Generator")
-
-        tabs = [tab_new_json_schema, tab_new_document_message, tab_new_document_message_column,
-                tab_new_document_message_field, tab_new_document_repeating_group, tab_generate_sbe_xml_schema]
-        default_index = tabs.index(tab_new_document_message)
-        tab = st.selectbox("Select Tab", tabs, index=default_index)
-
-        if tab == tab_new_json_schema:
-            form_new_sbe_schema()
-
-        elif tab == tab_new_document_message:
-            st.subheader(tab_new_document_message)
-            json_schema_name = st.text_input("Name JSON Schema")
-            message_name = st.text_input("Name Document Message")
-            template_id = st.number_input("Template ID", value=0, format="%d")
-
-            if json_schema_name and message_name and template_id >= 0:
-                json_handler = JsonSchemaHandler(json_schema_name)
-                if st.button(f"Create Message in {json_schema_name}"):
-                    json_handler.add_document_message(message_name, template_id)
-                    st.success(json_handler.load_schema())
-
-
-        elif tab == tab_new_document_message_column:
-            st.subheader(tab_new_document_message_column)
-            json_schema_name = st.text_input("Name JSON Schema")
-            message_name = st.text_input("Name Document Message")
-            column_name = st.text_input("Name Column")
-
-            if json_schema_name and message_name and column_name:
-                json_handler = JsonSchemaHandler(json_schema_name)
-                if st.button(f"Create Column in {message_name}"):
-                    json_handler.add_document_column_to_message(message_name, column_name)
-                    st.success(json_handler.load_schema())
-
-        elif tab == tab_new_document_message_field:
-            st.subheader(tab_new_document_message_field)
-            json_schema_name = st.text_input("Name JSON Schema")
-            message_name = st.text_input("Name Document Message")
-            group_id = st.text_input("Repeating Group ID",
-                                     help="Insert NumInGroup ID if the field belongs to a repeating group, otherwise leave it empty")
-            if json_schema_name and message_name:
-                json_handler = JsonSchemaHandler(json_schema_name)
-                if st.button(f"Show New {message_name}'s Field Form"):
-                    if "create_message_field" not in st.session_state:
-                        st.session_state["create_message_field"] = True
-                    st.session_state["create_message_field"] = True
-                if "create_message_field" in st.session_state and st.session_state["create_message_field"] == True:
-                    column_iterator = json_handler.get_message_array_iterator(message_name, 'array_document_columns')
-                    json_document_field = {}
-                    for column in column_iterator:
-                        json_document_field[column] = st.text_input(column)
-                    json_document_field["additional_information"] = st.text_input("Additional Information")
-                    if group_id:
-                        json_document_field["group_id"] = group_id
-                    if st.button(f"Create New Field in {message_name}"):
-                        json_handler.add_document_field_to_message(message_name, json_document_field)
-                        st.success(json_handler.load_schema())
-                        st.session_state["create_message_field"] = False
-
-        elif tab == tab_new_document_repeating_group:
-            st.subheader(tab_new_document_repeating_group)
-            json_schema_name = st.text_input("Name JSON Schema")
-            message_name = st.text_input("Name Document Message")
-            group_name = st.text_input("Name Repeating Group")
-            group_id = st.text_input("ID Repeating Group")
-            if json_schema_name and message_name and group_name and group_id:
-                json_handler = JsonSchemaHandler(json_schema_name)
-                if st.button(f"Create New Repeating Group in {message_name}"):
-                    json_handler.add_repeating_group_to_message(message_name, group_name, group_id)
-
-        elif tab == tab_new_document_composite:
-            st.subheader(tab_new_document_composite)
-            json_schema_name = st.text_input("Name JSON Schema")
-            name_composite = st.text_input("Name Composite")
-            description_composite = st.text_input("Description Composite")
-            if json_schema_name and name_composite:
-                json_handler = JsonSchemaHandler(json_schema_name)
-                if st.button(f"Create New Composite in {json_schema_name}"):
-                    json_handler.add_repeating_group_to_message(name_composite, description_composite)
-
-
-        elif tab == tab_generate_sbe_xml_schema:
-            st.subheader(tab_generate_sbe_xml_schema)
-            json_schema_name = st.text_input("Name JSON Schema")
-
-            if json_schema_name:
-                if st.button("Genera Schema SBE"):
-                    json_handler = JsonSchemaHandler(json_schema_name)
-                    xml_handler = XmlSbeSchemaHandler(json_schema_name)
-
-                    lambda_generate_sbe_fields = lambda document_message: (
-                        json_handler.generate_sbe_fields(document_message)
-                    )
-
-                    json_handler.iterate_document_messages(lambda_generate_sbe_fields)
-
-                    lambda_generate_sbe_data_type_definitions = lambda sbe_field: (
-                        json_handler.generate_sbe_data_type_definitions(sbe_field)
-                    )
-
-                    json_handler.iterate_sbe_fields_of_document_messages(lambda_generate_sbe_data_type_definitions)
-
-                    xml_handler.generate_xml_schema_from_json_schema(json_handler)
-
-    with tab3:
-        st.header("SBE JSON Schema Viewer")
-        load_and_display_json()
+    if tab == tab_new_json_schema:
+        form_new_sbe_schema()
+    elif tab == tab_new_document_message:
+        form_new_sbe_message()
+    elif tab == tab_generate_sbe_xml_schema:
+        form_generate_sbe_xml_schema()
 
 
 if __name__ == "__main__":

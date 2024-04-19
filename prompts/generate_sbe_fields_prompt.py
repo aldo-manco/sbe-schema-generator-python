@@ -3,7 +3,7 @@
 system_message = """
 You are an expert in electronic trading systems with a deep understanding of FIX and SBE protocols. Your mission is to identify various features regarding each message field of the given list of message fields, provided by a market documentation. For each message field, determine each of the following features step by step:
 1. Field ID: 
-Unique identifier for the field in the message, distinguishing it from others.
+If a field in message fields represents a FIX protocol tag number, either standard or custom, assign the appropriate tag number to the Field ID. If no such tag number is defined, do not define the Field ID.
 2. Field Name: 
 Textual reference briefly describing the content and purpose of the field.
 3. Data Type:
@@ -27,6 +27,8 @@ Calculate the byte length of the chosen data type. For enumerations or sets, cal
 Determine if the field is mandatory or optional, indicating whether it must always be included or can be omitted in some messages.
 7. Enumerazione/Set Structure: 
 For enumeration or set fields, associate a JSON object with all possible values. For primitive data types, associate an empty JSON {}.
+8. AI Engine ID:
+Unique identifier for the field in the message, defined in "ai_engine_id".
 
 In your response, include only a JSON array. This array must contain a JSON object with the requested features for each message field. 
 
@@ -43,7 +45,8 @@ example_1_human_message = """
     "possible values": "Timestamp",
     "m/c": "c",
     "short description, compatibility notes and conditions": "indicates the time of message transmission,  the consistency of the time provided is not  checked by the Exchange",
-    "value example": "20190214- 15:30:01.4 62743346"
+    "value example": "20190214- 15:30:01.4 62743346",
+    "ai_engine_id": 1
   },
   {
     "Tag": "11",
@@ -53,7 +56,8 @@ example_1_human_message = """
     "Possible Values": "From -2^63 to 2^63-1",
     "M/C": "A",
     "Short Description, Compatibility Notes & Conditions": "Identifier of an Order Modification message assigned by the Client when submitting the order modification message to the Exchange",
-    "Value Example": "25"
+    "Value Example": "25",
+    "ai_engine_id": 2
   },
   {
     "Tag": "21013",
@@ -63,7 +67,8 @@ example_1_human_message = """
     "Possible Values": "1 = Continuous Trading Phase 2 = Call Phase 3 = Halt Phase 5 = Trading At Last Phase 6 = Reserved 7 = Suspended 8 = Random Uncrossing Phase",
     "M/C": "A",
     "Short Description, Compatibility Notes & Conditions": "Indicates the trading phase during which the Matching Engine has received the order Values 5 and 8 apply only for Cash markets",
-    "Value Example": "1"
+    "Value Example": "1",
+    "ai_engine_id": 3
   },
   {
     "Tag": "21014",
@@ -73,7 +78,8 @@ example_1_human_message = """
     "Possible Values": "0 = Dark Indicator 1 = Queue Indicator 2 = Request with Client Order ID 3 = Use of Cross Partition 4 = Internal1 5 = Internal2 6 = Execution Upon Entry flag Enabled 7 = Executed Upon Entry flag",
     "M/C": "A",
     "Short Description, Compatibility Notes & Conditions": "Field used to provide additional information on the corresponding order. For Derivatives positions 0 is not applicable and is always set to 0.",
-    "Value Example": "0 0 0 0 0 0 0 0"
+    "Value Example": "0 0 0 0 0 0 0 0",
+    "ai_engine_id": 4
   }
 ]
     """
@@ -87,7 +93,8 @@ example_1_assistant_message = """
     "encoding_type": "char",
     "length": 27,
     "presence": "optional",
-    "structure": {}
+    "structure": {},
+    "ai_engine_id": 1
   },
   {
     "field_id": 11,
@@ -96,7 +103,8 @@ example_1_assistant_message = """
     "encoding_type": "int64",
     "length": 8,
     "presence": "mandatory",
-    "structure": {}
+    "structure": {},
+    "ai_engine_id": 2
   },
   {
     "field_id": 21013,
@@ -113,7 +121,8 @@ example_1_assistant_message = """
       "6": "Reserved",
       "7": "Suspended",
       "8": "Random Uncrossing Phase"
-    }
+    },
+    "ai_engine_id": 3
   },
   {
     "field_id": 21014,
@@ -131,7 +140,8 @@ example_1_assistant_message = """
       "5": "Internal2",
       "6": "Execution Upon Entry flag Enabled",
       "7": "Executed Upon Entry flag"
-    }
+    },
+    "ai_engine_id": 4
   }
 ]
     """
@@ -144,7 +154,8 @@ example_2_human_message = """
     "Format": "Uint16",
     "Len": "2",
     "Description": "Size of the message",
-    "Values": "N/A"
+    "Values": "N/A",
+    "ai_engine_id": 5
   },
   {
     "Offset": "8",
@@ -152,7 +163,8 @@ example_2_human_message = """
     "Format": "Uint8",
     "Len": "1",
     "Description": "Identifies the trading status of a security.",
-    "Values": "2 Trading Halt, 3 Resume"
+    "Values": "2 Trading Halt, 3 Resume",
+    "ai_engine_id": 6
   },
   {
     "Offset": "12",
@@ -160,7 +172,8 @@ example_2_human_message = """
     "Format": "String",
     "Len": "8",
     "Description": "Identify the trading state of the security",
-    "Values": "Please refer to the TradingPhaseCode information in SSE market data of this security for details. N/A for SZSE Instruments"
+    "Values": "Please refer to the TradingPhaseCode information in SSE market data of this security for details. N/A for SZSE Instruments",
+    "ai_engine_id": 7
   }
 ]
     """
@@ -168,16 +181,15 @@ example_2_human_message = """
 example_2_assistant_message = """
 [
   {
-    "field_id": 0,
     "field_name": "MsgSize",
     "data_type": "uint16",
     "encoding_type": "uint16",
     "length": 2,
     "presence": "mandatory",
-    "structure": {}
+    "structure": {},
+    "ai_engine_id": 5
   },
   {
-    "field_id": 8,
     "field_name": "SecurityTradingStatus",
     "data_type": "SecurityTradingStatus_enum",
     "encoding_type": "uint8",
@@ -186,16 +198,17 @@ example_2_assistant_message = """
     "structure": {
       "2": "Trading Halt",
       "3": "Resume"
-    }
+    },
+    "ai_engine_id": 6
   },
   {
-    "field_id": 12,
     "field_name": "TradingPhaseCode",
     "data_type": "char",
     "encoding_type": "char",
     "length": 8,
     "presence": "mandatory",
-    "structure": {}
+    "structure": {},
+    "ai_engine_id": 7
   }
 ]
     """
@@ -207,28 +220,32 @@ example_3_human_message = """
     "Offset": "31",
     "Length": "8",
     "Type": "Alpha",
-    "Description": "SEDOL code of the instrument."
+    "Description": "SEDOL code of the instrument.",
+    "ai_engine_id": 12
   },
   {
     "Field": "Allowed Book Types",
     "Offset": "39",
     "Length": "1",
     "Type": "Bit Field",
-    "Description": "Defines the order-book types that are allowed for the instrument. Each designated bit represents a book type. 0 Means not allowed and 1 means allowed: Bit Name 0 All 1 Firm Quote Book 2 Off-book 3 Electronic Order Book 4 Private RFQ"
+    "Description": "Defines the order-book types that are allowed for the instrument. Each designated bit represents a book type. 0 Means not allowed and 1 means allowed: Bit Name 0 All 1 Firm Quote Book 2 Off-book 3 Electronic Order Book 4 Private RFQ",
+    "ai_engine_id": 13
   },
   {
     "Field": "Source Venue",
     "Offset": "40",
     "Length": "2",
     "Type": "UInt16",
-    "Description": "Please refer the Additional Field Values section of this document for valid values."
+    "Description": "Please refer the Additional Field Values section of this document for valid values.",
+    "ai_engine_id": 14
   },
   {
     "Field": "Settlement System",
     "Offset": "146",
     "Length": "1",
     "Type": "UInt8",
-    "Description": "Settlement system type: Value Meaning 1 RRG 2 Express I 3 Express II 4 Clear stream 5 Undefined value 6 T2S"
+    "Description": "Settlement system type: Value Meaning 1 RRG 2 Express I 3 Express II 4 Clear stream 5 Undefined value 6 T2S",
+    "ai_engine_id": 15
   }
 ]
     """
@@ -236,16 +253,15 @@ example_3_human_message = """
 example_3_assistant_message = """
 [
   {
-    "field_id": 31,
     "field_name": "SEDOL",
     "data_type": "char",
     "encoding_type": "char",
     "length": 8,
     "presence": "mandatory",
-    "structure": {}
+    "structure": {},
+    "ai_engine_id": 12
   },
   {
-    "field_id": 39,
     "field_name": "AllowedBookTypes",
     "data_type": "allowedBookTypes_set",
     "encoding_type": "uint8",
@@ -257,19 +273,19 @@ example_3_assistant_message = """
       "2": "Off-book",
       "3": "Electronic Order Book",
       "4": "Private RFQ"
-    }
+    },
+    "ai_engine_id": 13
   },
   {
-    "field_id": 40,
     "field_name": "SourceVenue",
     "data_type": "uint16",
     "encoding_type": "uint16",
     "length": 2,
     "presence": "mandatory",
-    "structure": {}
+    "structure": {},
+    "ai_engine_id": 14
   },
   {
-    "field_id": 146,
     "field_name": "SettlementSystem",
     "data_type": "settlementSystem_enum",
     "encoding_type": "uint8",
@@ -282,7 +298,8 @@ example_3_assistant_message = """
       "4": "Clearstream",
       "5": "Undefined value",
       "6": "T2S"
-    }
+    },
+    "ai_engine_id": 15
   }
 ]
     """

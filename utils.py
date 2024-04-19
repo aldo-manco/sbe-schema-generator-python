@@ -1,5 +1,5 @@
 # utils.py
-
+import logging
 import os
 import json
 import math
@@ -50,7 +50,7 @@ def is_duplicate_in_json_array(field_name, field_value, json_array_fields):
         raise ValueError("Il campo fornito non esiste o il valore non è confrontabile.")
 
 
-def merge_unique_json_arrays(array_json_array):
+def merge_unique_sbe_fields_json_arrays(array_json_array):
     unique_json_objects = set()
     merged_array = []
 
@@ -62,6 +62,37 @@ def merge_unique_json_arrays(array_json_array):
                 merged_array.append(json_object)
 
     return merged_array
+
+
+def get_index_intersected_group(new_repeating_group, array_repeating_groups):
+    logging.info(f"new_repeating_group items: {new_repeating_group['items']}")
+    new_repeating_group_items_set = set(new_repeating_group["items"])
+    for index, repeating_group in enumerate(array_repeating_groups, start=0):
+        logging.info(f"repeating_group items: {repeating_group['items']}")
+        repeating_group_items_set = set(repeating_group["items"])
+        if bool(new_repeating_group_items_set & repeating_group_items_set):
+            return index
+    return -1
+
+
+def merge_unique_repeating_groups_json_arrays(array_json_array_repeating_groups):
+    logging.info(f"array_json_array_repeating_groups: {array_json_array_repeating_groups}")
+
+    array_distinct_repeating_groups = []
+    for array_repeating_groups in array_json_array_repeating_groups:
+        for repeating_group in array_repeating_groups:
+            logging.info(f"array_distinct_repeating_groups: {array_distinct_repeating_groups}")
+            index = get_index_intersected_group(repeating_group, array_distinct_repeating_groups)
+            logging.info(f"index: {index}")
+            if index == -1:
+                array_distinct_repeating_groups.append(repeating_group)
+            else:
+                array_distinct_repeating_groups[index]["items"] += [id for id in repeating_group["items"] if
+                                                                    id not in array_distinct_repeating_groups[index][
+                                                                        "items"]]
+
+    logging.info(f"FINAL: {array_distinct_repeating_groups}")
+    return array_distinct_repeating_groups
 
 
 def replace_newlines_with_space(input_string):
@@ -213,3 +244,30 @@ def generate_optimal_array_of_json_array(json_array_of_arrays, max_group_size):
     optimal_group_size = compute_optimal_group_size(len(merged_json_objects), max_group_size)
     grouped_json_objects = group_json_objects(merged_json_objects, optimal_group_size)
     return grouped_json_objects
+
+
+def add_ai_engine_id(array_json_array_fields):
+    current_ai_engine_id = 1
+    updated_array_json_array_fields = []
+
+    for json_array_fields in array_json_array_fields:
+        updated_json_array_fields = []
+
+        for field in json_array_fields:
+            updated_field = field.copy()
+            updated_field['ai_engine_id'] = current_ai_engine_id
+            current_ai_engine_id += 1
+            updated_json_array_fields.append(updated_field)
+
+        updated_array_json_array_fields.append(updated_json_array_fields)
+
+    return updated_array_json_array_fields
+
+
+def get_repeating_group_sbe_field(ai_engine_id, array_sbe_fields):
+    return next(
+        filter(
+            lambda sbe_field: sbe_field.get('ai_engine_id') == ai_engine_id,
+            array_sbe_fields),
+        None
+    )

@@ -251,6 +251,7 @@ def ocr_tables_batch_processing(output_previous_function):
 
 def group_multiple_pages_texts(output_previous_function):
     array_text_pages = output_previous_function["array_text_pages"]
+
     array_grouped_text_tables_pages = utils.group_texts_in_array(
         array_text_pages,
         2
@@ -274,8 +275,12 @@ def document_fields_generation_batch_processing(output_previous_function):
         15
     )
 
+    numbered_array_json_array_document_fields = utils.add_ai_engine_id(optimized_array_json_array_document_fields)
+
+    logging.info(f"numbered_array_json_array_document_fields: {numbered_array_json_array_document_fields}")
+
     return {
-        "array_json_array_document_fields": optimized_array_json_array_document_fields
+        "array_json_array_document_fields": numbered_array_json_array_document_fields
     }
 
 
@@ -390,11 +395,9 @@ def generate_sbe_message_components(output_previous_function):
     with Pool(number_processes) as pool:
         array_json_array_sbe_fields = pool.map(generate_sbe_fields, array_json_array_document_fields)
 
-    json_array_full_sbe_fields = utils.merge_unique_json_arrays(array_json_array_sbe_fields)
+    json_array_full_sbe_fields = utils.merge_unique_sbe_fields_json_arrays(array_json_array_sbe_fields)
 
     # REPEATING GROUPS
-    json_array_repeating_groups = []
-
     number_processes = utils.get_number_processes(array_json_array_document_fields)
     with Pool(number_processes) as pool:
         if len(array_json_array_document_fields) == 1:
@@ -405,54 +408,44 @@ def generate_sbe_message_components(output_previous_function):
         else:
             array_splitted_json_array_document_fields = utils.split_json_arrays(array_json_array_document_fields)
             array_document_fields_adjacent_pages = [
-                (array_splitted_json_array_document_fields[i] + array_splitted_json_array_document_fields[i + 1]) for i in
-                range(len(array_splitted_json_array_document_fields) - 1)]
+                (array_splitted_json_array_document_fields[i] + array_splitted_json_array_document_fields[i + 1]) for i
+                in
+                range(len(array_splitted_json_array_document_fields) - 1)
+            ]
             array_json_array_repeating_groups = pool.map(
                 generate_repeating_groups,
                 array_document_fields_adjacent_pages
             )
 
-    # FILTERING SBE FIELDS
-    json_array_full_repeating_groups = utils.merge_unique_json_arrays(array_json_array_repeating_groups)
-    if len(json_array_full_repeating_groups) > 0:
+    # FILL REPEATING GROUPS
+    json_array_distinct_repeating_groups = utils.merge_unique_repeating_groups_json_arrays(
+        array_json_array_repeating_groups)
+    if len(json_array_distinct_repeating_groups) > 0:
 
-        for json_array_repeating_group in array_json_array_repeating_groups:
-            for repeating_group in json_array_repeating_group:
-                if not utils.is_duplicate_in_json_array(
-                        "group_id",
-                        repeating_group["group_id"],
-                        json_array_repeating_groups
-                ):
-                    json_array_repeating_groups.append(repeating_group)
+        array_repeating_group_field_ai_engine_ids = [repeating_group["items"] for repeating_group in
+                                                     json_array_distinct_repeating_groups]
 
-        array_json_array_repeating_groups_document_fields = [repeating_group["items"] for repeating_group in
-                                                             json_array_repeating_groups]
+        logging.info(f"array_repeating_group_field_ai_engine_ids: {array_repeating_group_field_ai_engine_ids}")
 
-        number_processes = utils.get_number_processes(json_array_repeating_groups)
-        with Pool(number_processes) as pool:
-            array_json_array_repeating_groups_sbe_fields = pool.map(generate_sbe_fields,
-                                                                    array_json_array_repeating_groups_document_fields)
+        for repeating_group in json_array_distinct_repeating_groups:
+            for index, repeating_group_field in enumerate(repeating_group["items"]):
+                logging.info(f"enumerate(repeating_group items: {enumerate(repeating_group['items'])}")
+                updated_repeating_group_field = utils.get_repeating_group_sbe_field(repeating_group_field,
+                                                                                    json_array_full_sbe_fields)
+                logging.info(f"updated_repeating_group_field: {updated_repeating_group_field}")
+                repeating_group["items"][index] = updated_repeating_group_field
+                logging.info(f"repeating_group items index: {repeating_group['items'][index]}")
 
-        ids_to_remove = set()
-        names_to_remove = set()
+        # FILTERING SBE FIELDS
+        json_array_sbe_fields = [sbe_field for sbe_field in json_array_full_sbe_fields if
+                                sbe_field.get("ai_engine_id") not in array_repeating_group_field_ai_engine_ids]
 
-        for i, repeating_group in enumerate(json_array_repeating_groups):
-            repeating_group["items"] = array_json_array_repeating_groups_sbe_fields[i]
-            ids_to_remove.add(repeating_group["group_id"])
-            names_to_remove.add(repeating_group["group_name"])
-            for group_sbe_field in repeating_group["items"]:
-                ids_to_remove.add(group_sbe_field["field_id"])
-                names_to_remove.add(group_sbe_field["field_name"])
+        logging.info(
+            f"json_array_sbe_fields: {json_array_sbe_fields}\n\n\njson_array_distinct_repeating_groups: {json_array_distinct_repeating_groups}")
 
-        json_array_sbe_fields = []
+        return json_array_sbe_fields, json_array_distinct_repeating_groups
 
-        for field in json_array_full_sbe_fields:
-            if field["field_id"] not in ids_to_remove and field["field_name"] not in names_to_remove:
-                json_array_sbe_fields.append(field)
-
-        return json_array_sbe_fields, json_array_repeating_groups
-
-    return json_array_full_sbe_fields, json_array_repeating_groups
+    return json_array_full_sbe_fields, []
 
 
 def execute_pipeline_filters(pipeline_filters, input_pipeline):
@@ -512,4 +505,4 @@ def process(pdf_path, starting_page, ending_page, is_pdf_editable):
 
 
 if __name__ == "__main__":
-    process("pdf_documents/drop_copy_service.pdf", 24, 26, False)
+    process("pdf_documents/drop_copy_service.pdf", 26, 27, True)

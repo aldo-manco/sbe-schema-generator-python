@@ -125,16 +125,6 @@ class JsonSchemaHandler:
 
         return None
 
-    def add_document_column_to_message(self, message_key, column_name):
-        message = self.find_document_message_in_json_schema(message_key)
-        if message is None:
-            raise KeyError(f"Message '{message_key}' not found in schema.")
-        if column_name in message.get('array_document_columns', []):
-            print(
-                f"Document Column '{column_name}' already exists in the message '{message_key}' of the JSON schema '{self.json_schema_name}'")
-            return
-        message['array_document_columns'].append(column_name)
-        self.save_schema()
 
     def get_message_array_iterator(self, message_key, array_in_document_message):
         message = self.find_document_message_in_json_schema(message_key)
@@ -142,23 +132,6 @@ class JsonSchemaHandler:
             raise KeyError(f"Message '{message_key}' not found in schema.")
         return iter(message.get(array_in_document_message, []))
 
-    def add_document_field_to_message(self, message_key, json_document_field):
-        message = self.find_document_message_in_json_schema(message_key)
-        if message is None:
-            raise KeyError(f"Message '{message_key}' not found in schema.")
-        if json_document_field in message["array_document_fields"]:
-            print(
-                f"Document Field already exists in the message '{message_key}' of the JSON schema '{self.json_schema_name}'")
-            return
-        message['array_document_fields'].append(json_document_field)
-        self.save_schema()
-
-    def iterate_document_fields_of_document_messages(self, process_field_function):
-        document_messages = self.get_schema_array_iterator("array_document_messages")
-        for document_message in document_messages:
-            document_fields = self.get_message_array_iterator(document_message["message_name"], "array_document_fields")
-            for document_field in document_fields:
-                process_field_function(document_message, document_field)
 
     def iterate_document_messages(self, process_field_function):
         document_messages = self.get_schema_array_iterator("array_document_messages")
@@ -176,6 +149,7 @@ class JsonSchemaHandler:
         message['array_sbe_fields'].append(json_sbe_field)
         self.save_schema()
 
+
     def iterate_sbe_fields_of_document_messages(self, process_field_function):
         document_messages = self.get_schema_array_iterator("array_document_messages")
         for document_message in document_messages:
@@ -188,6 +162,7 @@ class JsonSchemaHandler:
                 sbe_fields = iter(repeating_group.get("items", []))
                 for sbe_field in sbe_fields:
                     process_field_function(sbe_field)
+
 
     def add_repeating_group_to_message(self, message_key, group_name, group_id):
         message = self.find_document_message_in_json_schema(message_key)
@@ -208,32 +183,16 @@ class JsonSchemaHandler:
         message["array_sbe_repeating_groups"].append(new_repeating_group)
         self.save_schema()
 
-    def add_composite_to_schema(self, name_composite, description_composite):
 
-        for composite in self.get_schema_array_iterator("array_composite_data_types"):
-            if composite["composite_name"] == name_composite:
-                print(
-                    f"Composite {name_composite} already exists in the JSON schema '{self.json_schema_name}'")
-                return
-
-        new_composite = {
-            "name_composite": name_composite,
-            "description_composite": description_composite,
-            "items": []
-        }
-
-        self.schema[self.json_schema_name]["array_composite_data_types"].append(new_composite)
-        self.save_schema()
-
-    def add_sbe_field_to_repeating_group(self, message_key, id_num_in_group_field, json_sbe_field):
+    def add_sbe_field_to_repeating_group(self, message_key, repeating_group_name, json_sbe_field):
         message = self.find_document_message_in_json_schema(message_key)
         if message is None:
             raise KeyError(f"Message '{message_key}' not found in schema.")
         for repeating_group in self.get_message_array_iterator(message_key, "array_sbe_repeating_groups"):
-            if repeating_group["group_id"] == id_num_in_group_field:
+            if repeating_group["group_name"] == repeating_group_name:
                 already_exists = False
                 for sbe_field in repeating_group["items"]:
-                    if sbe_field["field_id"] == json_sbe_field["field_id"]:
+                    if sbe_field["field_name"] == json_sbe_field["field_name"]:
                         already_exists = True
                 if not already_exists:
                     repeating_group["items"].append(json_sbe_field)
@@ -242,16 +201,8 @@ class JsonSchemaHandler:
                 else:
                     print(f"Repeating group's SBE field already exists.")
         else:
-            print(f"Repeating group {id_num_in_group_field} not found.")
+            print(f"Repeating group {repeating_group_name} not found.")
 
-    def add_sbe_field_to_composite(self, name_composite, json_sbe_field):
-        for composite in self.get_schema_array_iterator("array_composite_data_types"):
-            if composite["name_composite"] == name_composite:
-                composite["items"].append(json_sbe_field)
-                self.save_schema()
-                break
-        else:
-            print(f"Composite {name_composite} not found.")
 
     def add_primitive_data_type(self, array_primitive_data_type, sbe_field):
         sbe_field["custom_type"] = ""
@@ -283,8 +234,6 @@ class JsonSchemaHandler:
         self.schema[self.json_schema_name][array_primitive_data_type].append(new_primitive_data_type)
         self.save_schema()
 
-    def get_primitive_data_type_iterator(self, array_primitive_data_type):
-        return self.get_schema_array_iterator(array_primitive_data_type)
 
     def is_primitive_data_type_exists_in_json_schema(self, array_primitive_data_type, data_type_to_find, length,
                                                      presence):
@@ -309,8 +258,6 @@ class JsonSchemaHandler:
         self.schema[self.json_schema_name][array_custom_data_type].append(new_custom_data_type)
         self.save_schema()
 
-    def get_custom_data_type_iterator(self, array_custom_data_type):
-        return self.get_schema_array_iterator(array_custom_data_type)
 
     def is_custom_data_type_exists_in_json_schema(self, array_custom_data_type, data_type_to_find, structure):
         for data_type in self.get_schema_array_iterator(array_custom_data_type):
@@ -320,23 +267,6 @@ class JsonSchemaHandler:
 
         return False
 
-    def generate_sbe_fields(self, document_message):
-
-        document_fields = self.get_message_array_iterator(document_message["message_name"], "array_document_fields")
-        sbe_fields = ai_engine_module.generate_sbe_fields(list(document_fields))
-
-        for document_field, sbe_field in zip(document_fields, sbe_fields):
-
-            if document_field.get("group_id", -1) == -1:
-                self.add_sbe_field_to_message(
-                    document_message,
-                    json.loads(sbe_field))
-
-            elif document_field.get("group_id", -1) != -1:
-                self.add_sbe_field_to_repeating_group(
-                    document_message,
-                    document_field.get("group_id"),
-                    json.loads(sbe_field))
 
     def generate_sbe_data_type_definitions(self, sbe_field):
 
@@ -397,6 +327,6 @@ class JsonSchemaHandler:
             for sbe_field in repeating_group["items"]:
                 self.add_sbe_field_to_repeating_group(
                     message_name,
-                    repeating_group["group_id"],
+                    repeating_group["group_name"],
                     sbe_field
                 )

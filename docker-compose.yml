@@ -5,7 +5,7 @@ services:
     volumes:
       - .:/container
     working_dir: /container
-#    command: python3 ai_engine_module.py
-    command: streamlit run frontend_module.py
-    ports:
-      - "8502:8501"
+    command: python3 ai_engine_module.py
+#    command: streamlit run frontend_module.py
+#    ports:
+#      - "8502:8501"
