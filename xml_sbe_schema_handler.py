@@ -217,11 +217,17 @@ class XmlSbeSchemaHandler:
             type="fixHeader"
         )
 
+        counter = 1
+
         for sbe_field in iterator_sbe_fields:
+
+            field_id = sbe_field["field_tag_number"] if "field_tag_number" in sbe_field else counter
+            counter = counter + 1
+
             field = etree.SubElement(
                 message_element,
                 'field',
-                id=str(sbe_field["field_id"]),
+                id=str(field_id),
                 name=sbe_field["field_name"],
                 type=sbe_field.get("custom_type", sbe_field["data_type"])
             )
@@ -230,20 +236,30 @@ class XmlSbeSchemaHandler:
                 field.set('presence', sbe_field["presence"])
 
         for sbe_repeating_group in iterator_sbe_repeating_groups:
+
+            repeating_group_id = sbe_repeating_group["group_tag_number"] if "group_tag_number" in sbe_repeating_group else counter
+            counter = counter + 1
+
             group = etree.SubElement(
                 message_element,
                 "group",
                 dimensionType="groupSizeEncoding",
                 name=sbe_repeating_group["group_name"],
-                id=sbe_repeating_group["group_id"]
+                id=str(repeating_group_id)
             )
 
+            counter_nested_fields = 1
+
             for field_info in iter(sbe_repeating_group.get("items", [])):
+
+                nested_field_id = field_info["field_tag_number"] if "field_tag_number" in field_info else counter_nested_fields
+                counter_nested_fields = counter_nested_fields + 1
+
                 etree.SubElement(
                     group,
                     "field",
                     name=field_info["field_name"],
-                    id=str(field_info["field_id"]),
+                    id=str(nested_field_id),
                     type=field_info.get("custom_type", field_info["data_type"])
                 )
 

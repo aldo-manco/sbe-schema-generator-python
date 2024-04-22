@@ -265,22 +265,23 @@ def group_multiple_pages_texts(output_previous_function):
 def document_fields_generation_batch_processing(output_previous_function):
     array_text_pages = output_previous_function["array_text_pages"]
 
-    number_processes = utils.get_number_processes(array_text_pages)
+    # number_processes = utils.get_number_processes(array_text_pages)
+    #
+    # with Pool(processes=number_processes) as pool:
+    #     array_json_array_document_fields = pool.map(generate_document_fields, array_text_pages)
+    #
+    # optimized_array_json_array_document_fields = utils.generate_optimal_array_of_json_array(
+    #     array_json_array_document_fields,
+    #     30
+    # )
+    #
+    # numbered_array_json_array_document_fields = utils.add_ai_engine_id(optimized_array_json_array_document_fields)
 
-    with Pool(processes=number_processes) as pool:
-        array_json_array_document_fields = pool.map(generate_document_fields, array_text_pages)
-
-    optimized_array_json_array_document_fields = utils.generate_optimal_array_of_json_array(
-        array_json_array_document_fields,
-        15
-    )
-
-    numbered_array_json_array_document_fields = utils.add_ai_engine_id(optimized_array_json_array_document_fields)
-
-    logging.info(f"numbered_array_json_array_document_fields: {numbered_array_json_array_document_fields}")
+    with open('ai_document_fields.json', 'r') as file:
+        data = json.load(file)
 
     return {
-        "array_json_array_document_fields": numbered_array_json_array_document_fields
+        "array_json_array_document_fields": data
     }
 
 
@@ -305,16 +306,10 @@ def generate_document_fields(array_text_pages):
         generate_document_fields_prompt.example_4_assistant_message,
         human_message
     )
-    # output = "[]"
 
     logging.info(f"\n\nDOCUMENT FIELDS: {output}\n\n")
 
     return json.loads(output)
-
-    # with open('ai_document_fields.json', 'r') as file:
-    #     data = json.load(file)
-    #
-    # return data
 
 
 def generate_repeating_groups(array_document_fields):
@@ -340,16 +335,10 @@ def generate_repeating_groups(array_document_fields):
         generate_repeating_groups_prompt.example_4_assistant_message,
         human_message
     )
-    # output = "[]"
 
     logging.info(f"\n\nREPEATING GROUPS: {output}\n\n")
 
     return json.loads(output)
-
-    # with open('ai_repeating_groups.json', 'r') as file:
-    #     data = json.load(file)
-    #
-    # return data
 
 
 def generate_sbe_fields(array_document_fields):
@@ -375,77 +364,72 @@ def generate_sbe_fields(array_document_fields):
         generate_sbe_fields_prompt.example_4_assistant_message,
         human_message
     )
-    # output = "[]"
 
     logging.info(f"\n\nSBE FIELDS: {output}\n\n")
 
     return json.loads(output)
 
-    # with open('ai_sbe_fields.json', 'r') as file:
-    #     data = json.load(file)
-    #
-    # return data
-
 
 def generate_sbe_message_components(output_previous_function):
     array_json_array_document_fields = output_previous_function["array_json_array_document_fields"]
 
-    # SBE FIELDS
     number_processes = utils.get_number_processes(array_json_array_document_fields)
-    with Pool(number_processes) as pool:
-        array_json_array_sbe_fields = pool.map(generate_sbe_fields, array_json_array_document_fields)
+    # with Pool(number_processes) as pool:
+    #    array_json_array_sbe_fields = pool.map(generate_sbe_fields, array_json_array_document_fields)
+    with open('ai_sbe_fields.json', 'r') as file:
+        array_json_array_sbe_fields = json.load(file)
 
     json_array_full_sbe_fields = utils.merge_unique_sbe_fields_json_arrays(array_json_array_sbe_fields)
 
-    # REPEATING GROUPS
     number_processes = utils.get_number_processes(array_json_array_document_fields)
-    with Pool(number_processes) as pool:
-        if len(array_json_array_document_fields) == 1:
-            array_json_array_repeating_groups = pool.map(
-                generate_repeating_groups,
-                array_json_array_document_fields
-            )
-        else:
-            array_splitted_json_array_document_fields = utils.split_json_arrays(array_json_array_document_fields)
-            array_document_fields_adjacent_pages = [
-                (array_splitted_json_array_document_fields[i] + array_splitted_json_array_document_fields[i + 1]) for i
-                in
-                range(len(array_splitted_json_array_document_fields) - 1)
-            ]
-            array_json_array_repeating_groups = pool.map(
-                generate_repeating_groups,
-                array_document_fields_adjacent_pages
-            )
+    # with Pool(number_processes) as pool:
+    #     if len(array_json_array_document_fields) == 1:
+    #         array_json_array_repeating_groups = pool.map(
+    #             generate_repeating_groups,
+    #             array_json_array_document_fields
+    #         )
+    #     else:
+    #         array_splitted_json_array_document_fields = utils.split_json_arrays(array_json_array_document_fields)
+    #         array_document_fields_adjacent_pages = [
+    #             (array_splitted_json_array_document_fields[i] + array_splitted_json_array_document_fields[i + 1]) for i
+    #             in
+    #             range(len(array_splitted_json_array_document_fields) - 1)
+    #         ]
+    #         array_json_array_repeating_groups = pool.map(
+    #             generate_repeating_groups,
+    #             array_document_fields_adjacent_pages
+    #         )
 
-    # FILL REPEATING GROUPS
+    with open('ai_repeating_groups.json', 'r') as file:
+        array_json_array_repeating_groups = json.load(file)
+
     json_array_distinct_repeating_groups = utils.merge_unique_repeating_groups_json_arrays(
-        array_json_array_repeating_groups)
-    if len(json_array_distinct_repeating_groups) > 0:
+        array_json_array_repeating_groups
+    )
 
-        array_repeating_group_field_ai_engine_ids = [repeating_group["items"] for repeating_group in
-                                                     json_array_distinct_repeating_groups]
+    if len(json_array_distinct_repeating_groups) <= 0:
+        return json_array_full_sbe_fields, []
 
-        logging.info(f"array_repeating_group_field_ai_engine_ids: {array_repeating_group_field_ai_engine_ids}")
+    array_repeating_group_field_ai_engine_ids = utils.get_ai_engine_ids_repeating_groups(
+        json_array_distinct_repeating_groups
+    )
 
-        for repeating_group in json_array_distinct_repeating_groups:
-            for index, repeating_group_field in enumerate(repeating_group["items"]):
-                logging.info(f"enumerate(repeating_group items: {enumerate(repeating_group['items'])}")
-                updated_repeating_group_field = utils.get_repeating_group_sbe_field(repeating_group_field,
-                                                                                    json_array_full_sbe_fields)
-                logging.info(f"updated_repeating_group_field: {updated_repeating_group_field}")
-                repeating_group["items"][index] = updated_repeating_group_field
-                logging.info(f"repeating_group items index: {repeating_group['items'][index]}")
+    utils.fill_array_repeating_groups_with_sbe_fields(
+        json_array_distinct_repeating_groups,
+        json_array_full_sbe_fields
+    )
 
-        # FILTERING SBE FIELDS
-        json_array_sbe_fields = [sbe_field for sbe_field in json_array_full_sbe_fields if
-                                sbe_field.get("ai_engine_id") not in array_repeating_group_field_ai_engine_ids]
+    logging.info(
+        f"json_array_distinct_repeating_groups: {json_array_distinct_repeating_groups}")
 
-        logging.info(
-            f"json_array_sbe_fields: {json_array_sbe_fields}\n\n\njson_array_distinct_repeating_groups: {json_array_distinct_repeating_groups}")
+    json_array_sbe_fields = utils.get_array_sbe_fields_outside_repeating_groups(
+        json_array_full_sbe_fields,
+        array_repeating_group_field_ai_engine_ids
+    )
 
-        return json_array_sbe_fields, json_array_distinct_repeating_groups
+    logging.info(f"json_array_sbe_fields: {json_array_sbe_fields}")
 
-    return json_array_full_sbe_fields, []
+    return json_array_sbe_fields, json_array_distinct_repeating_groups
 
 
 def execute_pipeline_filters(pipeline_filters, input_pipeline):

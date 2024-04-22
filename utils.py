@@ -19,35 +19,12 @@ def create_directory_if_not_exists(directory_path):
         os.makedirs(directory_path)
 
 
-def empty_folder(folder_path):
-    for file_name in os.listdir(folder_path):
-        file_path = os.path.join(folder_path, file_name)
-        if file_path.endswith(('.jpg', '.jpeg', '.png')):
-            try:
-                os.remove(file_path)
-                print(f"File {file_name} cancellato con successo.")
-            except Exception as e:
-                print(f"Errore durante la cancellazione del file {file_name}: {e}")
-
-
 def save_uploaded_file(directory_path, file):
     create_directory_if_not_exists(directory_path)
     file_path = os.path.join(directory_path, file.name)
     with open(file_path, "wb") as f:
         f.write(file.getbuffer())
     return file_path
-
-
-def is_duplicate_in_json_array(field_name, field_value, json_array_fields):
-    try:
-        for item in json_array_fields:
-            if item.get(field_name) == field_value:
-                return True
-        return False
-    except json.JSONDecodeError:
-        raise ValueError("Il terzo argomento deve essere un JSON array.")
-    except TypeError:
-        raise ValueError("Il campo fornito non esiste o il valore non è confrontabile.")
 
 
 def merge_unique_sbe_fields_json_arrays(array_json_array):
@@ -65,10 +42,8 @@ def merge_unique_sbe_fields_json_arrays(array_json_array):
 
 
 def get_index_intersected_group(new_repeating_group, array_repeating_groups):
-    logging.info(f"new_repeating_group items: {new_repeating_group['items']}")
     new_repeating_group_items_set = set(new_repeating_group["items"])
     for index, repeating_group in enumerate(array_repeating_groups, start=0):
-        logging.info(f"repeating_group items: {repeating_group['items']}")
         repeating_group_items_set = set(repeating_group["items"])
         if bool(new_repeating_group_items_set & repeating_group_items_set):
             return index
@@ -76,27 +51,17 @@ def get_index_intersected_group(new_repeating_group, array_repeating_groups):
 
 
 def merge_unique_repeating_groups_json_arrays(array_json_array_repeating_groups):
-    logging.info(f"array_json_array_repeating_groups: {array_json_array_repeating_groups}")
-
     array_distinct_repeating_groups = []
     for array_repeating_groups in array_json_array_repeating_groups:
         for repeating_group in array_repeating_groups:
-            logging.info(f"array_distinct_repeating_groups: {array_distinct_repeating_groups}")
             index = get_index_intersected_group(repeating_group, array_distinct_repeating_groups)
-            logging.info(f"index: {index}")
             if index == -1:
                 array_distinct_repeating_groups.append(repeating_group)
             else:
                 array_distinct_repeating_groups[index]["items"] += [id for id in repeating_group["items"] if
                                                                     id not in array_distinct_repeating_groups[index][
                                                                         "items"]]
-
-    logging.info(f"FINAL: {array_distinct_repeating_groups}")
     return array_distinct_repeating_groups
-
-
-def replace_newlines_with_space(input_string):
-    return input_string.replace('\n', ' ')
 
 
 def clean_json_string(json_string):
@@ -105,12 +70,6 @@ def clean_json_string(json_string):
     cleaned_str = cleaned_str.rsplit("\n```", 1)[0]
 
     return cleaned_str
-
-
-def escape_braces_for_formatting(input_string):
-    return (input_string
-            .replace('{', '{{')
-            .replace('}', '}}'))
 
 
 def get_env_variables():
@@ -271,3 +230,30 @@ def get_repeating_group_sbe_field(ai_engine_id, array_sbe_fields):
             array_sbe_fields),
         None
     )
+
+
+def get_ai_engine_ids_repeating_groups(array_repeating_groups):
+    array_ai_engine_ids = []
+
+    for repeating_group in array_repeating_groups:
+        for ai_engine_id in repeating_group["items"]:
+            array_ai_engine_ids.append(ai_engine_id)
+        for ai_engine_id in repeating_group["indicators_items"]:
+            array_ai_engine_ids.append(ai_engine_id)
+
+    return array_ai_engine_ids
+
+
+def fill_array_repeating_groups_with_sbe_fields(array_repeating_groups, array_sbe_fields):
+    for repeating_group in array_repeating_groups:
+        for index, repeating_group_field in enumerate(repeating_group["items"]):
+            updated_repeating_group_field = get_repeating_group_sbe_field(
+                repeating_group_field,
+                array_sbe_fields
+            )
+            repeating_group["items"][index] = updated_repeating_group_field
+
+
+def get_array_sbe_fields_outside_repeating_groups(json_array_full_sbe_fields, array_repeating_group_field_ai_engine_ids):
+    return [sbe_field for sbe_field in json_array_full_sbe_fields if
+            sbe_field.get("ai_engine_id") not in array_repeating_group_field_ai_engine_ids]

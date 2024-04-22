@@ -6,6 +6,6 @@ services:
       - .:/container
     working_dir: /container
     command: python3 ai_engine_module.py
-#    command: streamlit run frontend_module.py
+#    command: streamlit run frontend_module.py --browser.gatherUsageStats false
 #    ports:
 #      - "8502:8501"

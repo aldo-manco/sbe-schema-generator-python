@@ -71,7 +71,6 @@ class JsonSchemaHandler:
                 "array_string_data_types": [],
                 "array_enum_data_types": [],
                 "array_set_data_types": [],
-                "array_composite_data_types": [],
                 "array_document_messages": []
             }
         }
@@ -93,8 +92,6 @@ class JsonSchemaHandler:
         new_document_message = {
             "message_name": message_name,
             "template_id": template_id,
-            "array_document_columns": [],
-            "array_document_fields": [],
             "array_sbe_fields": [],
             "array_sbe_repeating_groups": []
         }
@@ -138,6 +135,7 @@ class JsonSchemaHandler:
         for document_message in document_messages:
             process_field_function(document_message)
 
+
     def add_sbe_field_to_message(self, message_key, json_sbe_field):
         message = self.find_document_message_in_json_schema(message_key)
         if message is None:
@@ -164,21 +162,22 @@ class JsonSchemaHandler:
                     process_field_function(sbe_field)
 
 
-    def add_repeating_group_to_message(self, message_key, group_name, group_id):
+    def add_repeating_group_to_message(self, message_key, group_name, group_tag_number):
         message = self.find_document_message_in_json_schema(message_key)
         if message is None:
             raise KeyError(f"Message '{message_key}' not found in schema.")
         for repeating_group in self.get_message_array_iterator(message_key, "array_sbe_repeating_groups"):
-            if repeating_group["group_id"] == group_id:
+            if repeating_group["group_name"] == group_name:
                 print(
-                    f"Repeating Group {group_id} already exists in the message '{message_key}' of the JSON schema '{self.json_schema_name}'")
+                    f"Repeating Group {group_name} already exists in the message '{message_key}' of the JSON schema '{self.json_schema_name}'")
                 return
 
-        new_repeating_group = {
-            "group_id": group_id,
-            "group_name": group_name,
-            "items": []
-        }
+        new_repeating_group = {}
+
+        if group_tag_number != -1:
+            new_repeating_group["group_tag_number"] = group_tag_number
+        new_repeating_group["group_name"] = group_name
+        new_repeating_group["items"] = []
 
         message["array_sbe_repeating_groups"].append(new_repeating_group)
         self.save_schema()
@@ -191,9 +190,8 @@ class JsonSchemaHandler:
         for repeating_group in self.get_message_array_iterator(message_key, "array_sbe_repeating_groups"):
             if repeating_group["group_name"] == repeating_group_name:
                 already_exists = False
-                for sbe_field in repeating_group["items"]:
-                    if sbe_field["field_name"] == json_sbe_field["field_name"]:
-                        already_exists = True
+                if json_sbe_field in repeating_group["items"]:
+                    already_exists = True
                 if not already_exists:
                     repeating_group["items"].append(json_sbe_field)
                     self.save_schema()
@@ -321,7 +319,7 @@ class JsonSchemaHandler:
             self.add_repeating_group_to_message(
                 message_name,
                 repeating_group["group_name"],
-                repeating_group["group_id"]
+                repeating_group["group_tag_number"] if "group_tag_number" in repeating_group else -1
             )
 
             for sbe_field in repeating_group["items"]:

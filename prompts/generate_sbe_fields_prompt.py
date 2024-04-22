@@ -2,11 +2,11 @@
 
 system_message = """
 You are an expert in electronic trading systems with a deep understanding of FIX and SBE protocols. Your mission is to identify various features regarding each message field of the given list of message fields, provided by a market documentation. For each message field, determine each of the following features step by step:
-1. Field ID: 
-If a field in message fields represents a FIX protocol tag number, either standard or custom, assign the appropriate tag number to the Field ID. If no such tag number is defined, do not define the Field ID.
-2. Field Name: 
+1. field_tag_number: 
+If a field in message fields represents a FIX protocol tag number, either standard or custom, assign the appropriate tag number to the Field Tag Number. If no such tag number is defined, do not define the Field Tag Number.
+2. field_name: 
 Textual reference briefly describing the content and purpose of the field.
-3. Data Type:
+3. data_type:
 Choose the appropriate data type for the field, using only the types defined in the SBE protocol. Here is a guide on the different available data types:
 - char
 - int8
@@ -19,15 +19,15 @@ Choose the appropriate data type for the field, using only the types defined in 
 - uint64
 - Field Name in camelCase + "_enum" (For fields with a limited number of options where only one value can be selected)
 - Field Name in camelCase + "_set" (For fields with a limited number of options where multiple values can be selected)
-4. Encoding Type: 
+4. encoding_type: 
 For primitive data types, encoding type corresponds to the primitive data type itself. For enumerations and sets, use the smallest data type capable of containing all selectable values.
-5. Length in Byte: 
+5. length: 
 Calculate the byte length of the chosen data type. For enumerations or sets, calculate the byte length of the chosen encoding type capable of representing all possible values.
-6. Presence: 
+6. presence: 
 Determine if the field is mandatory or optional, indicating whether it must always be included or can be omitted in some messages.
-7. Enumerazione/Set Structure: 
+7. structure: 
 For enumeration or set fields, associate a JSON object with all possible values. For primitive data types, associate an empty JSON {}.
-8. AI Engine ID:
+8. ai_engine_id:
 Unique identifier for the field in the message, defined in "ai_engine_id".
 
 In your response, include only a JSON array. This array must contain a JSON object with the requested features for each message field. 
@@ -87,7 +87,7 @@ example_1_human_message = """
 example_1_assistant_message = """
 [
   {
-    "field_id": 21005,
+    "field_tag_number": 21005,
     "field_name": "ClientMessageSendingTime",
     "data_type": "char",
     "encoding_type": "char",
@@ -97,9 +97,10 @@ example_1_assistant_message = """
     "ai_engine_id": 1
   },
   {
-    "field_id": 11,
+    "field_tag_number": 11,
     "field_name": "ClOrdID",
     "data_type": "int64",
+    
     "encoding_type": "int64",
     "length": 8,
     "presence": "mandatory",
@@ -107,7 +108,7 @@ example_1_assistant_message = """
     "ai_engine_id": 2
   },
   {
-    "field_id": 21013,
+    "field_tag_number": 21013,
     "field_name": "AckPhase",
     "data_type": "ackPhase_enum",
     "encoding_type": "char",
@@ -125,7 +126,7 @@ example_1_assistant_message = """
     "ai_engine_id": 3
   },
   {
-    "field_id": 21014,
+    "field_tag_number": 21014,
     "field_name": "AckQualifiers",
     "data_type": "ackQualifiers_set",
     "encoding_type": "char",

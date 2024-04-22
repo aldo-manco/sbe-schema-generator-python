@@ -6,18 +6,27 @@ from json_schema_handler import JsonSchemaHandler
 from xml_sbe_schema_handler import XmlSbeSchemaHandler
 import utils
 
+name_software = "Gatelab AI Engine"
+favicon_software_path = "logo/euronext.png"
 tab_new_json_schema = "Add New JSON Schema File"
 tab_new_document_message = "Add New Document Message"
 tab_new_document_message_column = "Add New Document Message Column"
 tab_new_document_message_field = "Add New Document Message Field"
 tab_new_document_repeating_group = "Add New Document Repeating Group"
 tab_new_document_composite = "Add New Document Composite"
-tab_generate_sbe_xml_schema = "Generate SBE XML Schema"
+tab_generate_sbe_xml_schema_from_pdf = "Generate SBE XML Schema From PDF"
+tab_generate_sbe_xml_schema_from_json = "Generate SBE XML Schema From JSON"
 
 if 'toggle_state' not in st.session_state:
-    st.session_state['toggle_state'] = False
+    st.session_state['toggle_state'] = True
 if 'pdf_uploaded_state' not in st.session_state:
     st.session_state['pdf_uploaded_state'] = False
+if 'json_uploaded_state' not in st.session_state:
+    st.session_state['json_uploaded_state'] = False
+
+
+def set_page_properties(title, favicon_path):
+    st.set_page_config(page_title=title, page_icon=favicon_path)
 
 
 def form_new_sbe_schema():
@@ -143,8 +152,8 @@ def form_new_sbe_message():
             st.success(f"SBE Message \'{message_name}\' is in the SBE Schema \'{json_schema_name}\'")
 
 
-def form_generate_sbe_xml_schema():
-    st.subheader(tab_generate_sbe_xml_schema)
+def form_generate_sbe_xml_schema_from_pdf():
+    st.subheader(tab_generate_sbe_xml_schema_from_pdf)
 
     uploaded_file = st.file_uploader("Carica un file PDF", type="pdf")
 
@@ -157,7 +166,7 @@ def form_generate_sbe_xml_schema():
 
         json_schema_name = st.text_input(
             "Name JSON Schema",
-            key="json_schema_name_form_new_sbe_message"
+            key="json_schema_name_form_generate_sbe_xml_schema_from_pdf"
         )
 
         if json_schema_name:
@@ -196,36 +205,33 @@ def form_generate_sbe_xml_schema():
         st.info("Per favore, seleziona un file PDF.")
 
 
-def load_and_display_json():
-    name_sbe_schema = st.text_input("Name SBE Schema")
+def form_generate_sbe_xml_schema_from_json():
+    st.subheader(tab_generate_sbe_xml_schema_from_json)
 
-    if name_sbe_schema:
-        try:
-            json_schema_handler = JsonSchemaHandler(name_sbe_schema)
+    json_schema_name = st.text_input(
+        "Name JSON Schema",
+        key="json_schema_name_form_generate_sbe_xml_schema_from_json"
+    )
 
-            edited_content = st.text_area(
-                "Modifica JSON Schema:",
-                value=json_schema_handler.load_string_schema(),
-                height=300,
-                key=f"edit_{name_sbe_schema}"
-            )
+    if json_schema_name:
+        st.session_state['json_uploaded_state'] = True
 
-            if st.button("Salva modifiche", key=f"save_{name_sbe_schema}"):
-                success, message = json_schema_handler.save_edited_json_schema(edited_content)
-                if success:
-                    st.success(message)
-                else:
-                    st.error(message)
-        except Exception as e:
-            st.error(str(e))
-    else:
-        st.error("Inserisci un nome valido per lo schema.")
+    if st.session_state['json_uploaded_state']:
+        if st.button(f"Generate SBE XML Schema \'{json_schema_name}\'"):
+
+            json_handler = JsonSchemaHandler(json_schema_name)
+
+            xml_handler = XmlSbeSchemaHandler(json_schema_name)
+            xml_handler.generate_xml_schema_from_json_schema(json_handler)
+
+            st.success('Schema SBE XML Generato con successo.')
 
 
 def main():
-    st.title("Gatelab AI Engine")
+    set_page_properties(name_software, favicon_software_path)
+    st.title(name_software)
     st.header("SBE XML Schema AI Generator")
-    tabs = [tab_new_json_schema, tab_new_document_message, tab_generate_sbe_xml_schema]
+    tabs = [tab_new_json_schema, tab_new_document_message, tab_generate_sbe_xml_schema_from_pdf, tab_generate_sbe_xml_schema_from_json]
     default_index = tabs.index(tab_new_document_message)
     tab = st.selectbox("Select Tab", tabs, index=default_index)
 
@@ -233,8 +239,10 @@ def main():
         form_new_sbe_schema()
     elif tab == tab_new_document_message:
         form_new_sbe_message()
-    elif tab == tab_generate_sbe_xml_schema:
-        form_generate_sbe_xml_schema()
+    elif tab == tab_generate_sbe_xml_schema_from_pdf:
+        form_generate_sbe_xml_schema_from_pdf()
+    elif tab == tab_generate_sbe_xml_schema_from_json:
+        form_generate_sbe_xml_schema_from_json()
 
 
 if __name__ == "__main__":
