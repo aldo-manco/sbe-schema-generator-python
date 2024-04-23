@@ -485,174 +485,149 @@ Adhere the provided examples closely.
 
 [
   {
-    "Tag": 20175,
-    "Field Name": "TriggeredStopTimeInForce",
-    "Format": "Char",
-    "Len": 1,
-    "Possible Values": "0 = Day, 1 = Good Till Cancel, 6 = Good till Date",
-    "M/C": "C",
-    "Short Description, Compatibility Notes, & Conditions": "Specifies the maximum validity of a triggered stop order. On triggering of a Stop order the value in this field is populated in the field TimeInForce (59).",
-    "ai_engine_id": 1 
+    "field_name": "MarketDataSequenceNumber",
+    "data_type": "uint64",
+    "encoding_type": "uint64",
+    "length": 8,
+    "presence": "mandatory",
+    "structure": {},
+    "ai_engine_id": 1
   },
   {
-    "Tag": 131,
-    "Field Name": "QuoteReqID",
-    "Format": "String",
-    "Len": 20,
-    "Possible Values": "From 0 to 2^64-2",
-    "M/C": "C",
-    "Short Description, Compatibility Notes, & Conditions": "Numerical RFQ identifier assigned by the matching engine, unique per instrument and EMM.",
+    "field_name": "RebroadcastIndicator",
+    "data_type": "uint8",
+    "encoding_type": "uint8",
+    "length": 1,
+    "presence": "mandatory",
+    "structure": {},
     "ai_engine_id": 2
   },
   {
-    "Tag": 21037,
-    "Field Name": "RFQAnswerIndicator",
-    "Format": "Int",
-    "Len": 1,
-    "Possible Values": "0 = No, 1 = Yes",
-    "M/C": "C",
-    "Short Description, Compatibility Notes, & Conditions": "Indicates whether the message is, or not, a quote sent as an answer to a QuoteRequest (R) message.",
+    "field_name": "EMM",
+    "data_type": "EMM_enum",
+    "encoding_type": "char",
+    "length": 1,
+    "presence": "optional",
+    "structure": {
+      "See field description": "Various Market Mechanisms"
+    },
     "ai_engine_id": 3
   },
   {
-    "Tag": 21038,
-    "Field Name": "RFQConfirmationIndicator",
-    "Format": "Int",
-    "Len": 1,
-    "Possible Values": "0 = No, 1 = Yes",
-    "M/C": "C",
-    "Short Description, Compatibility Notes, & Conditions": "Indicates whether the message is, or not, an order sent as a confirmation of a QuoteRequest (R) message.",
+    "field_name": "PatternID",
+    "data_type": "uint16",
+    "encoding_type": "uint16",
+    "length": 2,
+    "presence": "optional",
+    "structure": {},
     "ai_engine_id": 4
   },
   {
-    "Tag": 21800,
-    "Field Name": "ConditionalOrderFlag",
-    "Format": "Int",
-    "Len": 1,
-    "Possible Values": "0 = Firm (default), 1 = Conditional",
-    "M/C": "C",
-    "Short Description, Compatibility Notes, & Conditions": "Indicates if the order is a conditional or a firm order.",
+    "field_name": "SymbolIndex",
+    "data_type": "uint32",
+    "encoding_type": "uint32",
+    "length": 4,
+    "presence": "optional",
+    "structure": {},
     "ai_engine_id": 5
   },
   {
-    "Tag": 453,
-    "Field Name": "NoPartyIDs",
-    "Format": "NumInGroup",
-    "Len": 1,
-    "Possible Values": "Always set to 1",
-    "M/C": "A",
-    "Short Description, Compatibility Notes, & Conditions": "Number of PartyID entries.",
+    "field_name": "TimetablesLength",
+    "data_type": "uint16",
+    "encoding_type": "uint16",
+    "length": 1,
+    "presence": "mandatory",
+    "structure": {},
     "ai_engine_id": 6
   },
   {
-    "Tag": 448,
-    "Field Name": "PartyID",
-    "Format": "String",
-    "Len": 11,
-    "Possible Values": "Alphanumeric",
-    "M/C": "A",
-    "Short Description, Compatibility Notes, & Conditions": "In this case provides the ExecutionWithinFirmShortCode.",
+    "field_name": "TimetablesOccurrences",
+    "data_type": "uint8",
+    "encoding_type": "uint8",
+    "length": 1,
+    "presence": "mandatory",
+    "structure": {},
     "ai_engine_id": 7
   },
   {
-    "Tag": 447,
-    "Field Name": "PartyIDSource",
-    "Format": "Char",
-    "Len": 1,
-    "Possible Values": "P = Short code identifier",
-    "M/C": "A",
-    "Short Description, Compatibility Notes, & Conditions": "Source of PartyID value.",
+    "field_name": "PhaseTime",
+    "data_type": "uint64",
+    "encoding_type": "uint64",
+    "length": 8,
+    "presence": "mandatory",
+    "structure": {},
     "ai_engine_id": 8
   },
   {
-    "Tag": 452,
-    "Field Name": "PartyRole",
-    "Format": "Int",
-    "Len": 3,
-    "Possible Values": "3 = Client ID, 12 = Executing Trader, 999 = Not Applicable",
-    "M/C": "A",
-    "Short Description, Compatibility Notes, & Conditions": "Identifies the type or role of the PartyID (448) specified. For Execution with Firm short code in Drop Copy where the values in the original trading OEG message were received in SBE protocol the value will be set to 999 (Not Applicable); were received in FIX protocol, the value will be set to 3 (Client ID) or 12 (Executing Trader)",
+    "field_name": "PhaseId",
+    "data_type": "PhaseId_enum",
+    "encoding_type": "char",
+    "length": 1,
+    "presence": "mandatory",
+    "structure": {
+      "See field description": "Phase Identifiers"
+    },
     "ai_engine_id": 9
   },
   {
-    "Tag": 2376,
-    "Field Name": "PartyRoleQualifier",
-    "Format": "Int",
-    "Len": 2,
-    "Possible Values": "22 = Algorithm, 23 = Firm or legal entity, 24 = Natural person, 99 = Not Applicable",
-    "M/C": "C",
-    "Short Description, Compatibility Notes, & Conditions": "Used to further qualify the value of PartyRole (452). For ExecutionWithinFirmShortCode in Drop Copy where the values in the original trading OEG message were received in SBE protocol the value will be set to 99 (Not Applicable); were received in FIX protocol, the value will be set to 22 (Algorithm) or 23 (Firm or Legal Entity) or 24 (Natural Person);",
+    "field_name": "PhaseQualifier",
+    "data_type": "PhaseQualifier_set",
+    "encoding_type": "uint16",
+    "length": 2,
+    "presence": "mandatory",
+    "structure": {
+      "See field description": "Various Qualifiers"
+    },
     "ai_engine_id": 10
   },
   {
-    "Tag": 1724,
-    "Field Name": "OrderOrigination",
-    "Format": "Int",
-    "Len": 1,
-    "Possible Values": "5 = Order received from a direct access or sponsored access customer",
-    "M/C": "C",
-    "Short Description, Compatibility Notes, & Conditions": "Identifies the origin of the order.",
+    "field_name": "TradingPeriod",
+    "data_type": "TradingPeriod_enum",
+    "encoding_type": "char",
+    "length": 1,
+    "presence": "mandatory",
+    "structure": {
+      "1": "Opening (Cash and Derivatives)",
+      "2": "Standard (Cash and Derivatives)",
+      "3": "Closing (Cash and Derivatives)"
+    },
     "ai_engine_id": 11
   },
   {
-    "Tag": 2593,
-    "Field Name": "NoOrderAttributes",
-    "Format": "NumInGroup",
-    "Len": 1,
-    "Possible Values": "If provided, from 1 to 2",
-    "M/C": "C",
-    "Short Description, Compatibility Notes, & Conditions": "Number of order attribute entries.",
+    "field_name": "OrderEntryQualifier",
+    "data_type": "OrderEntryQualifier_enum",
+    "encoding_type": "char",
+    "length": 1,
+    "presence": "optional",
+    "structure": {
+      "0": "Order Entry/Cancel/Modify Disabled",
+      "1": "Order Entry/Cancel/Modify Enabled",
+      "2": "Cancel and Modify Only (Derivatives Only)",
+      "3": "Cancel Only"
+    },
     "ai_engine_id": 12
   },
   {
-    "Tag": 2594,
-    "Field Name": "OrderAttributeType",
-    "Format": "Int",
-    "Len": 1,
-    "Possible Values": "0 = Aggregated order, 1 = Pending allocation, 3 = Risk reduction order",
-    "M/C": "C",
-    "Short Description, Compatibility Notes, & Conditions": "Used in case client needs to indicate values of AGGR or PNAL, or in Risk Reduction order.",
+    "field_name": "Session",
+    "data_type": "Session_enum",
+    "encoding_type": "char",
+    "length": 1,
+    "presence": "mandatory",
+    "structure": {
+      "See field description": "Session states"
+    },
     "ai_engine_id": 13
   },
   {
-    "Tag": 2595,
-    "Field Name": "OrderAttributeValue",
-    "Format": "String",
-    "Len": 1,
-    "Possible Values": "Y = Yes",
-    "M/C": "C",
-    "Short Description, Compatibility Notes, & Conditions": "Always set to Yes if OrderAttributeType (2594) if provided.",
+    "field_name": "ScheduledEvent",
+    "data_type": "ScheduledEvent_enum",
+    "encoding_type": "char",
+    "length": 1,
+    "presence": "optional",
+    "structure": {
+      "See field description": "Event types"
+    },
     "ai_engine_id": 14
-  },
-  {
-    "Tag": 29,
-    "Field Name": "LastCapacity",
-    "Format": "Char",
-    "Len": 1,
-    "Possible Values": "7 = Dealing on own account (DEAL), 8 = Matched principal (MTCH), 9 = Any other capacity (AOTC)",
-    "M/C": "A",
-    "Short Description, Compatibility Notes, & Conditions": "Indicates whether the order submission results from trading as matched principal, on own account or as any other capacity.",
-    "ai_engine_id": 15
-  },
-  {
-    "Tag": 110,
-    "Field Name": "MinQty",
-    "Format": "Qty",
-    "Len": 20,
-    "Possible Values": "Value '0' by default and depending to a minimum value for the given instrument and/or market type",
-    "M/C": "C",
-    "Short Description, Compatibility Notes, & Conditions": "Minimum quantity to be executed upon order entry (else the order is rejected). Only provided when submitted in the original order entry message.",
-    "ai_engine_id": 16
-  },
-  {
-    "Tag": 21013,
-    "Field Name": "AckPhase",
-    "Format": "Char",
-    "Len": 1,
-    "Possible Values": "1 = Continuous Trading Phase, 2 = Call Phase, 3 = Halt Phase, 5 = Trading At Last Phase, 6 = Reserved, 7 = Suspended, 8 = Random Uncrossing Phase",
-    "M/C": "A",
-    "Short Description, Compatibility Notes, & Conditions": "Indicates the trading phase during which the Matching Engine has received the order. Values 5 and 8 apply only for Cash markets.",
-    "ai_engine_id": 17
   }
 ]
 

@@ -9,12 +9,9 @@ import multiprocessing
 from multiprocessing import Pool
 from dotenv import load_dotenv
 import logging
-import fitz
 
-import utils
-from prompts import generate_document_fields_prompt
-from prompts import generate_repeating_groups_prompt
-from prompts import generate_sbe_fields_prompt
+from utils import utils
+from utils import cv_utils
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -29,19 +26,11 @@ def extract_pdf_text(input_pipeline):
 
     number_processes = utils.get_number_processes(array_page_info)
     with multiprocessing.Pool(number_processes) as pool:
-        array_text_pages = pool.map(extract_page_text, array_page_info)
+        array_text_pages = pool.map(cv_utils.extract_page_text, array_page_info)
 
     return {
         "array_text_pages": array_text_pages
     }
-
-
-def extract_page_text(page_info):
-    pdf_path, page_number = page_info
-    with fitz.open(pdf_path) as doc:
-        page = doc.load_page(page_number)
-        text = page.get_text()
-    return text
 
 
 def convert_pdf_pages_to_jpg(input_pipeline):
@@ -91,30 +80,11 @@ def grayscale_batch_processing(output_previous_function):
     number_processes = utils.get_number_processes(array_image_paths)
 
     with Pool(processes=number_processes) as pool:
-        array_grayscale_images = pool.map(convert_grayscale, array_image_paths)
+        array_grayscale_images = pool.map(cv_utils.convert_grayscale, array_image_paths)
 
     return {
         "array_images_info": array_grayscale_images
     }
-
-
-def convert_grayscale(image_path):
-    try:
-        image = cv2.imread(image_path)
-        if image is None:
-            raise FileNotFoundError("L'immagine specificata non è stata trovata.")
-
-        image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        image_gray = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2GRAY)
-
-        return {
-            "image_path": image_path,
-            "image": image_gray
-        }
-
-    except Exception as e:
-        print(f"Si è verificato un errore durante la conversione dell'immagine: {e}")
-        return None
 
 
 def increase_contrast_batch_processing(output_previous_function):
@@ -123,25 +93,10 @@ def increase_contrast_batch_processing(output_previous_function):
     number_processes = utils.get_number_processes(array_images_info)
 
     with Pool(processes=number_processes) as pool:
-        array_contrast_images_info = pool.map(increase_contrast, array_images_info)
+        array_contrast_images_info = pool.map(cv_utils.increase_contrast, array_images_info)
 
     return {
         "array_images_info": array_contrast_images_info
-    }
-
-
-def increase_contrast(output_previous_function):
-    image_path = output_previous_function["image_path"]
-    image = output_previous_function["image"]
-
-    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
-    image_clahe = clahe.apply(image)
-
-    cv2.imwrite(image_path, image_clahe)
-
-    return {
-        "image_path": image_path,
-        "image": image_clahe
     }
 
 
@@ -158,39 +113,11 @@ def thresholding_batch_processing(output_previous_function):
     }
 
 
-def thresholding(output_previous_function):
-    image_path = output_previous_function["image_path"]
-    image = output_previous_function["image"]
-
-    _, image_otsu = cv2.threshold(
-        image,
-        0,
-        255,
-        cv2.THRESH_BINARY + cv2.THRESH_OTSU
-    )
-
-    image_adaptive = cv2.adaptiveThreshold(
-        image,
-        255,
-        cv2.ADAPTIVE_THRESH_MEAN_C,
-        cv2.THRESH_BINARY,
-        19,  # Block Size: 15, 17, 19
-        10  # C-Value: 5, 10
-    )
-
-    cv2.imwrite(image_path, image_otsu)
-
-    return {
-        "image_path": image_path,
-        "image": image_otsu
-    }
-
-
 def table_detection_batch_processing(output_previous_function):
     array_images_info = output_previous_function["array_images_info"]
 
     detectron2_model = lp.Detectron2LayoutModel(
-        config_path='config.yaml',
+        config_path='../config.yaml',
         extra_config=["MODEL.ROI_HEADS.SCORE_THRESH_TEST", 0.65],
         label_map={
             0: "Text",
@@ -268,16 +195,16 @@ def document_fields_generation_batch_processing(output_previous_function):
     # number_processes = utils.get_number_processes(array_text_pages)
     #
     # with Pool(processes=number_processes) as pool:
-    #     array_json_array_document_fields = pool.map(generate_document_fields, array_text_pages)
+    #     array_json_array_document_fields = pool.map(ai_utils.generate_document_fields, array_text_pages)
     #
     # optimized_array_json_array_document_fields = utils.generate_optimal_array_of_json_array(
     #     array_json_array_document_fields,
-    #     30
+    #     15
     # )
     #
     # numbered_array_json_array_document_fields = utils.add_ai_engine_id(optimized_array_json_array_document_fields)
 
-    with open('ai_document_fields.json', 'r') as file:
+    with open('business_logic/testing/ai_document_fields.json', 'r') as file:
         data = json.load(file)
 
     return {
@@ -285,98 +212,13 @@ def document_fields_generation_batch_processing(output_previous_function):
     }
 
 
-def generate_document_fields(array_text_pages):
-    human_message = f"""
-### INPUT ###
-
-{array_text_pages}
-
-### OUTPUT JSON ###
-        """
-
-    output = utils.get_output_from_generative_ai(
-        generate_document_fields_prompt.system_message,
-        generate_document_fields_prompt.example_1_human_message,
-        generate_document_fields_prompt.example_1_assistant_message,
-        generate_document_fields_prompt.example_2_human_message,
-        generate_document_fields_prompt.example_2_assistant_message,
-        generate_document_fields_prompt.example_3_human_message,
-        generate_document_fields_prompt.example_3_assistant_message,
-        generate_document_fields_prompt.example_4_human_message,
-        generate_document_fields_prompt.example_4_assistant_message,
-        human_message
-    )
-
-    logging.info(f"\n\nDOCUMENT FIELDS: {output}\n\n")
-
-    return json.loads(output)
-
-
-def generate_repeating_groups(array_document_fields):
-    string_array_document_fields = json.dumps(array_document_fields)
-
-    human_message = f"""
-### INPUT ###
-
-{string_array_document_fields}
-
-### OUTPUT JSON ###
-    """
-
-    output = utils.get_output_from_generative_ai(
-        generate_repeating_groups_prompt.system_message,
-        generate_repeating_groups_prompt.example_1_human_message,
-        generate_repeating_groups_prompt.example_1_assistant_message,
-        generate_repeating_groups_prompt.example_2_human_message,
-        generate_repeating_groups_prompt.example_2_assistant_message,
-        generate_repeating_groups_prompt.example_3_human_message,
-        generate_repeating_groups_prompt.example_3_assistant_message,
-        generate_repeating_groups_prompt.example_4_human_message,
-        generate_repeating_groups_prompt.example_4_assistant_message,
-        human_message
-    )
-
-    logging.info(f"\n\nREPEATING GROUPS: {output}\n\n")
-
-    return json.loads(output)
-
-
-def generate_sbe_fields(array_document_fields):
-    string_array_document_fields = json.dumps(array_document_fields)
-
-    human_message = f"""
-### INPUT ###
-
-{string_array_document_fields}
-
-### OUTPUT JSON ###
-        """
-
-    output = utils.get_output_from_generative_ai(
-        generate_sbe_fields_prompt.system_message,
-        generate_sbe_fields_prompt.example_1_human_message,
-        generate_sbe_fields_prompt.example_1_assistant_message,
-        generate_sbe_fields_prompt.example_2_human_message,
-        generate_sbe_fields_prompt.example_2_assistant_message,
-        generate_sbe_fields_prompt.example_3_human_message,
-        generate_sbe_fields_prompt.example_3_assistant_message,
-        generate_sbe_fields_prompt.example_4_human_message,
-        generate_sbe_fields_prompt.example_4_assistant_message,
-        human_message
-    )
-
-    logging.info(f"\n\nSBE FIELDS: {output}\n\n")
-
-    return json.loads(output)
-
-
 def generate_sbe_message_components(output_previous_function):
     array_json_array_document_fields = output_previous_function["array_json_array_document_fields"]
 
     number_processes = utils.get_number_processes(array_json_array_document_fields)
     # with Pool(number_processes) as pool:
-    #    array_json_array_sbe_fields = pool.map(generate_sbe_fields, array_json_array_document_fields)
-    with open('ai_sbe_fields.json', 'r') as file:
+    #    array_json_array_sbe_fields = pool.map(ai_utils.generate_sbe_fields, array_json_array_document_fields)
+    with open('business_logic/testing/ai_sbe_fields.json', 'r') as file:
         array_json_array_sbe_fields = json.load(file)
 
     json_array_full_sbe_fields = utils.merge_unique_sbe_fields_json_arrays(array_json_array_sbe_fields)
@@ -385,7 +227,7 @@ def generate_sbe_message_components(output_previous_function):
     # with Pool(number_processes) as pool:
     #     if len(array_json_array_document_fields) == 1:
     #         array_json_array_repeating_groups = pool.map(
-    #             generate_repeating_groups,
+    #             ai_utils.generate_repeating_groups,
     #             array_json_array_document_fields
     #         )
     #     else:
@@ -396,11 +238,11 @@ def generate_sbe_message_components(output_previous_function):
     #             range(len(array_splitted_json_array_document_fields) - 1)
     #         ]
     #         array_json_array_repeating_groups = pool.map(
-    #             generate_repeating_groups,
+    #             ai_utils.generate_repeating_groups,
     #             array_document_fields_adjacent_pages
     #         )
 
-    with open('ai_repeating_groups.json', 'r') as file:
+    with open('business_logic/testing/ai_repeating_groups.json', 'r') as file:
         array_json_array_repeating_groups = json.load(file)
 
     json_array_distinct_repeating_groups = utils.merge_unique_repeating_groups_json_arrays(

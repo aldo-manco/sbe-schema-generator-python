@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 import ai_engine_module
+from utils import utils
 
 
 class JsonSchemaHandler:
@@ -22,8 +23,9 @@ class JsonSchemaHandler:
     ):
         self.json_schema_name = json_schema_name.lower()
         self.suffix_name = suffix_name.lower()
+        self.directory_name = "output"
         self.file_name = f"{self.json_schema_name}{self.suffix_name}.json"
-        self.file_path = Path(self.file_name)
+        self.file_path = Path(self.directory_name, self.file_name)
 
         if namespace_sbe and namespace_enx and namespace_str and namespace_ext and package and schema_id and version and semantic_version and description and byte_order:
             self.namespace_sbe = namespace_sbe.lower()
@@ -41,6 +43,7 @@ class JsonSchemaHandler:
 
         self.schema = self.load_schema()
 
+
     def load_schema(self):
         try:
             return json.loads(self.file_path.read_text(encoding='utf-8'))
@@ -49,12 +52,13 @@ class JsonSchemaHandler:
         except json.JSONDecodeError:
             return None, "Error in the JSON SBE Parsing."
 
+
     def load_string_schema(self):
         return json.dumps(self.load_schema(), indent=4)
 
+
     def create_new_file_json_schema(self):
-        file_name = f"{self.json_schema_name}{self.suffix_name}.json"
-        file_path = Path(file_name)
+        utils.create_directory_if_not_exists(self.directory_name)
         file_content = {
             self.json_schema_name: {
                 "namespace_sbe": self.namespace_sbe,
@@ -76,10 +80,11 @@ class JsonSchemaHandler:
         }
 
         try:
-            with open(file_path, 'w', encoding='utf-8') as f:
+            with open(self.file_path, 'w', encoding='utf-8') as f:
                 json.dump(file_content, f, indent=4, ensure_ascii=False)
         except Exception as e:
-            print(f"An error occurred while writing to {file_path}: {e}")
+            print(f"An error occurred while writing to {self.file_path}: {e}")
+
 
     def add_document_message(self, message_name, template_id, starting_page=0, ending_page=0):
         if self.json_schema_name not in self.schema:
@@ -103,17 +108,20 @@ class JsonSchemaHandler:
         self.schema[self.json_schema_name]['array_document_messages'].append(new_document_message)
         self.save_schema()
 
+
     def get_json_schema_field(self, name_field):
         if self.json_schema_name not in self.schema:
             raise KeyError(f"JSON schema '{self.json_schema_name}' not found.")
 
         return self.schema[self.json_schema_name][name_field]
 
+
     def get_schema_array_iterator(self, array_schema):
         if self.json_schema_name not in self.schema:
             raise KeyError(f"JSON schema '{self.json_schema_name}' not found.")
 
         return iter(self.schema[self.json_schema_name][array_schema])
+
 
     def find_document_message_in_json_schema(self, message_key):
         for message in self.get_schema_array_iterator('array_document_messages'):
@@ -242,6 +250,7 @@ class JsonSchemaHandler:
 
         return False
 
+
     def add_custom_data_type(self, array_custom_data_type, encoding_type, data_type, structure):
         if self.is_custom_data_type_exists_in_json_schema(array_custom_data_type, data_type, structure):
             print(f"Data Type \'{data_type}\' already exists in the JSON schema \'{self.json_schema_name}\'")
@@ -289,8 +298,10 @@ class JsonSchemaHandler:
                                       sbe_field["data_type"],
                                       sbe_field["structure"])
 
+
     def save_schema(self):
         self.file_path.write_text(json.dumps(self.schema, indent=4, ensure_ascii=False), encoding='utf-8')
+
 
     def save_edited_json_schema(self, edited_content):
         try:
@@ -299,6 +310,7 @@ class JsonSchemaHandler:
             return True, "JSON SBE Schema updated correctly."
         except Exception as e:
             return False, str(e)
+
 
     def generate_sbe_message(self, document_message, pdf_path, is_pdf_editable):
         message_name = document_message["message_name"]

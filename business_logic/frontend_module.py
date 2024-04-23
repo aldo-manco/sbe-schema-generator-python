@@ -4,7 +4,7 @@ import streamlit as st
 
 from json_schema_handler import JsonSchemaHandler
 from xml_sbe_schema_handler import XmlSbeSchemaHandler
-import utils
+from utils import utils
 
 name_software = "Gatelab AI Engine"
 favicon_software_path = "logo/euronext.png"
@@ -17,16 +17,17 @@ tab_new_document_composite = "Add New Document Composite"
 tab_generate_sbe_xml_schema_from_pdf = "Generate SBE XML Schema From PDF"
 tab_generate_sbe_xml_schema_from_json = "Generate SBE XML Schema From JSON"
 
+st.set_page_config(
+    page_title=name_software,
+    page_icon=favicon_software_path,
+)
+
 if 'toggle_state' not in st.session_state:
     st.session_state['toggle_state'] = True
 if 'pdf_uploaded_state' not in st.session_state:
     st.session_state['pdf_uploaded_state'] = False
 if 'json_uploaded_state' not in st.session_state:
     st.session_state['json_uploaded_state'] = False
-
-
-def set_page_properties(title, favicon_path):
-    st.set_page_config(page_title=title, page_icon=favicon_path)
 
 
 def form_new_sbe_schema():
@@ -158,7 +159,7 @@ def form_generate_sbe_xml_schema_from_pdf():
     uploaded_file = st.file_uploader("Carica un file PDF", type="pdf")
 
     if uploaded_file is not None:
-        pdf_path = utils.save_uploaded_file("pdf_documents", uploaded_file)
+        pdf_path = utils.save_uploaded_file("../pdf_documents", uploaded_file)
         st.success(f"File salvato in: {pdf_path}")
 
         checkbox_label = "Editable PDF" if st.session_state.toggle_state else "Read Only PDF"
@@ -228,7 +229,6 @@ def form_generate_sbe_xml_schema_from_json():
 
 
 def main():
-    set_page_properties(name_software, favicon_software_path)
     st.title(name_software)
     st.header("SBE XML Schema AI Generator")
     tabs = [tab_new_json_schema, tab_new_document_message, tab_generate_sbe_xml_schema_from_pdf, tab_generate_sbe_xml_schema_from_json]

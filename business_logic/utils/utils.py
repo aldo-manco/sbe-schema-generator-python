@@ -5,13 +5,6 @@ import json
 import math
 from itertools import chain
 import multiprocessing
-from langchain_openai import ChatOpenAI
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.messages import (
-    SystemMessage,
-    HumanMessage,
-    AIMessage
-)
 
 
 def create_directory_if_not_exists(directory_path):
@@ -62,88 +55,6 @@ def merge_unique_repeating_groups_json_arrays(array_json_array_repeating_groups)
                                                                     id not in array_distinct_repeating_groups[index][
                                                                         "items"]]
     return array_distinct_repeating_groups
-
-
-def clean_json_string(json_string):
-    cleaned_str = json_string.strip()
-    cleaned_str = cleaned_str.replace("```json\n", "", 1)
-    cleaned_str = cleaned_str.rsplit("\n```", 1)[0]
-
-    return cleaned_str
-
-
-def get_env_variables():
-    openai_api_key = os.getenv("OPENAI_API_KEY")
-    openai_ai_model_name = os.getenv("OPENAI_AI_MODEL_NAME")
-
-    return openai_api_key, openai_ai_model_name
-
-
-def get_output_from_generative_ai(
-        system_message,
-        example_1_human_message,
-        example_1_assistant_message,
-        example_2_human_message,
-        example_2_assistant_message,
-        example_3_human_message,
-        example_3_assistant_message,
-        example_4_human_message,
-        example_4_assistant_message,
-        human_message
-):
-    openai_api_key, openai_ai_model_name = get_env_variables()
-
-    llm = ChatOpenAI(
-        openai_api_key=openai_api_key,
-        model_name=openai_ai_model_name,
-        temperature=0.0
-    )
-
-    array_examples = []
-    add_example_in_array(
-        array_examples,
-        example_1_human_message,
-        example_1_assistant_message
-    )
-    add_example_in_array(
-        array_examples,
-        example_2_human_message,
-        example_2_assistant_message
-    )
-    add_example_in_array(
-        array_examples,
-        example_3_human_message,
-        example_3_assistant_message
-    )
-    add_example_in_array(
-        array_examples,
-        example_4_human_message,
-        example_4_assistant_message
-    )
-
-    prompt = [
-        SystemMessage(content=system_message)
-    ]
-
-    for example in array_examples:
-        prompt.append(HumanMessage(content=example["human_message"]))
-        prompt.append(AIMessage(content=example["ai_message"]))
-
-    prompt.append(HumanMessage(content=human_message))
-
-    output_parser = StrOutputParser()
-
-    chain = llm | output_parser
-
-    return clean_json_string(chain.invoke(prompt))
-
-
-def add_example_in_array(array_examples, example_human_message, example_assistant_message):
-    if example_human_message != "" and example_assistant_message != "":
-        array_examples.append({
-            "human_message": example_human_message,
-            "ai_message": example_assistant_message,
-        })
 
 
 def get_number_processes(array):

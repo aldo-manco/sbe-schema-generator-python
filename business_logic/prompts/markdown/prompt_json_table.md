@@ -451,130 +451,71 @@ exclusive with (1616, 1547) and 1545.
 
 ### INPUT ###
 
-Optiq Drop Copy Service – Interface Specification Message Structure For Individual Cases
-© 2022 Euronext N.V. - All rights reserved. Page 26 of 127 5.16.0
-Tag Field Name Format Len Possible Values M/C Short Description, Compatibility Notes
-& Conditions
-Value
-Example
-20175 TriggeredStopTim
-eInForce
-Char 1 0 = Day
-1 = Good Till Cancel
-6 = Good till Date
-C CASH ONLY
-Specifies the maximum validity of an
-triggered stop order. On triggering of a Stop
-order the value in this field is populated in
-the field TimeInForce (59).
-131 QuoteReqID String 20 From 0 to 2^64-2 C Numerical RFQ identifier assigned by the
-matching engine, unique per instrument
-and EMM.
-21037 RFQAnswerIndicat
-or
-Int 1 0 = No
-1 = Yes
-C CASH ONLY
-Indicates whether the message is, or not, a
-quote sent as an answer to a QuoteRequest
-(R) message.
-21038 RFQConfirmationI
-ndicator
-Int 1 0 = No
-1 = Yes
-C CASH ONLY
-Indicates whether the message is, or not, an
-order sent as a confirmation of a
-QuoteRequest (R) message.
-21800 ConditionalOrderF
-lag
-Int 1 0 = Firm (default)
-1 = Conditional
-C CASH ONLY
-Indicates if the order is a conditional or a
-firm order
-453 NoPartyIDs NumInGroup 1 Always set to 1 A Number of PartyID entries 1
-448 PartyID String 11 Alphanumeric A In this case provides the
-ExecutionWithinFirmShortCode
-59786
-447 PartyIDSource Char 1 P = Short code identifier A Source of PartyID value P
-452 PartyRole Int 3 3 = Client ID
-12 = Executing Trader
-999 = Not Applicable
-A Identifies the type or role of the PartyID
-(448) specified.
-For Execution with Firm short code in Drop
-Copy where the values in the original
-trading OEG message:
-• were received in SBE protocol the
-value will be set to 999 (Not
-Applicable);
-• were received in FIX protocol, the
-value will be set to 3 (Client ID) or
-12 (Executing Trader)
-Optiq Drop Copy Service – Interface Specification Message Structure For Individual Cases
-© 2022 Euronext N.V. - All rights reserved. Page 27 of 127 5.16.0
-Tag Field Name Format Len Possible Values M/C Short Description, Compatibility Notes
-& Conditions
-Value
-Example
-2376 PartyRoleQualifier Int 2 22 = Algorithm
-23 = Firm or legal entity
-24 = Natural person
-99 = Not Applicable
-C Used to further qualify the value of
-PartyRole (452)
-For ExecutionWithinFirmShortCode in Drop
-Copy where the values in the original
-trading OEG message:
-• were received in SBE protocol the
-value will be set to 99 (Not
-Applicable);
-• were received in FIX protocol, the
-value will be set to 22 (Algorithm)
-or 23 (Firm or Legal Entity) or 24
-(Natural Person);
-23
-1724 OrderOrigination Int 1 5 = Order received from a direct access or
-sponsored access customer
-C Identifies the origin of the order
-2593 NoOrderAttribute
-s
-NumInGroup 1 If provided, from 1 to 2 C Number of order attribute entries
-2594 OrderAttributeTyp
-e
-Int 1 0 = Aggregated order
-1 = Pending allocation
-3 = Risk reduction order
-C Used in case client needs to indicate values
-of AGGR or PNAL, OR in Risk Reduction
-order
-2595 OrderAttributeVal
-ue
-String 1 Y = Yes C Always set to Yes if OrderAttributeType
-(2594) if provided
-29 LastCapacity Char 1 7 = Dealing on own account (DEAL)
-8 = Matched principal (MTCH)
-9 = Any other capacity (AOTC)
-A Indicates whether the order submission
-results from trading as matched principal,
-on own account or as any other capacity.
-7
-110 MinQty Qty 20 Value '0' by default and depending to a minimum
-value for the given instrument and/or market type
-C Minimum quantity to be executed upon
-order entry (else the order is rejected).
-Only provided when submitted in the
-original order entry message
-21013 AckPhase Char 1 1 = Continuous Trading Phase
-2 = Call Phase
-3 = Halt Phase
-5 = Trading At Last Phase
-6 = Reserved
-7 = Suspended
-8 = Random Uncrossing Phase
-A Indicates the trading phase during which
-the Matching Engine has received the order
-Values 5 and 8 apply only for Cash markets
+Field Short Description Format Len Values Presence
+Market Data
+Sequence Number
+Assigned by MDG for each message.
+Each channel has its own Market
+Data Sequence Number sequence.
+Sequence 8 0..2^64-2 Mandatory
+Messages Specification Messages
+Optiq MDG Client Specification Referential Messages
+© 2021 Euronext N.V. - All rights reserved. 67 of 235 4.6.0
+Field Short Description Format Len Values Presence
+Rebroadcast
+Indicator
+Indicates if this message is resent or
+new (1 if resent, 0 otherwise). For a
+snapshot, this field will always be
+set to '1'.
+Numerical ID 1 0..2^8-2 Mandatory
+EMM Defines the Exchange Market
+Mechanism applied on each
+platform.
+Enumerated 1 (See field description) Optional
+Pattern ID Numerical Pattern identifier
+available as a characteristic of an
+instrument in Standing Data file and
+message, and used in the MDG
+timetable message. Cash Markets
+only.
+Numerical ID 2 0..2^16-2 Optional
+Symbol Index Exchange identification code of the
+instrument/contract.
+Numerical ID 4 0..2^32-2 Optional
+Timetables length Repeating section header Numerical 1 0.. 2^16-2 Mandatory
+Timetables
+occurrences
+Repeating section header Numerical 1 1..254 Mandatory
+Phase Time Time of Phase start Integer Time in
+hhmmss
+8 0..2^64-2 Mandatory
+Phase Id Indicates the phase of the
+instrument.
+Enumerated 1 (See field description) Mandatory
+Phase Qualifier Indicates the Phase Qualifier. Bitmap 2 (See field description) Mandatory
+Trading Period Provides the current trading period. Enumerated 1 1 Opening (Cash and
+Derivatives)
+2 Standard (Cash and
+Derivatives)
+3 Closing (Cash and
+Derivatives)
+Mandatory
+Order Entry
+Qualifier
+Field indicating the state of the Order
+Entry for the current market state.
+Enumerated 1 0 Order
+Entry/Cancel/Modify
+Disabled
+1 Order
+Entry/Cancel/Modify
+Enabled
+2 Cancel and Modify Only
+(Derivatives Only)
+3 Cancel Only
+Optional
+Session Current market session. Enumerated 1 (See field description) Mandatory
+Scheduled Event Type of Scheduled Event. Enumerated 1 (See field description) Optional
 
 ### OUTPUT JSON ###
