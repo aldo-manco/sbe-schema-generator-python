@@ -1,4 +1,5 @@
 # utils.py
+
 import logging
 import os
 import json
@@ -10,6 +11,12 @@ import multiprocessing
 def create_directory_if_not_exists(directory_path):
     if not os.path.exists(directory_path):
         os.makedirs(directory_path)
+
+
+def extract_pdf_filename(pdf_path):
+    base_name = os.path.basename(pdf_path)
+    pdf_filename = os.path.splitext(base_name)[0]
+    return pdf_filename
 
 
 def save_uploaded_file(directory_path, file):
@@ -116,22 +123,16 @@ def generate_optimal_array_of_json_array(json_array_of_arrays, max_group_size):
     return grouped_json_objects
 
 
-def add_ai_engine_id(array_json_array_fields):
-    current_ai_engine_id = 1
-    updated_array_json_array_fields = []
+def numbering_document_fields(array_json_array_document_fields):
+    ai_engine_id = 1
+    for json_array_document_fields in array_json_array_document_fields:
+        for document_field in json_array_document_fields:
+            document_field['ai_engine_id'] = ai_engine_id
+            ai_engine_id += 1
 
-    for json_array_fields in array_json_array_fields:
-        updated_json_array_fields = []
 
-        for field in json_array_fields:
-            updated_field = field.copy()
-            updated_field['ai_engine_id'] = current_ai_engine_id
-            current_ai_engine_id += 1
-            updated_json_array_fields.append(updated_field)
-
-        updated_array_json_array_fields.append(updated_json_array_fields)
-
-    return updated_array_json_array_fields
+def dictionary_to_string(dictionary):
+    return ' and '.join(f'"{key}": "{value}"' for key, value in dictionary.items())
 
 
 def get_repeating_group_sbe_field(ai_engine_id, array_sbe_fields):

@@ -9,28 +9,14 @@ import multiprocessing
 from multiprocessing import Pool
 from dotenv import load_dotenv
 import logging
+from PyPDF2 import PdfReader
 
 from utils import utils
 from utils import cv_utils
+from utils import ai_utils
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-
-def extract_pdf_text(input_pipeline):
-    pdf_path = input_pipeline['pdf_path']
-    starting_page = input_pipeline['starting_page']
-    ending_page = input_pipeline['ending_page']
-
-    array_page_info = [(pdf_path, page) for page in range(starting_page - 1, ending_page)]
-
-    number_processes = utils.get_number_processes(array_page_info)
-    with multiprocessing.Pool(number_processes) as pool:
-        array_text_pages = pool.map(cv_utils.extract_page_text, array_page_info)
-
-    return {
-        "array_text_pages": array_text_pages
-    }
 
 
 def convert_pdf_pages_to_jpg(input_pipeline):
@@ -172,43 +158,89 @@ def ocr_tables_batch_processing(output_previous_function):
         array_text_tables_pages.append('\n'.join(array_layout_tables.get_texts()))
 
     return {
-        "array_text_pages": array_text_tables_pages
+        "array_pdf_pages_texts": array_text_tables_pages
+    }
+
+
+def extract_pdf_text(input_pipeline):
+    pdf_path = input_pipeline['pdf_path']
+    starting_page = input_pipeline['starting_page']
+    ending_page = input_pipeline['ending_page']
+
+    pdf_reader = PdfReader(pdf_path)
+    number_pdf_pages = len(pdf_reader.pages)
+
+    array_page_info = [(pdf_path, page) for page in range(number_pdf_pages)]
+
+    number_processes = utils.get_number_processes(array_page_info)
+    with multiprocessing.Pool(number_processes) as pool:
+        array_pdf_pages_texts = pool.map(cv_utils.extract_page_text, array_page_info)
+
+    chunk_size = 500
+    chunk_overlap = 200
+
+    ai_utils.create_storage_embeddings(
+        pdf_path,
+        array_pdf_pages_texts,
+        chunk_size,
+        chunk_overlap
+    )
+
+    return {
+        "array_pdf_pages_texts": array_pdf_pages_texts[starting_page:ending_page + 1],
+        "pdf_path": pdf_path
     }
 
 
 def group_multiple_pages_texts(output_previous_function):
-    array_text_pages = output_previous_function["array_text_pages"]
+    array_pdf_pages_texts = output_previous_function["array_pdf_pages_texts"]
+    pdf_path = output_previous_function["pdf_path"]
 
     array_grouped_text_tables_pages = utils.group_texts_in_array(
-        array_text_pages,
+        array_pdf_pages_texts,
         2
     )
 
     return {
-        "array_text_pages": array_grouped_text_tables_pages
+        "array_pdf_pages_texts": array_grouped_text_tables_pages,
+        "pdf_path": pdf_path
     }
 
 
 def document_fields_generation_batch_processing(output_previous_function):
-    array_text_pages = output_previous_function["array_text_pages"]
+    array_pdf_pages_texts = output_previous_function["array_pdf_pages_texts"]
+    pdf_path = output_previous_function["pdf_path"]
 
-    # number_processes = utils.get_number_processes(array_text_pages)
-    #
-    # with Pool(processes=number_processes) as pool:
-    #     array_json_array_document_fields = pool.map(ai_utils.generate_document_fields, array_text_pages)
-    #
-    # optimized_array_json_array_document_fields = utils.generate_optimal_array_of_json_array(
-    #     array_json_array_document_fields,
-    #     15
-    # )
-    #
-    # numbered_array_json_array_document_fields = utils.add_ai_engine_id(optimized_array_json_array_document_fields)
+    number_processes = utils.get_number_processes(array_pdf_pages_texts)
 
-    with open('business_logic/testing/ai_document_fields.json', 'r') as file:
-        data = json.load(file)
+    with Pool(processes=number_processes) as pool:
+        array_json_array_document_fields = pool.map(ai_utils.generate_document_fields, array_pdf_pages_texts)
+
+    max_group_size = 10
+
+    optimized_array_json_array_document_fields = utils.generate_optimal_array_of_json_array(
+        array_json_array_document_fields,
+        max_group_size
+    )
+
+    utils.numbering_document_fields(
+        optimized_array_json_array_document_fields,
+    )
+
+    logging.info(f"optimized_array_json_array_document_fields: {optimized_array_json_array_document_fields}")
+
+    ai_utils.indepth_document_fields(
+        optimized_array_json_array_document_fields,
+        pdf_path
+    )
+
+    logging.info(f"optimized_array_json_array_document_fields: {optimized_array_json_array_document_fields}")
+
+    # with open('business_logic/testing/ai_document_fields.json', 'r') as file:
+    #     optimized_array_json_array_document_fields = json.load(file)
 
     return {
-        "array_json_array_document_fields": data
+        "array_json_array_document_fields": optimized_array_json_array_document_fields
     }
 
 
@@ -216,34 +248,35 @@ def generate_sbe_message_components(output_previous_function):
     array_json_array_document_fields = output_previous_function["array_json_array_document_fields"]
 
     number_processes = utils.get_number_processes(array_json_array_document_fields)
-    # with Pool(number_processes) as pool:
-    #    array_json_array_sbe_fields = pool.map(ai_utils.generate_sbe_fields, array_json_array_document_fields)
-    with open('business_logic/testing/ai_sbe_fields.json', 'r') as file:
-        array_json_array_sbe_fields = json.load(file)
+    with Pool(number_processes) as pool:
+        array_json_array_sbe_fields = pool.map(ai_utils.generate_sbe_fields, array_json_array_document_fields)
+
+    # with open('business_logic/testing/ai_sbe_fields.json', 'r') as file:
+    #     array_json_array_sbe_fields = json.load(file)
 
     json_array_full_sbe_fields = utils.merge_unique_sbe_fields_json_arrays(array_json_array_sbe_fields)
 
     number_processes = utils.get_number_processes(array_json_array_document_fields)
-    # with Pool(number_processes) as pool:
-    #     if len(array_json_array_document_fields) == 1:
-    #         array_json_array_repeating_groups = pool.map(
-    #             ai_utils.generate_repeating_groups,
-    #             array_json_array_document_fields
-    #         )
-    #     else:
-    #         array_splitted_json_array_document_fields = utils.split_json_arrays(array_json_array_document_fields)
-    #         array_document_fields_adjacent_pages = [
-    #             (array_splitted_json_array_document_fields[i] + array_splitted_json_array_document_fields[i + 1]) for i
-    #             in
-    #             range(len(array_splitted_json_array_document_fields) - 1)
-    #         ]
-    #         array_json_array_repeating_groups = pool.map(
-    #             ai_utils.generate_repeating_groups,
-    #             array_document_fields_adjacent_pages
-    #         )
+    with Pool(number_processes) as pool:
+        if len(array_json_array_document_fields) == 1:
+            array_json_array_repeating_groups = pool.map(
+                ai_utils.generate_repeating_groups,
+                array_json_array_document_fields
+            )
+        else:
+            array_splitted_json_array_document_fields = utils.split_json_arrays(array_json_array_document_fields)
+            array_document_fields_adjacent_pages = [
+                (array_splitted_json_array_document_fields[i] + array_splitted_json_array_document_fields[i + 1]) for i
+                in
+                range(len(array_splitted_json_array_document_fields) - 1)
+            ]
+            array_json_array_repeating_groups = pool.map(
+                ai_utils.generate_repeating_groups,
+                array_document_fields_adjacent_pages
+            )
 
-    with open('business_logic/testing/ai_repeating_groups.json', 'r') as file:
-        array_json_array_repeating_groups = json.load(file)
+    # with open('business_logic/testing/ai_repeating_groups.json', 'r') as file:
+    #     array_json_array_repeating_groups = json.load(file)
 
     json_array_distinct_repeating_groups = utils.merge_unique_repeating_groups_json_arrays(
         array_json_array_repeating_groups
@@ -331,4 +364,4 @@ def process(pdf_path, starting_page, ending_page, is_pdf_editable):
 
 
 if __name__ == "__main__":
-    process("pdf_documents/drop_copy_service.pdf", 26, 27, True)
+    process("pdf_documents/euronext_mdg.pdf", 74, 74, True)

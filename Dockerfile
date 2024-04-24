@@ -24,6 +24,7 @@ RUN pip3 install --upgrade pip && \
     Pillow \
     pdf2image \
     pymupdf \
+    PyPDF2 \
     layoutparser[ocr] \
     opencv-python \
     python-dotenv \
