@@ -1,0 +1,490 @@
+<?xml version="1.0"?>
+<sbe:messageSchema xmlns:sbe="http://fixprotocol.io/2016/sbe"
+  xmlns:enx="http://www.euronext.com/dd"
+  xmlns:str="http://exslt.org/strings"
+  xmlns:ext="http://exslt.org/common" package="euronext_dcg" id="25" version="306" semanticVersion="4.6.0" description="Drop Copy Gateway Binary" byteOrder="littleEndian">
+
+  <types>
+
+    <!-- Primitive Data Types -->
+
+    <type name="int8_t" primitiveType="int8" nullValue="-128" presence="optional" minValue="-127" maxValue="127"/>
+    <type name="uint8_t" primitiveType="uint8" nullValue="255" presence="optional" minValue="0" maxValue="254"/>
+    <type name="int16_t" primitiveType="int16" nullValue="-32768" presence="optional" minValue="-32767" maxValue="32767"/>
+    <type name="uint16_t" primitiveType="uint16" nullValue="65535" presence="optional" minValue="0" maxValue="65534"/>
+    <type name="int32_t" primitiveType="int32" nullValue="-2147483648" presence="optional" minValue="-2147483647" maxValue="2147483647"/>
+    <type name="uint32_t" primitiveType="uint32" nullValue="4294967295" presence="optional" minValue="0" maxValue="4294967294"/>
+    <type name="int64_t" primitiveType="int64" nullValue="-9223372036854775808" presence="optional" minValue="-9223372036854775807" maxValue="9223372036854775807"/>
+    <type name="uint64_t" primitiveType="uint64" nullValue="18446744073709551615" presence="optional" minValue="0" maxValue="18446744073709551614"/>
+
+    <type name="char8" length="8" primitiveType="char"/>
+    <type name="char11" length="11" primitiveType="char"/>
+    <type name="char12" length="12" primitiveType="char"/>
+    <type name="char18" length="18" primitiveType="char"/>
+    <type name="char30" length="30" primitiveType="char"/>
+    <type name="char100" length="100" primitiveType="char"/>
+
+    <type name="idString" length="48" primitiveType="char" semanticType="String" description="Fixed-len string for FIX field with ID semantic"/>
+    <type name="UTCTimestamp" length="31" primitiveType="char" semanticType="String" description="Time/date combination represented in UTC(YYYYMMDD-HH:MM:SS.sss*)"/>
+
+
+
+    <!-- Composite -->
+
+    <composite name="messageHeader" description="Message identifiers and length of message root">
+      <type name="blockLength" primitiveType="uint16"/>
+      <type name="templateId" primitiveType="uint16"/>
+      <type name="schemaId" primitiveType="uint16"/>
+      <type name="version" primitiveType="uint16"/>
+    </composite>
+
+    <composite name="fixHeader" description="FIX protocol header">
+      <type name="MsgSeqNum" primitiveType="uint32" id="34"/>
+      <type name="SenderCompID" type="idString" id="49"/>
+      <type name="TargetCompID" type="idString" id="56"/>
+      <type name="SendingTime" type="UTCTimestamp" id="52"/>
+      <type name="DeliverToCompID" presence="optional" type="idString" id="128"/>
+    </composite>
+
+    <composite name="groupSizeEncoding" description="Repeating group dimensions">
+      <type name="blockLength" primitiveType="uint8"/>
+      <type name="numInGroup" primitiveType="uint8" semanticType="NumInGroup"/>
+    </composite>
+
+    <composite name="groupSizeEncoding16" description="Repeating group dimensions">
+      <type name="blockLength" primitiveType="uint16"/>
+      <type name="numInGroup" primitiveType="uint8" semanticType="NumInGroup"/>
+    </composite>
+
+
+
+    <!-- Enumerations -->
+
+    <enum name="OrderSide_enum" encodingType="uint8">
+      <validValue name="Buy">1</validValue>
+      <validValue name="Sell">2</validValue>
+      <validValue name="Cross">3</validValue>
+    </enum>
+
+    <enum name="EMM_enum" encodingType="uint8">
+      <validValue name="Cash_and_Derivative_Central_Order_Book">1</validValue>
+      <validValue name="NAV_Trading_Facility">2</validValue>
+      <validValue name="Derivatives_Wholesales">4</validValue>
+      <validValue name="Cash_On_Exchange_Off_book">5</validValue>
+      <validValue name="Euronext_off_exchange_trade_reports">6</validValue>
+      <validValue name="Derivatives_On_Exchange_Off_book">7</validValue>
+      <validValue name="ETF_MTF_NAV_Central_Order_Book">8</validValue>
+      <validValue name="Listed_not_traded" sinceVersion="107">9</validValue>
+      <validValue name="Delta_Neutral_Contingency_Leg" sinceVersion="203">15</validValue>
+      <validValue name="Not_Applicable">99</validValue>
+    </enum>
+
+    <enum name="OrderType_enum" encodingType="uint8">
+      <validValue name="Market">1</validValue>
+      <validValue name="Limit">2</validValue>
+      <validValue name="Stop_market_or_Stop_market_on_quote">3</validValue>
+      <validValue name="Stop_limit_or_Stop_limit_on_quote">4</validValue>
+      <validValue name="Primary_Peg">5</validValue>
+      <validValue name="Market_to_limit">6</validValue>
+      <validValue name="Market_Peg">7</validValue>
+      <validValue name="Mid_Point_Peg">8</validValue>
+      <validValue name="Average_Price">9</validValue>
+      <validValue name="Iceberg">10</validValue>
+    </enum>
+
+    <enum name="TimeInForce_enum" encodingType="uint8">
+      <validValue name="Day">0</validValue>
+      <validValue name="Good_Till_Cancel">1</validValue>
+      <validValue name="Valid_for_Uncrossing">2</validValue>
+      <validValue name="Immediate_or_Cancel">3</validValue>
+      <validValue name="Fill_or_Kill">4</validValue>
+      <validValue name="Good_till_Time">5</validValue>
+      <validValue name="Good_till_Date">6</validValue>
+      <validValue name="Valid_for_Closing_Uncrossing">7</validValue>
+      <validValue name="Valid_for_Session">8</validValue>
+    </enum>
+
+    <enum name="TradingCapacity_enum" encodingType="uint8">
+      <validValue name="Dealing_on_own_account">7</validValue>
+      <validValue name="Matched_principal">8</validValue>
+      <validValue name="Any_other_capacity">9</validValue>
+    </enum>
+
+    <enum name="AckPhase_enum" encodingType="uint8">
+      <validValue name="Continuous_Trading_Phase">1</validValue>
+      <validValue name="Call_Phase">2</validValue>
+      <validValue name="Halt_Phase">3</validValue>
+      <validValue name="Closed_Phase">4</validValue>
+      <validValue name="Trading_At_Last_Phase">5</validValue>
+      <validValue name="Reserved">6</validValue>
+      <validValue name="Suspended">7</validValue>
+      <validValue name="Random_Uncrossing_Phase" sinceVersion="110">8</validValue>
+    </enum>
+
+    <enum name="ClearingInstruction_enum" encodingType="uint16">
+      <validValue name="Process_normally__formerly_Systematic_posting_">0</validValue>
+      <validValue name="Manual_mode">8</validValue>
+      <validValue name="Automatic_posting_mode">9</validValue>
+      <validValue name="Automatic_give_up_mode">10</validValue>
+      <validValue name="Automatic_and_account_authorization" deprecated="200">4008</validValue>
+      <validValue name="Manual_and_account_authorization" deprecated="200">4009</validValue>
+      <validValue name="Give_up_to_single_firm" deprecated="200">4010</validValue>
+    </enum>
+
+    <enum name="AccountType_enum" encodingType="uint8">
+      <validValue name="Client">1</validValue>
+      <validValue name="House">2</validValue>
+      <validValue name="RO">4</validValue>
+      <validValue name="Liquidity_Provider">6</validValue>
+      <validValue name="Related_Party">7</validValue>
+      <validValue name="Structured_Product_Market_Maker">8</validValue>
+      <validValue name="Omega_Client" sinceVersion="200">14</validValue>
+      <validValue name="Ceres_Client" sinceVersion="200">15</validValue>
+    </enum>
+
+    <enum name="LPRole_enum" encodingType="uint8">
+      <validValue name="Liquidity_Provider_or_Market_Maker">1</validValue>
+      <validValue name="Retail_Liquidity_Provider">3</validValue>
+      <validValue name="RFQ_Liquidity_Provider" sinceVersion="107">12</validValue>
+    </enum>
+
+    <enum name="TechnicalOrigin_enum" encodingType="uint8">
+      <validValue name="Index_trading_arbitrage">1</validValue>
+      <validValue name="Portfolio_strategy">2</validValue>
+      <validValue name="Unwind_order">3</validValue>
+      <validValue name="Other_orders__default">4</validValue>
+      <validValue name="Cross_margining">5</validValue>
+    </enum>
+
+    <!-- STPAggressorIndicator Enum -->
+    <enum name="STPAggressorIndicator_enum" encodingType="uint8">
+      <validValue name="Cancel_resting_order">0</validValue>
+      <validValue name="Cancel_incoming_order">1</validValue>
+      <validValue name="Cancel_both_orders">2</validValue>
+      <validValue name="Disable_STP">9</validValue>
+    </enum>
+
+    <!-- DisclosedQtyRandIndicator Enum -->
+    <enum name="DisclosedQtyRandIndicator_enum" encodingType="uint8">
+      <validValue name="No">0</validValue>
+      <validValue name="Yes">1</validValue>
+    </enum>
+
+    <!-- CancelOnDisconnectionIndicator Enum -->
+    <enum name="CancelOnDisconnectionIndicator_enum" encodingType="uint8">
+      <validValue name="Per_Default_Configuration">0</validValue>
+      <validValue name="Order_not_in_the_scope_of_Cancel_On_Disconnect">1</validValue>
+    </enum>
+
+    <!-- PegPriceType Enum -->
+    <enum name="PegPriceType_enum" encodingType="uint8">
+      <validValue name="Mid_price_peg">2</validValue>
+      <validValue name="Market_peg">4</validValue>
+      <validValue name="Primary_peg">5</validValue>
+    </enum>
+
+    <!-- OrderAttributeType Enum -->
+    <enum name="OrderAttributeType_enum" encodingType="uint8">
+      <validValue name="Aggregated_order">0</validValue>
+      <validValue name="Pending_allocation">1</validValue>
+      <validValue name="Risk_reduction_order">3</validValue>
+    </enum>
+
+    <enum name="TriggeredStopTimeInForce_enum" encodingType="uint8">
+      <validValue name="Day">0</validValue>
+      <validValue name="Good_Till_Cancel">1</validValue>
+      <validValue name="Good_till_Date">6</validValue>
+    </enum>
+
+    <enum name="TradeType_enum" encodingType="uint8">
+      <validValue name="Conventional_Trade">1</validValue>
+      <validValue name="Large_in_Scale_LiS_Trade">2</validValue>
+      <validValue name="Basis_Trade" deprecated="200">3</validValue>
+      <validValue name="Large_in_Scale_LiS_Package_Trade">4</validValue>
+      <validValue name="Guaranteed_Cross_Trade">5</validValue>
+      <validValue name="Against_Actual_Trade">6</validValue>
+      <validValue name="Asset_Allocation_Trade" deprecated="200">7</validValue>
+      <validValue name="Exchange_for_Swap_Trade">9</validValue>
+      <validValue name="Exchange_for_Physical_Trade_Cash_Leg" deprecated="200">10</validValue>
+      <validValue name="Strategy_Leg_Conventional_Trade">11</validValue>
+      <validValue name="Strategy_Leg_Large_in_Scale_LiS_Trade" deprecated="200">12</validValue>
+      <validValue name="Strategy_Leg_Basis_Trade" deprecated="200">13</validValue>
+      <validValue name="Strategy_Leg_Guaranteed_Cross_Trade" deprecated="200">14</validValue>
+      <validValue name="Strategy_Leg_Against_Actual_Trade" deprecated="200">15</validValue>
+      <validValue name="Strategy_Leg_Asset_Allocation_Trade" deprecated="200">16</validValue>
+      <validValue name="Strategy_Leg_Exchange_For_Swap_Trade" deprecated="200">18</validValue>
+      <validValue name="Strategy_Leg_Exchange_For_Physical_Trade" deprecated="200">19</validValue>
+      <validValue name="BoB_Trade">20</validValue>
+      <validValue name="AtomX_Trade" deprecated="200">22</validValue>
+      <validValue name="Trade_Cancellation">24</validValue>
+      <validValue name="Out_of_Market_Trade">25</validValue>
+      <validValue name="Delta_Neutral_Trade_Underlying_Cash_Leg">26</validValue>
+      <validValue name="Market_VWAP_Operation_Trade">27</validValue>
+      <validValue name="Euronext_Fund_Service_Trade">28</validValue>
+      <validValue name="Secondary_Listing_Trade">29</validValue>
+      <validValue name="Request_for_Cross_Trade">30</validValue>
+      <validValue name="Request_for_cross_strategy_Leg_Trade">31</validValue>
+      <validValue name="Trade_Publication">32</validValue>
+      <validValue name="Dark_Trade">33</validValue>
+      <validValue name="Delta_Neutral_Trade_Underlying_Future_Leg">34</validValue>
+      <validValue name="Total_Traded_Volume">36</validValue>
+      <validValue name="ETF_MTF_NAV_Trade_price_in_bp" deprecated="107">37</validValue>
+      <validValue name="ETF_MTF_NAV_Dark_Trade_price_in_bp" deprecated="107">38</validValue>
+      <validValue name="Guaranteed_Cross_Negotiated_deal_NLIQ">39</validValue>
+      <validValue name="Guaranteed_Cross_Negotiated_deal_OILQ">40</validValue>
+      <validValue name="Large_in_Scale_Trade">41</validValue>
+      <validValue name="Large_in_Scale_Trade_in_basis_points" sinceVersion="107">42</validValue>
+      <validValue name="Large_in_Scale_Package_Trade_in_basis_points" sinceVersion="107">43</validValue>
+      <validValue name="Strategy_Leg_Large_in_Scale_Trade_in_basis_points" sinceVersion="107" deprecated="200">44</validValue>
+      <validValue name="Non_Standard_Settlement" sinceVersion="302">46</validValue>
+      <validValue name="Repurchase_Agreement___Repo" sinceVersion="302">47</validValue>
+      <validValue name="Exchange_Granted_Trade" sinceVersion="302">48</validValue>
+      <validValue name="Other" sinceVersion="302">49</validValue>
+      <validValue name="Odd_Lot" sinceVersion="302">50</validValue>
+      <validValue name="Conventional_Trade___Provisional_price" sinceVersion="203">100</validValue>
+      <validValue name="Large_in_Scale__LiS__Trade___Provisional_price" sinceVersion="203">101</validValue>
+      <validValue name="Large_in_Scale__LiS__Package_Trade___Provisional_price" sinceVersion="203">102</validValue>
+    </enum>
+
+    <enum name="ExecutionPhase_enum" encodingType="uint8">
+      <validValue name="Continuous_Trading_Phase">1</validValue>
+      <validValue name="Uncrossing_Phase">2</validValue>
+      <validValue name="Trading_At_Last_Phase">3</validValue>
+      <validValue name="Continuous_Uncrossing_Phase">4</validValue>
+      <validValue name="IPO">5</validValue>
+    </enum>
+
+    <enum name="RFQIndicator_enum" encodingType="uint8">
+      <validValue name="No" id="0">0</validValue>
+      <validValue name="Yes" id="1">1</validValue>
+    </enum>
+
+    <enum name="ConditionalOrderFlag_enum" encodingType="uint8">
+      <validValue name="Firm" id="0">0</validValue>
+      <validValue name="Conditional" id="1">1</validValue>
+    </enum>
+
+    <enum name="PartyIDSource_enum" encodingType="char">
+      <validValue name="Short_Code_Identifier">P</validValue>
+      <validValue name="Proprietary_Custom_Code">D</validValue>
+    </enum>
+
+    <enum name="PartyRole_enum" encodingType="uint16">
+      <validValue name="Investment_Decision_Maker">22</validValue>
+      <validValue name="ClientID">3</validValue>
+      <validValue name="Correspondent_Broker">26</validValue>
+      <validValue name="Clearing_Firm">4</validValue>
+      <validValue name="Executing_Trader">12</validValue>
+      <validValue name="Not_Applicable">999</validValue>
+    </enum>
+
+    <enum name="PartyRoleQualifier_enum" encodingType="uint8">
+      <validValue name="Algorithm">22</validValue>
+      <validValue name="Firm_Or_Legal_Entity">23</validValue>
+      <validValue name="Natural_Person">24</validValue>
+      <validValue name="Not_Applicable">99</validValue>
+    </enum>
+
+    <enum encodingType="int32" name="EncryptMethod_enum">
+      <validValue name="None">0</validValue>
+    </enum>
+
+
+
+
+
+    <!-- Set Definitions -->
+
+    <set name="DarkExecutionInstruction_set" encodingType="uint8">
+      <choice name="DarkIndicator">0</choice>
+      <choice name="DeferredTradeIndicator" deprecated="107">1</choice>
+      <choice name="DisplayedOrderInteraction" deprecated="107">2</choice>
+      <choice name="SweepOrderIndicator">3</choice>
+      <choice name="MinimumQuantityType">4</choice>
+    </set>
+
+    <set name="AckQualifiers_set" encodingType="uint8">
+      <choice name="DarkIndicator">0</choice>
+      <choice name="QueueIndicator">1</choice>
+      <choice name="RequestWithClientOrderID" sinceVersion="200">2</choice>
+      <choice name="UseOfCrossPartition" sinceVersion="200">3</choice>
+      <choice name="Internal1" sinceVersion="200">4</choice>
+      <choice name="Internal2" sinceVersion="200">5</choice>
+      <choice name="ExecutionUponEntryFlagEnabled" sinceVersion="200">6</choice>
+      <choice name="ExecutedUponEntryFlag" sinceVersion="200">7</choice>
+    </set>
+
+    <set name="TradingSessionValidity_set" encodingType="uint8">
+      <choice name="Session1">1</choice>
+      <choice name="Session2">2</choice>
+      <choice name="Session3">3</choice>
+      <choice name="Session4" sinceVersion="301">4</choice>
+    </set>
+
+    <set name="OpenClose_set" encodingType="uint16">
+      <choice name="FieldActivelyUsed">0</choice>
+      <choice name="Leg1">1</choice>
+      <choice name="Leg2">2</choice>
+      <choice name="Leg3">3</choice>
+      <choice name="Leg4">4</choice>
+      <choice name="Leg5">5</choice>
+      <choice name="Leg6">6</choice>
+      <choice name="Leg7">7</choice>
+      <choice name="Leg8">8</choice>
+      <choice name="Leg9">9</choice>
+    </set>
+
+    <set name="TradeQualifier_set" encodingType="uint8">
+      <choice name="UncrossingTrade">0</choice>
+      <choice name="FirstTradePrice">1</choice>
+      <choice name="PassiveOrder">2</choice>
+      <choice name="AggressiveOrder">3</choice>
+      <choice name="TradeCreationByMarketOperations">4</choice>
+      <choice name="NAVTradeExpressedInBps">5</choice>
+      <choice name="NAVTradeExpressedInPriceCurrency">6</choice>
+      <choice name="DeferredPublication" sinceVersion="107">7</choice>
+    </set>
+
+  </types>
+
+
+
+  <!-- Message Templates -->
+
+  <sbe:message id="0" name="Heartbeat">
+    <field id="20007" name="FixHeader" type="fixHeader"/>
+    <field id="112" name="TestReqID" presence="optional" type="char100"/>
+  </sbe:message>
+
+  <sbe:message id="7" name="Logon">
+    <field id="20007" name="FixHeader" type="fixHeader"/>
+    <field id="108" name="HeartBtInt" presence="required" type="int32_t"/>
+    <field id="98" name="EncryptMethod" presence="required" type="EncryptMethod_enum"/>
+    <field id="21019" name="OEPartitionID" presence="required" type="uint32_t"/>
+    <field id="21021" name="LogicalAccessID" presence="required" type="uint32_t"/>
+    <field id="789" name="NextExpectedMsgSeqNum" presence="required" type="int32_t"/>
+    <field id="21020" name="QueueingIndicator" presence="required" type="uint32_t"/>
+    <field id="1137" name="DefaultApplVerID" presence="required" type="char100"/>
+    <field id="21050" name="SoftwareProvider" presence="optional" type="char100"/>
+  </sbe:message>
+
+  <sbe:message id="5" name="Logout">
+    <field id="20007" name="FixHeader" type="fixHeader"/>
+    <field id="58" name="Text" presence="optional" type="char100"/>
+    <field id="354" name="EncodedTextLen" presence="optional" type="int32_t"/>
+    <field id="355" name="EncodedText" presence="optional" type="char100"/>
+    <field id="347" name="MessageEncoding" presence="optional" type="char100"/>
+  </sbe:message>
+
+  <sbe:message name="DCOrder" id="1" description="DCOrder Message">
+    <field name="FixHeader" id="20007" type="fixHeader"/>
+    <field name="order_id" id="37" type="uint64_t"/>
+    <field name="security_id" id="48" type="uint32_t"/>
+    <field name="side" id="54" type="OrderSide_enum"/>
+    <field name="emm" id="20020" type="EMM_enum"/>
+    <field name="exec_type" id="150" type="char8"/>
+    <field name="order_status" id="39" type="char8"/>
+    <field name="book_in_time" id="21002" type="uint64_t"/>
+    <field name="expire_date" id="432" type="uint16_t"/>
+    <field name="cl_ord_id" id="11" type="int64_t"/>
+    <field name="ord_type" id="40" type="OrderType_enum"/>
+    <field name="time_in_force" id="59" type="TimeInForce_enum"/>
+    <field name="price" id="44" type="int64_t"/>
+    <field name="order_qty" id="38" type="uint64_t"/>
+    <field name="leaves_qty" id="151" type="uint64_t"/>
+    <field name="cum_qty" id="14" type="uint64_t"/>
+    <field name="order_priority" id="21004" type="uint64_t"/>
+    <field name="dark_execution_instruction" id="20052" type="DarkExecutionInstruction_set"/>
+    <field name="stop_price" id="99" type="int64_t"/>
+    <field name="display_qty" id="1138" type="uint64_t"/>
+    <field name="triggered_stop_time_in_force" id="20175" type="TriggeredStopTimeInForce_enum"/>
+    <field name="quote_req_id" id="131" type="uint64_t"/>
+    <field name="rfq_answer" id="21037" type="RFQIndicator_enum"/>
+    <field name="rfq_confirmation" id="21038" type="RFQIndicator_enum"/>
+    <field name="conditional_order" id="21800" type="ConditionalOrderFlag_enum"/>
+    <field name="last_capacity" id="29" type="TradingCapacity_enum"/>
+    <field name="min_qty" id="110" type="uint64_t"/>
+    <field name="ack_phase" id="21013" type="AckPhase_enum"/>
+    <field name="ack_qualifiers" id="21014" type="AckQualifiers_set"/>
+    <field name="trading_session_id" id="336" type="TradingSessionValidity_set"/>
+    <field name="clearing_instruction" id="577" type="ClearingInstruction_enum"/>
+    <field name="text" id="58" type="char18"/>
+    <field name="account" id="1" type="char12"/>
+    <field name="account_code" id="6399" type="AccountType_enum"/>
+    <field name="lp_role" id="20021" type="LPRole_enum"/>
+    <field name="technical_ord_type" id="9941" type="TechnicalOrigin_enum"/>
+    <field name="open_close" id="7443" type="OpenClose_set"/>
+    <field name="expire_time" id="126" type="uint32_t"/>
+    <field name="stp_aggressor_indicator" id="21015" type="STPAggressorIndicator_enum"/>
+    <field name="order_sub_type" id="21016" type="DisclosedQtyRandIndicator_enum"/>
+    <field name="autoremoval" id="21018" type="CancelOnDisconnectionIndicator_enum"/>
+    <field name="peg_price_type" id="1094" type="PegPriceType_enum"/>
+    <field name="peg_offset_value" id="211" type="int8_t"/>
+    <field name="order_attribute_type" id="2594" type="OrderAttributeType_enum"/>
+    <field name="undisclosed_price" id="20004" type="int64_t"/>
+    <group dimensionType="groupSizeEncoding" name="party_id_group" id="453">
+      <field name="party_id" id="448" type="char11"/>
+      <field name="party_id_source" id="447" type="PartyIDSource_enum"/>
+      <field name="party_role" id="452" type="PartyRole_enum"/>
+      <field name="party_role_qualifier" id="2376" type="PartyRoleQualifier_enum"/>
+    </group>
+    <group dimensionType="groupSizeEncoding" name="nested_party_id_group" id="539">
+      <field name="party_id" id="524" type="char11"/>
+      <field name="party_id_source" id="525" type="PartyIDSource_enum"/>
+      <field name="party_role" id="538" type="PartyRole_enum"/>
+      <field name="party_role_qualifier" id="2384" type="PartyRoleQualifier_enum"/>
+    </group>
+  </sbe:message>
+
+  <sbe:message name="DCTrade" id="2" description="DCTrade Message">
+    <field name="FixHeader" id="20007" type="fixHeader"/>
+    <field name="order_id" id="37" type="uint64_t"/>
+    <field name="security_id" id="48" type="uint32_t"/>
+    <field name="side" id="54" type="OrderSide_enum"/>
+    <field name="emm" id="20020" type="EMM_enum"/>
+    <field name="exec_type" id="150" type="char8"/>
+    <field name="order_status" id="39" type="char8"/>
+    <field name="book_in_time" id="21002" type="uint64_t"/>
+    <field name="expire_date" id="432" type="uint16_t"/>
+    <field name="orig_cl_ord_id" id="41" type="int64_t"/>
+    <field name="exec_id" id="17" type="uint32_t"/>
+    <field name="regulatory_trade_id" id="1903" type="char30"/>
+    <field name="trade_type" id="21010" type="TradeType_enum"/>
+    <field name="order_attribute_type" id="2594" type="OrderAttributeType_enum"/>
+    <field name="exec_phase" id="21023" type="ExecutionPhase_enum"/>
+    <field name="ord_type" id="40" type="OrderType_enum"/>
+    <field name="order_priority" id="21004" type="uint64_t"/>
+    <field name="time_in_force" id="59" type="TimeInForce_enum"/>
+    <field name="book_out_time" id="21003" type="uint64_t"/>
+    <field name="price" id="44" type="int64_t"/>
+    <field name="last_price" id="31" type="int64_t"/>
+    <field name="last_qty" id="32" type="uint64_t"/>
+    <field name="order_qty" id="38" type="uint64_t"/>
+    <field name="leaves_qty" id="151" type="uint64_t"/>
+    <field name="cum_qty" id="14" type="uint64_t"/>
+    <field name="dark_execution_instruction" id="20052" type="DarkExecutionInstruction_set"/>
+    <field name="last_capacity" id="29" type="TradingCapacity_enum"/>
+    <field name="trading_session_id" id="336" type="TradingSessionValidity_set"/>
+    <field name="clearing_instruction" id="577" type="ClearingInstruction_enum"/>
+    <field name="text" id="58" type="char18"/>
+    <field name="account" id="1" type="char12"/>
+    <field name="account_code" id="6399" type="AccountType_enum"/>
+    <field name="lp_role" id="20021" type="LPRole_enum"/>
+    <field name="open_close" id="7443" type="OpenClose_set"/>
+    <field name="trade_qualifier" id="21080" type="TradeQualifier_set"/>
+    <field name="contrabroker" id="375" type="char8"/>
+    <group dimensionType="groupSizeEncoding" name="party_id_group" id="453">
+      <field name="party_id" id="448" type="char11"/>
+      <field name="party_id_source" id="447" type="PartyIDSource_enum"/>
+      <field name="party_role" id="452" type="PartyRole_enum"/>
+      <field name="party_role_qualifier" id="2376" type="PartyRoleQualifier_enum"/>
+    </group>
+    <group dimensionType="groupSizeEncoding" name="nested_party_id_group" id="539">
+      <field name="party_id" id="524" type="char11"/>
+      <field name="party_id_source" id="525" type="PartyIDSource_enum"/>
+      <field name="party_role" id="538" type="PartyRole_enum"/>
+      <field name="party_role_qualifier" id="2384" type="PartyRoleQualifier_enum"/>
+    </group>
+  </sbe:message>
+
+</sbe:messageSchema>

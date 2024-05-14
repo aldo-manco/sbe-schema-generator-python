@@ -1,0 +1,67 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<sbe:messageSchema xmlns:sbe="http://fixprotocol.io/2016/sbe" xmlns:enx="enx" xmlns:str="http://exslt.org/strings" xmlns:ext="http://exslt.org/common" package="mdg_pack" id="25" version="306" semanticVersion="4.6.0" description="desc" byteOrder="littleEndian">
+  <types>
+    <type name="uint8_t" primitiveType="uint8" nullValue="255" presence="optional" minValue="0" maxValue="254"/>
+    <type name="uint64_t" primitiveType="uint64" nullValue="18446744073709551615" presence="optional" minValue="0" maxValue="18446744073709551614"/>
+    <type name="uint32_t" primitiveType="uint32" nullValue="4294967295" presence="optional" minValue="0" maxValue="4294967294"/>
+    <type name="uint16_t" primitiveType="uint16" nullValue="65535" presence="optional" minValue="0" maxValue="65534"/>
+    <type name="char12_optional" length="12" primitiveType="char" presence="optional"/>
+    <enum encodingType="uint8" name="MMProtections_enum">
+      <validValue name="Disabled">0</validValue>
+      <validValue name="Enabled">1</validValue>
+    </enum>
+    <enum encodingType="uint8" name="ContractTradingType_enum">
+      <validValue name="Traded as an outright">1</validValue>
+      <validValue name="Not traded, but listed in contract data. Traders may subscribe to it">2</validValue>
+      <validValue name="Traded as a simple inter-commodity spread">3</validValue>
+      <validValue name="Traded as an inter-commodity spread">4</validValue>
+    </enum>
+    <enum encodingType="null" name="InstrumentUnitExpression_enum"/>
+    <enum encodingType="null" name="UnderlyingSubtype_enum"/>
+    <enum encodingType="uint8" name="TradingPolicy_enum">
+      <validValue name="Price Explicit Time">1</validValue>
+      <validValue name="Price Pro Rata">2</validValue>
+    </enum>
+    <enum encodingType="uint8" name="DerivativesMarketModel_enum">
+      <validValue name="No Synthetic Quote">0</validValue>
+      <validValue name="Spontaneous Implied Matching">1</validValue>
+      <validValue name="Event Driven Implied Matching">2</validValue>
+    </enum>
+    <composite name="messageHeader" description="Message identifiers and length of message root">
+      <type name="blockLength" primitiveType="uint16"/>
+      <type name="templateId" primitiveType="uint16"/>
+      <type name="schemaId" primitiveType="uint16"/>
+      <type name="version" primitiveType="uint16"/>
+    </composite>
+    <composite name="groupSizeEncoding" description="Repeating group dimensions">
+      <type name="blockLength" primitiveType="uint8"/>
+      <type name="numInGroup" primitiveType="uint8" semanticType="NumInGroup"/>
+    </composite>
+    <composite name="groupSizeEncoding16" description="Repeating group dimensions">
+      <type name="blockLength" primitiveType="uint16"/>
+      <type name="numInGroup" primitiveType="uint8" semanticType="NumInGroup"/>
+    </composite>
+  </types>
+  <sbe:message name="ContractStandingData" id="1013">
+    <field id="20007" name="FixHeader" type="fixHeader"/>
+    <field id="-1" name="StrikePriceDecimals" type="uint8_t" presence="optional"/>
+    <field id="-1" name="MMProtections" type="MMProtections_enum"/>
+    <field id="-1" name="ContractTradingType" type="ContractTradingType_enum"/>
+    <field id="-1" name="InstrumentUnitExpression" type="InstrumentUnitExpression_enum" presence="optional"/>
+    <field id="-1" name="UnderlyingSubtype" type="UnderlyingSubtype_enum" presence="optional"/>
+    <field id="-1" name="MotherStockISIN" type="char12_optional" presence="optional"/>
+    <field id="-1" name="SettlementTickSize" type="Price" presence="optional"/>
+    <field id="-1" name="EDSPTickSize" type="uint64_t" presence="optional"/>
+    <field id="-1" name="UnderlyingSymbolIndex" type="uint32_t" presence="optional"/>
+    <field id="-1" name="TradingPolicy" type="TradingPolicy_enum" presence="optional"/>
+    <field id="-1" name="ReferenceSpreadTableID" type="uint16_t" presence="optional"/>
+    <field id="-1" name="DerivativesMarketModel" type="DerivativesMarketModel_enum" presence="optional"/>
+    <field id="-1" name="TradingUnit" type="uint64_t" presence="optional"/>
+    <field id="-1" name="SettlementTickSize" type="uint64_t" presence="optional"/>
+    <field id="-1" name="EDSPTickSize" type="Price" presence="optional"/>
+    <field id="-1" name="UnderlyingSymbolIndex" type="uint32_t" presence="optional"/>
+    <field id="-1" name="ReferenceSpreadTableID" type="uint16_t" presence="optional"/>
+    <field id="-1" name="TradingUnit" type="Quantity" presence="optional"/>
+    <field id="-1" name="StrikePriceDecimals" type="uint8_t" presence="optional"/>
+  </sbe:message>
+</sbe:messageSchema>

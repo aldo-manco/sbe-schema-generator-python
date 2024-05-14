@@ -1,4 +1,5 @@
 import json
+import logging
 from pathlib import Path
 
 import ai_engine_module
@@ -43,7 +44,6 @@ class JsonSchemaHandler:
 
         self.schema = self.load_schema()
 
-
     def load_schema(self):
         try:
             return json.loads(self.file_path.read_text(encoding='utf-8'))
@@ -52,10 +52,8 @@ class JsonSchemaHandler:
         except json.JSONDecodeError:
             return None, "Error in the JSON SBE Parsing."
 
-
     def load_string_schema(self):
         return json.dumps(self.load_schema(), indent=4)
-
 
     def create_new_file_json_schema(self):
         utils.create_directory_if_not_exists(self.directory_name)
@@ -85,12 +83,19 @@ class JsonSchemaHandler:
         except Exception as e:
             print(f"An error occurred while writing to {self.file_path}: {e}")
 
-
-    def add_document_message(self, message_name, template_id, starting_page=0, ending_page=0):
+    def add_document_message(
+            self,
+            message_name,
+            template_id,
+            starting_page=0,
+            ending_page=0
+    ):
         if self.json_schema_name not in self.schema:
             raise KeyError(f"JSON schema '{self.json_schema_name}' not found.")
+
         for document_message in self.get_schema_array_iterator("array_document_messages"):
-            if document_message["message_name"] == message_name or document_message["template_id"] == template_id:
+            if (document_message["message_name"] == message_name
+                    or document_message["template_id"] == template_id):
                 print(f"Message \'{message_name}\' already exists in the JSON schema \'{self.json_schema_name}\'")
                 return
 
@@ -108,73 +113,126 @@ class JsonSchemaHandler:
         self.schema[self.json_schema_name]['array_document_messages'].append(new_document_message)
         self.save_schema()
 
-
-    def get_json_schema_field(self, name_field):
+    def get_json_schema_field(
+            self,
+            name_field
+    ):
         if self.json_schema_name not in self.schema:
             raise KeyError(f"JSON schema '{self.json_schema_name}' not found.")
 
         return self.schema[self.json_schema_name][name_field]
 
-
-    def get_schema_array_iterator(self, array_schema):
+    def get_schema_array_iterator(
+            self,
+            array_schema
+    ):
         if self.json_schema_name not in self.schema:
             raise KeyError(f"JSON schema '{self.json_schema_name}' not found.")
 
-        return iter(self.schema[self.json_schema_name][array_schema])
+        return iter(
+            self.schema[self.json_schema_name][array_schema]
+        )
 
-
-    def find_document_message_in_json_schema(self, message_key):
+    def find_document_message_in_json_schema(
+            self,
+            message_key
+    ):
         for message in self.get_schema_array_iterator('array_document_messages'):
             if message.get("message_name") == message_key:
                 return message
 
         return None
 
-
-    def get_message_array_iterator(self, message_key, array_in_document_message):
+    def get_message_array_iterator(
+            self,
+            message_key,
+            array_in_document_message
+    ):
         message = self.find_document_message_in_json_schema(message_key)
         if message is None:
             raise KeyError(f"Message '{message_key}' not found in schema.")
-        return iter(message.get(array_in_document_message, []))
 
+        return iter(
+            message.get(
+                array_in_document_message,
+                []
+            )
+        )
 
-    def iterate_document_messages(self, process_field_function):
+    def iterate_document_messages(
+            self,
+            process_field_function
+    ):
         document_messages = self.get_schema_array_iterator("array_document_messages")
+
         for document_message in document_messages:
             process_field_function(document_message)
 
-
-    def add_sbe_field_to_message(self, message_key, json_sbe_field):
+    def add_sbe_field_to_message(
+            self,
+            message_key,
+            json_sbe_field
+    ):
         message = self.find_document_message_in_json_schema(message_key)
         if message is None:
             raise KeyError(f"Message '{message_key}' not found in schema.")
-        if json_sbe_field in self.get_message_array_iterator(message_key, 'array_sbe_fields'):
+
+        if json_sbe_field in self.get_message_array_iterator(
+                message_key,
+                'array_sbe_fields'
+        ):
             print(
                 f"SBE Field already exists in the message '{message_key}' of the JSON schema '{self.json_schema_name}'")
             return
+
         message['array_sbe_fields'].append(json_sbe_field)
         self.save_schema()
 
-
-    def iterate_sbe_fields_of_document_messages(self, process_field_function):
+    def iterate_sbe_fields_of_document_messages(
+            self,
+            process_field_function
+    ):
         document_messages = self.get_schema_array_iterator("array_document_messages")
+
         for document_message in document_messages:
-            sbe_fields = self.get_message_array_iterator(document_message["message_name"], "array_sbe_fields")
+            sbe_fields = self.get_message_array_iterator(
+                document_message["message_name"],
+                "array_sbe_fields"
+            )
+
             for sbe_field in sbe_fields:
                 process_field_function(sbe_field)
-            repeating_groups = self.get_message_array_iterator(document_message["message_name"],
-                                                               "array_sbe_repeating_groups")
+
+            repeating_groups = self.get_message_array_iterator(
+                document_message["message_name"],
+                "array_sbe_repeating_groups"
+            )
+
             for repeating_group in repeating_groups:
-                sbe_fields = iter(repeating_group.get("items", []))
+                sbe_fields = iter(
+                    repeating_group.get(
+                        "items",
+                        []
+                    )
+                )
+
                 for sbe_field in sbe_fields:
                     process_field_function(sbe_field)
 
-
-    def add_repeating_group_to_message(self, message_key, group_name, group_tag_number):
+    def add_repeating_group_to_message(
+            self,
+            message_key,
+            group_name,
+            group_tag_number
+    ):
         message = self.find_document_message_in_json_schema(message_key)
         if message is None:
             raise KeyError(f"Message '{message_key}' not found in schema.")
-        for repeating_group in self.get_message_array_iterator(message_key, "array_sbe_repeating_groups"):
+
+        for repeating_group in self.get_message_array_iterator(
+                message_key,
+                "array_sbe_repeating_groups"
+        ):
             if repeating_group["group_name"] == group_name:
                 print(
                     f"Repeating Group {group_name} already exists in the message '{message_key}' of the JSON schema '{self.json_schema_name}'")
@@ -184,18 +242,22 @@ class JsonSchemaHandler:
 
         if group_tag_number != -1:
             new_repeating_group["group_tag_number"] = group_tag_number
+
         new_repeating_group["group_name"] = group_name
         new_repeating_group["items"] = []
 
         message["array_sbe_repeating_groups"].append(new_repeating_group)
         self.save_schema()
 
-
     def add_sbe_field_to_repeating_group(self, message_key, repeating_group_name, json_sbe_field):
         message = self.find_document_message_in_json_schema(message_key)
         if message is None:
             raise KeyError(f"Message '{message_key}' not found in schema.")
-        for repeating_group in self.get_message_array_iterator(message_key, "array_sbe_repeating_groups"):
+
+        for repeating_group in self.get_message_array_iterator(
+                message_key,
+                "array_sbe_repeating_groups"
+        ):
             if repeating_group["group_name"] == repeating_group_name:
                 already_exists = False
                 if json_sbe_field in repeating_group["items"]:
@@ -209,21 +271,41 @@ class JsonSchemaHandler:
         else:
             print(f"Repeating group {repeating_group_name} not found.")
 
-
-    def add_primitive_data_type(self, array_primitive_data_type, sbe_field):
+    def add_alphanumeric_data_type(
+            self,
+            sbe_field
+    ):
         sbe_field["custom_type"] = ""
-        if array_primitive_data_type == "array_string_data_types":
-            if sbe_field["presence"] == "optional":
-                sbe_field["custom_type"] = f"{sbe_field['data_type']}{sbe_field['length']}_{sbe_field['presence']}"
-            else:
-                sbe_field["custom_type"] = f"{sbe_field['data_type']}{sbe_field['length']}"
-        elif array_primitive_data_type == "array_number_data_types":
-            sbe_field["custom_type"] = f"{sbe_field['data_type']}_t"
 
-        if self.is_primitive_data_type_exists_in_json_schema(
-                array_primitive_data_type,
+        if sbe_field["presence"] == "optional":
+            sbe_field["custom_type"] = f"{sbe_field['data_type']}{sbe_field['length']}_{sbe_field['presence']}"
+        else:
+            sbe_field["custom_type"] = f"{sbe_field['data_type']}{sbe_field['length']}"
+
+        if self.is_alphanumeric_data_type_exists_in_json_schema(
                 sbe_field["data_type"],
+                sbe_field["presence"],
                 sbe_field["length"],
+        ):
+            print(
+                f"Data Type \'{sbe_field['data_type']}\' already exists in the JSON schema \'{self.json_schema_name}\'")
+            return
+
+        new_primitive_data_type = {
+            "name_type": sbe_field["custom_type"],
+            "data_type": sbe_field["data_type"],
+            "presence": sbe_field["presence"],
+            "length": sbe_field["length"]
+        }
+
+        self.schema[self.json_schema_name]["array_string_data_types"].append(new_primitive_data_type)
+        self.save_schema()
+
+    def add_numeric_data_type(self, sbe_field):
+        sbe_field["custom_type"] = f"{sbe_field['data_type']}_t"
+
+        if self.is_numeric_data_type_exists_in_json_schema(
+                sbe_field["data_type"],
                 sbe_field["presence"]
         ):
             print(
@@ -233,86 +315,134 @@ class JsonSchemaHandler:
         new_primitive_data_type = {
             "name_type": sbe_field["custom_type"],
             "data_type": sbe_field["data_type"],
-            "length": sbe_field["length"],
             "presence": sbe_field["presence"]
         }
 
-        self.schema[self.json_schema_name][array_primitive_data_type].append(new_primitive_data_type)
+        self.schema[self.json_schema_name]["array_number_data_types"].append(new_primitive_data_type)
         self.save_schema()
 
+    def is_alphanumeric_data_type_exists_in_json_schema(
+            self,
+            data_type_to_find,
+            presence,
+            length
+    ):
+        for data_type in self.get_schema_array_iterator("array_string_data_types"):
+            if (data_type.get("data_type") == data_type_to_find
+                    and data_type.get("length") == length
+                    and data_type.get("presence") == presence
+            ):
+                return True
 
-    def is_primitive_data_type_exists_in_json_schema(self, array_primitive_data_type, data_type_to_find, length,
-                                                     presence):
-        for data_type in self.get_schema_array_iterator(array_primitive_data_type):
-            if data_type.get("data_type") == data_type_to_find and data_type.get("length") == length and data_type.get(
+        return False
+
+    def is_numeric_data_type_exists_in_json_schema(self, data_type_to_find, presence):
+        for data_type in self.get_schema_array_iterator("array_number_data_types"):
+            if data_type.get("data_type") == data_type_to_find and data_type.get(
                     "presence") == presence:
                 return True
 
         return False
 
-
-    def add_custom_data_type(self, array_custom_data_type, encoding_type, data_type, structure):
-        if self.is_custom_data_type_exists_in_json_schema(array_custom_data_type, data_type, structure):
+    def add_custom_data_type(
+            self,
+            array_custom_data_type,
+            encoding_type,
+            data_type,
+            possible_values
+    ):
+        if self.is_custom_data_type_exists_in_json_schema(
+                array_custom_data_type,
+                data_type,
+                possible_values
+        ):
             print(f"Data Type \'{data_type}\' already exists in the JSON schema \'{self.json_schema_name}\'")
             return
 
         new_custom_data_type = {
-            "encoding_type": encoding_type,
             "data_type": data_type,
-            "structure": structure
+            "possible_values": possible_values,
+            "encoding_type": encoding_type
         }
 
         self.schema[self.json_schema_name][array_custom_data_type].append(new_custom_data_type)
         self.save_schema()
 
-
-    def is_custom_data_type_exists_in_json_schema(self, array_custom_data_type, data_type_to_find, structure):
+    def is_custom_data_type_exists_in_json_schema(
+            self,
+            array_custom_data_type,
+            data_type_to_find,
+            possible_values
+    ):
         for data_type in self.get_schema_array_iterator(array_custom_data_type):
             if data_type.get("data_type") == data_type_to_find:
-                data_type["structure"] = {**structure, **data_type["structure"]}
+                data_type["possible_values"] = {**possible_values, **data_type["possible_values"]}
                 return True
 
         return False
 
+    def generate_sbe_data_type_definitions(
+            self,
+            sbe_field
+    ):
+        array_numeric_data_types = [
+            "int8",
+            "int16",
+            "int32",
+            "int64",
+            "uint8",
+            "uint16",
+            "uint32",
+            "uint64"
+        ]
 
-    def generate_sbe_data_type_definitions(self, sbe_field):
+        array_alphanumeric_data_types = [
+            "char"
+        ]
 
-        if sbe_field["data_type"].lower() == "char":
-            self.add_primitive_data_type("array_string_data_types", sbe_field)
+        if sbe_field["data_type"].lower() in array_alphanumeric_data_types:
+            self.add_alphanumeric_data_type(
+                sbe_field
+            )
 
-        elif sbe_field["data_type"].lower() in ["int8", "int16",
-                                                "int32", "int64",
-                                                "uint8",
-                                                "uint16",
-                                                "uint32",
-                                                "uint64"] and sbe_field["presence"] == "optional":
-            self.add_primitive_data_type("array_number_data_types", sbe_field)
+        elif (sbe_field["data_type"].lower() in array_numeric_data_types
+              and sbe_field["presence"] == "optional"):
+            self.add_numeric_data_type(
+                sbe_field
+            )
 
         elif sbe_field["data_type"].lower().endswith("_enum"):
-            self.add_custom_data_type("array_enum_data_types", sbe_field["encoding_type"],
-                                      sbe_field["data_type"],
-                                      sbe_field["structure"])
+            self.add_custom_data_type(
+                "array_enum_data_types",
+                sbe_field["encoding_type"],
+                sbe_field["data_type"],
+                sbe_field["possible_values"]
+            )
 
         elif sbe_field["data_type"].lower().endswith("_set"):
-            self.add_custom_data_type("array_set_data_types", sbe_field["encoding_type"],
-                                      sbe_field["data_type"],
-                                      sbe_field["structure"])
-
+            self.add_custom_data_type(
+                "array_set_data_types",
+                sbe_field["encoding_type"],
+                sbe_field["data_type"],
+                sbe_field["possible_values"]
+            )
 
     def save_schema(self):
-        self.file_path.write_text(json.dumps(self.schema, indent=4, ensure_ascii=False), encoding='utf-8')
+        self.file_path.write_text(
+            json.dumps(
+                self.schema,
+                indent=4,
+                ensure_ascii=False
+            ),
+            encoding='utf-8'
+        )
 
-
-    def save_edited_json_schema(self, edited_content):
-        try:
-            with open(f"{self.file_path}", "w") as file:
-                json.dump(json.loads(edited_content), file, indent=4)
-            return True, "JSON SBE Schema updated correctly."
-        except Exception as e:
-            return False, str(e)
-
-
-    def generate_sbe_message(self, document_message, pdf_path, is_pdf_editable):
+    def generate_sbe_message(
+            self,
+            document_message,
+            pdf_path,
+            is_pdf_editable
+    ):
         message_name = document_message["message_name"]
         starting_page = document_message["starting_page"]
         ending_page = document_message["ending_page"]
@@ -325,13 +455,16 @@ class JsonSchemaHandler:
         )
 
         for sbe_field in json_array_sbe_fields:
-            self.add_sbe_field_to_message(message_name, sbe_field)
+            self.add_sbe_field_to_message(
+                message_name,
+                sbe_field
+            )
 
         for repeating_group in json_array_repeating_groups:
             self.add_repeating_group_to_message(
                 message_name,
                 repeating_group["group_name"],
-                repeating_group["group_tag_number"] if "group_tag_number" in repeating_group else -1
+                repeating_group["group_tag_number"]
             )
 
             for sbe_field in repeating_group["items"]:

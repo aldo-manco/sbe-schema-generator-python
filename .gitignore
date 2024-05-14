@@ -1,5 +1,5 @@
 extracted_pdf_pages/
-model_final.pth
+business_logic/detectron2/model_final.pth
 .env
 
 # Byte-compiled / optimized / DLL files

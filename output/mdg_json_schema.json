@@ -1,0 +1,275 @@
+{
+    "mdg": {
+        "namespace_sbe": "http://fixprotocol.io/2016/sbe",
+        "namespace_enx": "enx",
+        "namespace_str": "http://exslt.org/strings",
+        "namespace_ext": "http://exslt.org/common",
+        "package": "mdg_pack",
+        "schema_id": "25",
+        "version": "306",
+        "semantic_version": "4.6.0",
+        "description": "desc",
+        "byte_order": "littleEndian",
+        "array_number_data_types": [
+            {
+                "name_type": "uint8_t",
+                "data_type": "uint8",
+                "presence": "optional"
+            },
+            {
+                "name_type": "uint64_t",
+                "data_type": "uint64",
+                "presence": "optional"
+            },
+            {
+                "name_type": "uint32_t",
+                "data_type": "uint32",
+                "presence": "optional"
+            },
+            {
+                "name_type": "uint16_t",
+                "data_type": "uint16",
+                "presence": "optional"
+            }
+        ],
+        "array_string_data_types": [
+            {
+                "name_type": "char12_optional",
+                "data_type": "char",
+                "presence": "optional",
+                "length": 12
+            }
+        ],
+        "array_enum_data_types": [
+            {
+                "data_type": "MMProtections_enum",
+                "possible_values": {
+                    "0": "Disabled",
+                    "1": "Enabled"
+                },
+                "encoding_type": "uint8"
+            },
+            {
+                "data_type": "ContractTradingType_enum",
+                "possible_values": {
+                    "1": "Traded as an outright",
+                    "2": "Not traded, but listed in contract data. Traders may subscribe to it",
+                    "3": "Traded as a simple inter-commodity spread",
+                    "4": "Traded as an inter-commodity spread"
+                },
+                "encoding_type": "uint8"
+            },
+            {
+                "data_type": "InstrumentUnitExpression_enum",
+                "possible_values": {},
+                "encoding_type": "null"
+            },
+            {
+                "data_type": "UnderlyingSubtype_enum",
+                "possible_values": {},
+                "encoding_type": "null"
+            },
+            {
+                "data_type": "TradingPolicy_enum",
+                "possible_values": {
+                    "1": "Price Explicit Time",
+                    "2": "Price Pro Rata"
+                },
+                "encoding_type": "uint8"
+            },
+            {
+                "data_type": "DerivativesMarketModel_enum",
+                "possible_values": {
+                    "0": "No Synthetic Quote",
+                    "1": "Spontaneous Implied Matching",
+                    "2": "Event Driven Implied Matching"
+                },
+                "encoding_type": "uint8"
+            }
+        ],
+        "array_set_data_types": [],
+        "array_document_messages": [
+            {
+                "message_name": "ContractStandingData",
+                "template_id": 1013,
+                "array_sbe_fields": [
+                    {
+                        "ai_engine_id": 1,
+                        "field_name": "StrikePriceDecimals",
+                        "field_tag_number": -1,
+                        "data_type": "uint8",
+                        "presence": "optional",
+                        "custom_type": "uint8_t"
+                    },
+                    {
+                        "ai_engine_id": 2,
+                        "field_name": "MMProtections",
+                        "field_tag_number": -1,
+                        "data_type": "MMProtections_enum",
+                        "presence": "mandatory",
+                        "possible_values": {
+                            "0": "Disabled",
+                            "1": "Enabled"
+                        },
+                        "encoding_type": "uint8"
+                    },
+                    {
+                        "ai_engine_id": 3,
+                        "field_name": "ContractTradingType",
+                        "field_tag_number": -1,
+                        "data_type": "ContractTradingType_enum",
+                        "presence": "mandatory",
+                        "possible_values": {
+                            "1": "Traded as an outright",
+                            "2": "Not traded, but listed in contract data. Traders may subscribe to it",
+                            "3": "Traded as a simple inter-commodity spread",
+                            "4": "Traded as an inter-commodity spread"
+                        },
+                        "encoding_type": "uint8"
+                    },
+                    {
+                        "ai_engine_id": 4,
+                        "field_name": "InstrumentUnitExpression",
+                        "field_tag_number": -1,
+                        "data_type": "InstrumentUnitExpression_enum",
+                        "presence": "optional",
+                        "possible_values": {},
+                        "encoding_type": "null"
+                    },
+                    {
+                        "ai_engine_id": 5,
+                        "field_name": "UnderlyingSubtype",
+                        "field_tag_number": -1,
+                        "data_type": "UnderlyingSubtype_enum",
+                        "presence": "optional",
+                        "possible_values": {},
+                        "encoding_type": "null"
+                    },
+                    {
+                        "ai_engine_id": 6,
+                        "field_name": "MotherStockISIN",
+                        "field_tag_number": -1,
+                        "data_type": "char",
+                        "presence": "optional",
+                        "length": 12,
+                        "custom_type": "char12_optional"
+                    },
+                    {
+                        "ai_engine_id": 7,
+                        "field_name": "SettlementTickSize",
+                        "field_tag_number": -1,
+                        "data_type": "Price",
+                        "presence": "optional"
+                    },
+                    {
+                        "ai_engine_id": 8,
+                        "field_name": "EDSPTickSize",
+                        "field_tag_number": -1,
+                        "data_type": "uint64",
+                        "presence": "optional",
+                        "length": 8,
+                        "custom_type": "uint64_t"
+                    },
+                    {
+                        "ai_engine_id": 9,
+                        "field_name": "UnderlyingSymbolIndex",
+                        "field_tag_number": -1,
+                        "data_type": "uint32",
+                        "presence": "optional",
+                        "length": 4,
+                        "custom_type": "uint32_t"
+                    },
+                    {
+                        "ai_engine_id": 10,
+                        "field_name": "TradingPolicy",
+                        "field_tag_number": -1,
+                        "data_type": "TradingPolicy_enum",
+                        "presence": "optional",
+                        "possible_values": {
+                            "1": "Price Explicit Time",
+                            "2": "Price Pro Rata"
+                        },
+                        "encoding_type": "uint8"
+                    },
+                    {
+                        "ai_engine_id": 11,
+                        "field_name": "ReferenceSpreadTableID",
+                        "field_tag_number": -1,
+                        "data_type": "uint16",
+                        "presence": "optional",
+                        "length": 2,
+                        "custom_type": "uint16_t"
+                    },
+                    {
+                        "ai_engine_id": 12,
+                        "field_name": "DerivativesMarketModel",
+                        "field_tag_number": -1,
+                        "data_type": "DerivativesMarketModel_enum",
+                        "presence": "optional",
+                        "possible_values": {
+                            "0": "No Synthetic Quote",
+                            "1": "Spontaneous Implied Matching",
+                            "2": "Event Driven Implied Matching"
+                        },
+                        "encoding_type": "uint8"
+                    },
+                    {
+                        "ai_engine_id": 13,
+                        "field_name": "TradingUnit",
+                        "field_tag_number": -1,
+                        "data_type": "uint64",
+                        "presence": "optional",
+                        "length": 8
+                    },
+                    {
+                        "ai_engine_id": 7,
+                        "field_name": "SettlementTickSize",
+                        "field_tag_number": -1,
+                        "data_type": "uint64",
+                        "presence": "optional"
+                    },
+                    {
+                        "ai_engine_id": 8,
+                        "field_name": "EDSPTickSize",
+                        "field_tag_number": -1,
+                        "data_type": "Price",
+                        "presence": "optional",
+                        "length": 8
+                    },
+                    {
+                        "ai_engine_id": 9,
+                        "field_name": "UnderlyingSymbolIndex",
+                        "field_tag_number": -1,
+                        "data_type": "uint32",
+                        "presence": "optional"
+                    },
+                    {
+                        "ai_engine_id": 11,
+                        "field_name": "ReferenceSpreadTableID",
+                        "field_tag_number": -1,
+                        "data_type": "uint16",
+                        "presence": "optional"
+                    },
+                    {
+                        "ai_engine_id": 13,
+                        "field_name": "TradingUnit",
+                        "field_tag_number": -1,
+                        "data_type": "Quantity",
+                        "presence": "optional",
+                        "length": 8
+                    },
+                    {
+                        "ai_engine_id": 1,
+                        "field_name": "StrikePriceDecimals",
+                        "field_tag_number": -1,
+                        "data_type": "uint8",
+                        "presence": "optional"
+                    }
+                ],
+                "array_sbe_repeating_groups": [],
+                "starting_page": 75,
+                "ending_page": 75
+            }
+        ]
+    }
+}

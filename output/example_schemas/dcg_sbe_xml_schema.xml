@@ -1,0 +1,283 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<sbe:messageSchema xmlns:sbe="http://fixprotocol.io/2016/sbe" xmlns:enx="enx" xmlns:str="http://exslt.org/strings" xmlns:ext="http://exslt.org/common" package="dcg.euronext.com" id="25" version="306" semanticVersion="4.6.0" description="desc" byteOrder="littleEndian">
+  <types>
+    <type name="uint64_t" primitiveType="uint64" nullValue="18446744073709551615" presence="optional" minValue="0" maxValue="18446744073709551614"/>
+    <type name="int64_t" primitiveType="int64" nullValue="-9223372036854775808" presence="optional" minValue="-9223372036854775807" maxValue="9223372036854775807"/>
+    <type name="int16_t" primitiveType="int16" nullValue="-32768" presence="optional" minValue="-32767" maxValue="32767"/>
+    <type name="int8_t" primitiveType="int8" nullValue="-128" presence="optional" minValue="-127" maxValue="127"/>
+    <type name="uint8_t" primitiveType="uint8" nullValue="255" presence="optional" minValue="0" maxValue="254"/>
+    <type name="int32_t" primitiveType="int32" nullValue="-2147483648" presence="optional" minValue="-2147483647" maxValue="2147483647"/>
+    <type name="char27_optional" length="27" primitiveType="char" presence="optional"/>
+    <type name="char27" length="27" primitiveType="char"/>
+    <type name="char20" length="20" primitiveType="char"/>
+    <type name="char10" length="10" primitiveType="char"/>
+    <type name="char1" length="1" primitiveType="char"/>
+    <type name="char20" length="20" primitiveType="char"/>
+    <type name="char20_optional" length="20" primitiveType="char" presence="optional"/>
+    <type name="char11" length="11" primitiveType="char"/>
+    <type name="char1_optional" length="1" primitiveType="char" presence="optional"/>
+    <type name="char18_optional" length="18" primitiveType="char" presence="optional"/>
+    <type name="char12" length="12" primitiveType="char"/>
+    <type name="char16_optional" length="16" primitiveType="char" presence="optional"/>
+    <type name="char11_optional" length="11" primitiveType="char" presence="optional"/>
+    <enum encodingType="char" name="execType_enum">
+      <validValue name="New">0</validValue>
+      <validValue name="Order Creation By Market Operations">i</validValue>
+      <validValue name="RFQ Ack">j</validValue>
+      <validValue name="Refilled Iceberg Ack">e</validValue>
+      <validValue name="Iceberg Transformed to Limit due to Minimum size">h</validValue>
+    </enum>
+    <enum encodingType="char" name="TriggeredStopTimeInForce_enum">
+      <validValue name="Day">0</validValue>
+      <validValue name="Good Till Cancel">1</validValue>
+      <validValue name="Good till Date">6</validValue>
+    </enum>
+    <enum encodingType="int8" name="RFQAnswerIndicator_enum">
+      <validValue name="No">0</validValue>
+      <validValue name="Yes">1</validValue>
+    </enum>
+    <enum encodingType="int8" name="RFQConfirmationIndicator_enum">
+      <validValue name="No">0</validValue>
+      <validValue name="Yes">1</validValue>
+    </enum>
+    <enum encodingType="int8" name="ConditionalOrderFlag_enum">
+      <validValue name="Firm">0</validValue>
+      <validValue name="Conditional">1</validValue>
+    </enum>
+    <enum encodingType="char" name="TradingSessionID_enum">
+      <validValue name="Session 1">101</validValue>
+      <validValue name="Session 2">102</validValue>
+      <validValue name="Session 3">103</validValue>
+      <validValue name="Session 4">104</validValue>
+      <validValue name="Session 1 and Session 3">205</validValue>
+      <validValue name="Session 1, 3 and Session 4">313</validValue>
+      <validValue name="All Sessions, deprecated">123</validValue>
+    </enum>
+    <enum encodingType="char" name="OrdType_enum">
+      <validValue name="Market">1</validValue>
+      <validValue name="Limit">2</validValue>
+      <validValue name="Stop-Market / Stop-Market on quote">3</validValue>
+      <validValue name="Stop limit / Stop on quote limit">4</validValue>
+      <validValue name="Market to limit">K</validValue>
+      <validValue name="Peg">P</validValue>
+      <validValue name="Average Price">T</validValue>
+      <validValue name="Iceberg">X</validValue>
+    </enum>
+    <enum encodingType="char" name="TimeInForce_enum">
+      <validValue name="Day">0</validValue>
+      <validValue name="Good Till Cancel (GTC)">1</validValue>
+      <validValue name="Immediate or Cancel (IOC)">3</validValue>
+      <validValue name="Fill or Kill (FOK)">4</validValue>
+      <validValue name="Good till Date (GTD)">6</validValue>
+      <validValue name="At the Close">7</validValue>
+      <validValue name="Good for Time (GTT)">A</validValue>
+      <validValue name="Good for auction (GFA)">B</validValue>
+    </enum>
+    <enum encodingType="int8" name="STPAggressorIndicator_enum">
+      <validValue name="Cancel resting order [C]">0</validValue>
+      <validValue name="Cancel incoming order [C]">1</validValue>
+      <validValue name="Cancel both orders">2</validValue>
+      <validValue name="Disable STP [C]">9</validValue>
+    </enum>
+    <enum encodingType="int8" name="DisclosedQtyRandIndicator_enum">
+      <validValue name="No">0</validValue>
+      <validValue name="Yes">1</validValue>
+    </enum>
+    <enum encodingType="int8" name="CancelOnDisconnectionIndicator_enum">
+      <validValue name="Per Default Configuration">0</validValue>
+      <validValue name="Order not in the scope of Cancel On Disconnect">1</validValue>
+    </enum>
+    <enum encodingType="int8" name="PegPriceType_enum">
+      <validValue name="Mid-price peg (mid-price of inside quote) [C]">2</validValue>
+      <validValue name="Market peg [C]">4</validValue>
+      <validValue name="Primary peg (primary market - buy at bid or sell at offer) [C]">5</validValue>
+    </enum>
+    <enum encodingType="int32" name="PartyRole_enum">
+      <validValue name="Client ID">3</validValue>
+      <validValue name="Executing Trader">12</validValue>
+      <validValue name="Not Applicable">999</validValue>
+    </enum>
+    <enum encodingType="int8" name="OrderAttributeType_enum">
+      <validValue name="Aggregated order">0</validValue>
+      <validValue name="Pending allocation">1</validValue>
+      <validValue name="Risk reduction order">3</validValue>
+    </enum>
+    <enum encodingType="char" name="Side_enum">
+      <validValue name="Buy">1</validValue>
+      <validValue name="Sell">2</validValue>
+    </enum>
+    <enum encodingType="int32" name="ClearingInstruction_enum">
+      <validValue name="Process normally (formerly Systematic posting)">0</validValue>
+      <validValue name="Manual mode">8</validValue>
+      <validValue name="Automatic posting mode">9</validValue>
+      <validValue name="Automatic give-up mode">10</validValue>
+    </enum>
+    <enum encodingType="int8" name="AccountCode_enum">
+      <validValue name="Client">1</validValue>
+      <validValue name="House">2</validValue>
+      <validValue name="RO">4</validValue>
+      <validValue name="Liquidity Provider">6</validValue>
+      <validValue name="Related Party">7</validValue>
+      <validValue name="Structured Product Market Maker">8</validValue>
+      <validValue name="Omega Client">14</validValue>
+      <validValue name="Ceres Client">15</validValue>
+    </enum>
+    <enum encodingType="int8" name="LPRole_enum">
+      <validValue name="Liquidity Provider or Market Maker">1</validValue>
+      <validValue name="Retail Liquidity Provider [C]">3</validValue>
+      <validValue name="RFQ Liquidity Provider [C]">12</validValue>
+    </enum>
+    <enum encodingType="char" name="TechnicalOrdType_enum">
+      <validValue name="Index trading arbitrage">1</validValue>
+      <validValue name="Portfolio strategy">2</validValue>
+      <validValue name="Unwind order">3</validValue>
+      <validValue name="Other orders (default)">4</validValue>
+      <validValue name="Cross margining">5</validValue>
+    </enum>
+    <enum encodingType="int32" name="NestedPartyRole_enum">
+      <validValue name="Correspondent Broker">26</validValue>
+      <validValue name="Clearing Firm">4</validValue>
+      <validValue name="Client ID">3</validValue>
+    </enum>
+    <enum encodingType="int32" name="NestedPartyRoleQualifier_enum">
+      <validValue name="Firm or legal entity">23</validValue>
+      <validValue name="Not Applicable">99</validValue>
+      <validValue name="Algorithm">22</validValue>
+      <validValue name="Natural person">24</validValue>
+    </enum>
+    <set encodingType="char" name="darkExecutionInstruction_set">
+      <choice name="No Dark Indicator">0</choice>
+      <choice name="Yes Dark Indicator">1</choice>
+      <choice name="No Sweep Order Indicator">4</choice>
+      <choice name="Yes Sweep Order Indicator">5</choice>
+      <choice name="MAQ Minimum Quantity Type">6</choice>
+      <choice name="MES Minimum Quantity Type">7</choice>
+    </set>
+    <set encodingType="char" name="ackQualifiers_set">
+      <choice name="Dark Indicator">0</choice>
+      <choice name="Queue Indicator">1</choice>
+      <choice name="Request with Client Order ID">2</choice>
+      <choice name="Use of Cross Partition">3</choice>
+      <choice name="Internal1">4</choice>
+      <choice name="Internal2">5</choice>
+      <choice name="Execution Upon Entry flag Enabled">6</choice>
+      <choice name="Executed Upon Entry flag">7</choice>
+    </set>
+    <set encodingType="char" name="PostingAction_set">
+      <choice name="Field Actively Used">0</choice>
+      <choice name="Leg 1">1</choice>
+      <choice name="Leg 2">2</choice>
+      <choice name="Leg 3">3</choice>
+      <choice name="Leg 4">4</choice>
+      <choice name="Leg 5">5</choice>
+      <choice name="Leg 6">6</choice>
+      <choice name="Leg 7">7</choice>
+      <choice name="Leg 8">8</choice>
+      <choice name="Leg 9">9</choice>
+    </set>
+    <composite name="messageHeader" description="Message identifiers and length of message root">
+      <type name="blockLength" primitiveType="uint16"/>
+      <type name="templateId" primitiveType="uint16"/>
+      <type name="schemaId" primitiveType="uint16"/>
+      <type name="version" primitiveType="uint16"/>
+    </composite>
+    <composite name="groupSizeEncoding" description="Repeating group dimensions">
+      <type name="blockLength" primitiveType="uint8"/>
+      <type name="numInGroup" primitiveType="uint8" semanticType="NumInGroup"/>
+    </composite>
+    <composite name="groupSizeEncoding16" description="Repeating group dimensions">
+      <type name="blockLength" primitiveType="uint16"/>
+      <type name="numInGroup" primitiveType="uint8" semanticType="NumInGroup"/>
+    </composite>
+  </types>
+  <sbe:message name="DCOrder" id="31">
+    <field id="20007" name="FixHeader" type="fixHeader"/>
+    <field id="21005" name="ClientMessageSendingTime" type="char27_optional" presence="optional"/>
+    <field id="5979" name="OEGINFromMember" type="char27_optional" presence="optional"/>
+    <field id="7764" name="OEGOUTToME" type="char27_optional" presence="optional"/>
+    <field id="21002" name="BookINTime" type="char27"/>
+    <field id="21003" name="BookOUTTime" type="char27_optional" presence="optional"/>
+    <field id="7765" name="OEGINFromME" type="char27_optional" presence="optional"/>
+    <field id="11" name="ClOrdID" type="char20"/>
+    <field id="48" name="SecurityID" type="char10"/>
+    <field id="22" name="SecurityIDSource" type="char1"/>
+    <field id="20020" name="EMM" type="int32"/>
+    <field id="37" name="OrderID" type="char20"/>
+    <field id="39" name="OrdStatus" type="char1"/>
+    <field id="21004" name="OrderPriority" type="uint64_t" presence="optional"/>
+    <field id="20052" name="DarkExecutionInstruction" type="darkExecutionInstruction_set" presence="optional"/>
+    <field id="44" name="Price" type="int64_t" presence="optional"/>
+    <field id="38" name="OrderQty" type="uint64_t" presence="optional"/>
+    <field id="151" name="LeavesQty" type="int64"/>
+    <field id="17" name="ExecID" type="char10"/>
+    <field id="150" name="ExecType" type="execType_enum"/>
+    <field id="99" name="StopPx" type="int64_t" presence="optional"/>
+    <field id="20004" name="UndisclosedPrice" type="char20"/>
+    <field id="1138" name="DisplayQty" type="uint64_t" presence="optional"/>
+    <field id="20175" name="TriggeredStopTimeInForce" type="TriggeredStopTimeInForce_enum" presence="optional"/>
+    <field id="131" name="QuoteReqID" type="char20_optional" presence="optional"/>
+    <field id="21037" name="RFQAnswerIndicator" type="RFQAnswerIndicator_enum" presence="optional"/>
+    <field id="21038" name="RFQConfirmationIndicator" type="RFQConfirmationIndicator_enum" presence="optional"/>
+    <field id="21800" name="ConditionalOrderFlag" type="ConditionalOrderFlag_enum" presence="optional"/>
+    <field id="453" name="NoPartyIDs" type="int8"/>
+    <field id="2376" name="PartyRoleQualifier" type="int16_t" presence="optional"/>
+    <field id="1724" name="OrderOrigination" type="int8_t" presence="optional"/>
+    <field id="2593" name="NoOrderAttributes" type="uint8_t" presence="optional"/>
+    <field id="29" name="LastCapacity" type="char1"/>
+    <field id="110" name="MinQty" type="int64_t" presence="optional"/>
+    <field id="21013" name="AckPhase" type="char1"/>
+    <field id="21014" name="AckQualifiers" type="ackQualifiers_set"/>
+    <field id="21019" name="OEPartitionID" type="uint16"/>
+    <field id="21021" name="LogicalAccessID" type="uint32"/>
+    <field id="432" name="ExpireDate" type="LocalMktDate" presence="optional"/>
+    <field id="14" name="CumQty" type="uint64"/>
+    <field id="336" name="TradingSessionID" type="TradingSessionID_enum"/>
+    <field id="40" name="OrdType" type="OrdType_enum"/>
+    <field id="59" name="TimeInForce" type="TimeInForce_enum"/>
+    <field id="552" name="NoSides" type="uint8"/>
+    <field id="539" name="NoNestedPartyIDs" type="uint8"/>
+    <field id="126" name="ExpireTime" type="char27_optional" presence="optional"/>
+    <field id="21015" name="STPAggressorIndicator" type="STPAggressorIndicator_enum" presence="optional"/>
+    <field id="21016" name="DisclosedQtyRandIndicator" type="DisclosedQtyRandIndicator_enum" presence="optional"/>
+    <field id="21018" name="CancelOnDisconnectionIndicator" type="CancelOnDisconnectionIndicator_enum"/>
+    <field id="1094" name="PegPriceType" type="PegPriceType_enum" presence="optional"/>
+    <field id="211" name="PegOffsetValue" type="int16_t" presence="optional"/>
+    <group dimensionType="groupSizeEncoding" name="PartyIDsGroup" id="453">
+      <field name="PartyID" id="448" type="char11"/>
+      <field name="PartyIDSource" id="447" type="char1"/>
+      <field name="PartyRole" id="452" type="PartyRole_enum"/>
+    </group>
+    <group dimensionType="groupSizeEncoding" name="OrderAttributesGroup" id="2593">
+      <field name="OrderAttributeType" id="2594" type="OrderAttributeType_enum"/>
+      <field name="OrderAttributeValue" id="2595" type="char1_optional"/>
+    </group>
+    <group dimensionType="groupSizeEncoding" name="SidesGroup" id="552">
+      <field name="Side" id="54" type="Side_enum"/>
+      <field name="ClearingInstruction" id="577" type="ClearingInstruction_enum"/>
+      <field name="Text" id="58" type="char18_optional"/>
+      <field name="Account" id="1" type="char12"/>
+      <field name="AccountCode" id="6399" type="AccountCode_enum"/>
+      <field name="LPRole" id="20021" type="LPRole_enum"/>
+      <field name="TechnicalOrdType" id="9941" type="TechnicalOrdType_enum"/>
+      <field name="PostingAction" id="7443" type="PostingAction_set"/>
+      <field name="LongClientID" id="21804" type="char16_optional"/>
+    </group>
+    <group dimensionType="groupSizeEncoding" name="NestedPartyIDsGroup" id="539">
+      <field name="NestedPartyID" id="524" type="char11_optional"/>
+      <field name="NestedPartyIDSource" id="525" type="char1_optional"/>
+      <field name="NestedPartyRole" id="538" type="int32_t"/>
+    </group>
+    <group dimensionType="groupSizeEncoding" name="NestedPartyGroup" id="538">
+      <field name="NestedPartyID" id="524" type="char11_optional"/>
+      <field name="NestedPartyIDSource" id="525" type="char1_optional"/>
+      <field name="NestedPartyRole" id="538" type="NestedPartyRole_enum"/>
+      <field name="NestedPartyRoleQualifier" id="2384" type="NestedPartyRoleQualifier_enum"/>
+    </group>
+    <group dimensionType="groupSizeEncoding" name="NestedPartyIDGroup" id="524">
+      <field name="NestedPartyID" id="524" type="char11_optional"/>
+      <field name="NestedPartyIDSource" id="525" type="char1_optional"/>
+      <field name="NestedPartyRole" id="538" type="NestedPartyRole_enum"/>
+      <field name="NestedPartyRoleQualifier" id="2384" type="NestedPartyRoleQualifier_enum"/>
+    </group>
+  </sbe:message>
+</sbe:messageSchema>

@@ -32,7 +32,8 @@ RUN pip3 install --upgrade pip && \
     langchain \
     langchain-community \
     langchain-core \
-    langchain-openai
+    langchain-openai \
+    faiss-cpu
 
 RUN python -m pip install \
     'git+https://github.com/facebookresearch/detectron2.git'

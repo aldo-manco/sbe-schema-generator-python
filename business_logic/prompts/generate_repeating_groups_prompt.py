@@ -1,7 +1,9 @@
 # generate_repeating_groups_prompt.py
 
 system_message = """
-You are an expert in electronic trading systems with a deep understanding of FIX and SBE protocols. Your mission is to identify repeating groups within a provided JSON array of message field information from market documentation. Identify repeating groups using the following criteria:
+You are an expert in electronic trading systems with a deep understanding of FIX and SBE protocols. 
+Your mission is to identify repeating groups within a provided JSON array of message field information from market documentation. 
+Identify repeating groups using the following criteria:
 - Start/End Indicators: 
 Typically, one or more fields that indicates the length or number of elements of the repeating group (ex. NumInGroup) often precedes the repeating group fields. In some cases, repeating groups are delimited by special fields that mark the beginning and end, or they may include a composite field that serves as a header.
 - Pattern in Names: 
@@ -14,15 +16,30 @@ Descriptions containing words like "party" or "group" can indicate a field's ass
 A logical relationship between fields can indicate that they represent attributes of the same repeating group.
 
 In your response, include only a JSON array. This array must contain a JSON object for each repeating group, described as follows:
-- group_tag_number: If a field in message fields represents a FIX protocol tag number, either standard or custom, assign the appropriate of the NumInGroup field. If no such tag number is defined, do not define the group_tag_number.
-- group_name: A name derived from the repeating group field names.
-- items: A JSON array of AI Engine Identifiers of fields within the repeating group.
-- indicators_items: A JSON array of AI Engine Identifiers of Start/End Indicators of the repeating group. Typically, one or more fields that indicates the length or number of elements of the repeating group (ex. NumInGroup).
+1. group_name: 
+Descriptive name derived from the repeating group field names.
+2. items: 
+JSON array of AI Engine Identifiers of fields within the repeating group.
+3. indicators_items: 
+JSON array of AI Engine Identifiers of Start/End Indicators of the repeating group. Typically, one or more fields that indicates the length or number of elements of the repeating group (ex. NumInGroup).
+
+In each JSON object for repeating groups, define the following field only if the group contains a start/end indicator field, such as `NumInGroup`, which has a standard or custom FIX protocol tag number. 
+This indicator typically represents the number of elements in the group.
+- `group_tag_number`: 
+Set this to the FIX protocol tag number of the start/end indicator field. 
+If no such tag number exists, set `group_tag_number` to -1.
 
 In your response, include only an empty JSON array if no repeating groups are identified. 
 
+The JSON array must be incorporated into the following JSON object:
+{
+    "json_array": [
+        ...
+    ]
+}
+
 Adhere the provided examples closely.
-    """
+"""
 
 example_1_human_message = """
 [
@@ -148,24 +165,26 @@ example_1_human_message = """
     "ai_engine_id": 11
   }
 ]
-    """
+"""
 
 example_1_assistant_message = """
-[
-  {
-    "group_tag_number": 453,
-    "group_name": "PartyIDGroup",
-    "items": [4, 5, 6, 7]
-    "indicators_items": [3]
-  },
-  {
-    "group_tag_number": 2593,
-    "group_name": "OrderAttributesGroup",
-    "items": [10, 11]
-    "indicators_items": [9]
-  }
-]
-    """
+{
+    "json_array": [
+      {
+        "group_name": "PartyIDGroup",
+        "items": [4, 5, 6, 7],
+        "indicators_items": [3],
+        "group_tag_number": 453
+      },
+      {
+        "group_name": "OrderAttributesGroup",
+        "items": [10, 11],
+        "indicators_items": [9],
+        "group_tag_number": 2593
+      }
+    ]
+}
+"""
 
 example_2_human_message = """
 [
@@ -305,17 +324,19 @@ example_2_human_message = """
     "ai_engine_id": 23
   }
 ]
-    """
+"""
 
 example_2_assistant_message = """
-[
-  {
-    "group_name": "OrdersGroup",
-    "items": [15, 16, 17, 18, 19, 20, 21, 22, 23]
-    "indicators_items": [13, 14]
-  }
-]
-    """
+{
+    "json_array: [
+      {
+        "group_name": "OrdersGroup",
+        "items": [15, 16, 17, 18, 19, 20, 21, 22, 23],
+        "indicators_items": [13, 14]
+      }
+    ]
+}
+"""
 
 example_3_human_message = """
 [
@@ -408,18 +429,20 @@ example_3_human_message = """
     "ai_engine_id": 23
   }
 ]
-    """
+"""
 
 example_3_assistant_message = """
-[
-  {
-    "group_tag_number": 268,
-    "group_name": "MDEntriesGroup",
-    "items": [17, 18, 19, 20, 21, 22, 23]
-    "indicators_items": [16]
-  }
-]
-    """
+{
+    "json_array": [
+      {
+        "group_name": "MDEntriesGroup",
+        "items": [17, 18, 19, 20, 21, 22, 23],
+        "indicators_items": [16],
+        "group_tag_number": 268
+      }
+    ]
+}
+"""
 
 example_4_human_message = """
 [
@@ -479,8 +502,10 @@ example_4_human_message = """
     "ai_engine_id": 38
   }
 ]
-    """
+"""
 
 example_4_assistant_message = """
-[]
-    """
+{
+    "json_array": []
+}
+"""

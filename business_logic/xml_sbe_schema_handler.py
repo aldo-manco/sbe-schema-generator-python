@@ -1,3 +1,5 @@
+import logging
+
 from lxml import etree
 from pathlib import Path
 
@@ -66,7 +68,7 @@ class XmlSbeSchemaHandler:
         ).decode("UTF-8")
 
 
-    def generate_sbe_enum_definition(self, encoding_type, name_enum, enum_structure):
+    def generate_sbe_enum_definition(self, encoding_type, name_enum, enum_possible_values):
 
         enum_element = etree.SubElement(
             self.types_tag,
@@ -75,7 +77,7 @@ class XmlSbeSchemaHandler:
             name=name_enum
         )
 
-        for value, name in enum_structure.items():
+        for value, name in enum_possible_values.items():
             valid_value_element = etree.SubElement(
                 enum_element,
                 'validValue',
@@ -90,7 +92,7 @@ class XmlSbeSchemaHandler:
         ).decode()
 
 
-    def generate_sbe_set_definition(self, encoding_type, name_set, set_structure):
+    def generate_sbe_set_definition(self, encoding_type, name_set, set_possible_values):
 
         set_element = etree.SubElement(
             self.types_tag,
@@ -99,7 +101,7 @@ class XmlSbeSchemaHandler:
             name=name_set
         )
 
-        for value, name in set_structure.items():
+        for value, name in set_possible_values.items():
             valid_value_element = etree.SubElement(
                 set_element,
                 'choice',
@@ -255,8 +257,9 @@ class XmlSbeSchemaHandler:
 
         for sbe_field in iterator_sbe_fields:
 
-            field_id = sbe_field["field_tag_number"] if "field_tag_number" in sbe_field else counter
-            counter = counter + 1
+            field_id = counter
+            if "field_tag_number" in sbe_field and sbe_field["field_tag_number"] is not None:
+                field_id = sbe_field["field_tag_number"]
 
             field = etree.SubElement(
                 message_element,
@@ -266,14 +269,16 @@ class XmlSbeSchemaHandler:
                 type=sbe_field.get("custom_type", sbe_field["data_type"])
             )
 
+            counter = counter + 1
+
             if sbe_field["presence"] == "optional":
                 field.set('presence', sbe_field["presence"])
 
         for sbe_repeating_group in iterator_sbe_repeating_groups:
 
-            repeating_group_id = sbe_repeating_group[
-                "group_tag_number"] if "group_tag_number" in sbe_repeating_group else counter
-            counter = counter + 1
+            repeating_group_id = counter
+            if "group_tag_number" in sbe_repeating_group and sbe_repeating_group["group_tag_number"] is not None:
+                repeating_group_id = sbe_repeating_group["group_tag_number"]
 
             group = etree.SubElement(
                 message_element,
@@ -283,12 +288,15 @@ class XmlSbeSchemaHandler:
                 id=str(repeating_group_id)
             )
 
+            counter = counter + 1
+
             counter_nested_fields = 1
 
             for field_info in iter(sbe_repeating_group.get("items", [])):
-                nested_field_id = field_info[
-                    "field_tag_number"] if "field_tag_number" in field_info else counter_nested_fields
-                counter_nested_fields = counter_nested_fields + 1
+
+                nested_field_id = counter_nested_fields
+                if "field_tag_number" in field_info and field_info["field_tag_number"] is not None:
+                    nested_field_id = field_info["field_tag_number"]
 
                 etree.SubElement(
                     group,
@@ -297,6 +305,8 @@ class XmlSbeSchemaHandler:
                     id=str(nested_field_id),
                     type=field_info.get("custom_type", field_info["data_type"])
                 )
+
+                counter_nested_fields = counter_nested_fields + 1
 
         self.append_to_sbe_schema_root(message_element)
         return etree.tostring(
@@ -321,12 +331,12 @@ class XmlSbeSchemaHandler:
         enum_data_types = json_handler.get_schema_array_iterator("array_enum_data_types")
         for enum_data_type in enum_data_types:
             self.generate_sbe_enum_definition(enum_data_type["encoding_type"], enum_data_type["data_type"],
-                                              enum_data_type["structure"])
+                                              enum_data_type["possible_values"])
 
         set_data_types = json_handler.get_schema_array_iterator("array_set_data_types")
         for set_data_type in set_data_types:
             self.generate_sbe_set_definition(set_data_type["encoding_type"], set_data_type["data_type"],
-                                             set_data_type["structure"])
+                                             set_data_type["possible_values"])
 
         self.generate_sbe_default_composites()
 

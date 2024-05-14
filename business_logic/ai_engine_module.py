@@ -7,6 +7,7 @@ from pdf2image import convert_from_path
 import json
 import multiprocessing
 from multiprocessing import Pool
+from functools import partial
 from dotenv import load_dotenv
 import logging
 from PyPDF2 import PdfReader
@@ -103,7 +104,7 @@ def table_detection_batch_processing(output_previous_function):
     array_images_info = output_previous_function["array_images_info"]
 
     detectron2_model = lp.Detectron2LayoutModel(
-        config_path='../config.yaml',
+        config_path='./business_logic/detectron2/config.yaml',
         extra_config=["MODEL.ROI_HEADS.SCORE_THRESH_TEST", 0.65],
         label_map={
             0: "Text",
@@ -176,18 +177,21 @@ def extract_pdf_text(input_pipeline):
     with multiprocessing.Pool(number_processes) as pool:
         array_pdf_pages_texts = pool.map(cv_utils.extract_page_text, array_page_info)
 
-    chunk_size = 500
-    chunk_overlap = 200
+    chunk_size = 1000
+    chunk_overlap = 800
+
+    pdf_without_message = array_pdf_pages_texts[:starting_page-1] + array_pdf_pages_texts[ending_page:]
+    pdf_message_only = array_pdf_pages_texts[starting_page-1:ending_page]
 
     ai_utils.create_storage_embeddings(
         pdf_path,
-        array_pdf_pages_texts,
+        pdf_without_message,
         chunk_size,
         chunk_overlap
     )
 
     return {
-        "array_pdf_pages_texts": array_pdf_pages_texts[starting_page:ending_page + 1],
+        "array_pdf_pages_texts": pdf_message_only,
         "pdf_path": pdf_path
     }
 
@@ -227,34 +231,50 @@ def document_fields_generation_batch_processing(output_previous_function):
         optimized_array_json_array_document_fields,
     )
 
-    logging.info(f"optimized_array_json_array_document_fields: {optimized_array_json_array_document_fields}")
-
-    ai_utils.indepth_document_fields(
-        optimized_array_json_array_document_fields,
-        pdf_path
-    )
-
-    logging.info(f"optimized_array_json_array_document_fields: {optimized_array_json_array_document_fields}")
+    with open('business_logic/testing/ai_document_fields_NEW.json', 'w') as file:
+        file.write(json.dumps(optimized_array_json_array_document_fields))
 
     # with open('business_logic/testing/ai_document_fields.json', 'r') as file:
     #     optimized_array_json_array_document_fields = json.load(file)
 
     return {
-        "array_json_array_document_fields": optimized_array_json_array_document_fields
+        "array_json_array_document_fields": optimized_array_json_array_document_fields,
+        "pdf_path": pdf_path
     }
 
 
-def generate_sbe_message_components(output_previous_function):
+def sbe_fields_generation_batch_processing(output_previous_function):
     array_json_array_document_fields = output_previous_function["array_json_array_document_fields"]
+    pdf_path = output_previous_function["pdf_path"]
 
     number_processes = utils.get_number_processes(array_json_array_document_fields)
     with Pool(number_processes) as pool:
-        array_json_array_sbe_fields = pool.map(ai_utils.generate_sbe_fields, array_json_array_document_fields)
+        array_json_array_sbe_fields = pool.map(
+            ai_utils.generate_basic_sbe_fields,
+            array_json_array_document_fields
+        )
 
-    # with open('business_logic/testing/ai_sbe_fields.json', 'r') as file:
-    #     array_json_array_sbe_fields = json.load(file)
+        partial_generate_completed_sbe_fields = partial(
+            ai_utils.generate_completed_sbe_fields,
+            pdf_path=pdf_path
+        )
 
-    json_array_full_sbe_fields = utils.merge_unique_sbe_fields_json_arrays(array_json_array_sbe_fields)
+        pool.map(
+            partial_generate_completed_sbe_fields,
+            zip(array_json_array_document_fields, array_json_array_sbe_fields)
+        )
+
+    return {
+        "array_json_array_document_fields": array_json_array_document_fields,
+        "array_json_array_sbe_fields": array_json_array_sbe_fields,
+        "pdf_path": pdf_path
+    }
+
+
+def repeating_groups_generation_batch_processing(output_previous_function):
+    array_json_array_document_fields = output_previous_function["array_json_array_document_fields"]
+    array_json_array_sbe_fields = output_previous_function["array_json_array_sbe_fields"]
+    pdf_path = output_previous_function["pdf_path"]
 
     number_processes = utils.get_number_processes(array_json_array_document_fields)
     with Pool(number_processes) as pool:
@@ -264,16 +284,17 @@ def generate_sbe_message_components(output_previous_function):
                 array_json_array_document_fields
             )
         else:
-            array_splitted_json_array_document_fields = utils.split_json_arrays(array_json_array_document_fields)
             array_document_fields_adjacent_pages = [
-                (array_splitted_json_array_document_fields[i] + array_splitted_json_array_document_fields[i + 1]) for i
+                (array_json_array_document_fields[i] + array_json_array_document_fields[i + 1]) for i
                 in
-                range(len(array_splitted_json_array_document_fields) - 1)
+                range(len(array_json_array_document_fields) - 1)
             ]
             array_json_array_repeating_groups = pool.map(
                 ai_utils.generate_repeating_groups,
                 array_document_fields_adjacent_pages
             )
+
+    json_array_full_sbe_fields = utils.merge_unique_sbe_fields_json_arrays(array_json_array_sbe_fields)
 
     # with open('business_logic/testing/ai_repeating_groups.json', 'r') as file:
     #     array_json_array_repeating_groups = json.load(file)
@@ -341,14 +362,16 @@ def process(pdf_path, starting_page, ending_page, is_pdf_editable):
         ocr_tables_batch_processing,
         group_multiple_pages_texts,
         document_fields_generation_batch_processing,
-        generate_sbe_message_components
+        sbe_fields_generation_batch_processing,
+        repeating_groups_generation_batch_processing
     ]
 
     editable_pdf_pipeline_filters = [
         extract_pdf_text,
         group_multiple_pages_texts,
         document_fields_generation_batch_processing,
-        generate_sbe_message_components
+        sbe_fields_generation_batch_processing,
+        repeating_groups_generation_batch_processing
     ]
 
     if is_pdf_editable:
@@ -364,4 +387,4 @@ def process(pdf_path, starting_page, ending_page, is_pdf_editable):
 
 
 if __name__ == "__main__":
-    process("pdf_documents/euronext_mdg.pdf", 74, 74, True)
+    process("pdf_documents/euronext_mdg.pdf", 75, 75, True)

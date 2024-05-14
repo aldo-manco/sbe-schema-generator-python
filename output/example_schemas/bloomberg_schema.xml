@@ -1,0 +1,1050 @@
+<?xml version="1.0" ?>
+<sbe:messageSchema byteOrder="littleEndian" id="16" package="bloomberg_schema" semanticVersion="0.1.0" version="1" xmlns:sbe="http://fixprotocol.io/2017/sbe">
+   <types>
+      <type description="ISO 3166 Country code (2-character) values" length="3" name="Country" primitiveType="char" semanticType="String"/>
+      <type description="ISO 4217 Currency code (3-character) values" length="4" name="Currency" primitiveType="char" semanticType="String"/>
+      <type description="Fixed-len string for FIX field with ID semantic" length="48" name="idString" primitiveType="char" semanticType="String"/>
+      <type description="FIX Message type" length="5" name="String5" primitiveType="char" semanticType="String"/>
+      <type description="Default FIX STRING mapping" length="100" name="String100" primitiveType="char" semanticType="String"/>
+      <type description="Month of a year. An optional day of the month can be appended or an optional week code" length="8" name="MonthYear" primitiveType="char" semanticType="String"/>
+      <type description="ISO 10383 Market Identifier Code" length="5" name="Exchange" primitiveType="char" semanticType="String"/>
+      <type description="Date of Local Market in YYYYMMDD" length="9" name="LocalMktDate" primitiveType="char" semanticType="String"/>
+      <type description="The time local to a particular market center in HH:MM:SS" length="9" name="LocalMktTime" primitiveType="char" semanticType="String"/>
+      <type description="Time/date combination represented in UTC(YYYYMMDD-HH:MM:SS.sss*)" length="31" name="UTCTimestamp" primitiveType="char" semanticType="String"/>
+      <type description="Time in format HH:MM[:SS][Z|[+|-hh[:mm]]]" length="31" name="TZTimeOnly" primitiveType="char" semanticType="String"/>
+      <type description="The number of entries in a repeating group" name="numInGroup" primitiveType="uint16"/>
+      <enum encodingType="char" name="LastCapacity">
+         <validValue name="Agent">1</validValue>
+         <validValue name="CrossAsAgent">2</validValue>
+         <validValue name="CrossAsPrincipal">3</validValue>
+         <validValue name="Principal">4</validValue>
+         <validValue name="RisklessPrincipal">5</validValue>
+      </enum>
+      <enum encodingType="char" name="OrdStatus">
+         <validValue name="New">0</validValue>
+         <validValue name="PartiallyFilled">1</validValue>
+         <validValue name="Filled">2</validValue>
+         <validValue name="DoneForDay">3</validValue>
+         <validValue name="Canceled">4</validValue>
+         <validValue name="PendingCancel">6</validValue>
+         <validValue name="Rejected">8</validValue>
+         <validValue name="PendingNew">A</validValue>
+         <validValue name="Expired">C</validValue>
+         <validValue name="PendingFill">z</validValue>
+      </enum>
+      <enum encodingType="char" name="OrdType">
+         <validValue name="Market">1</validValue>
+         <validValue name="Limit">2</validValue>
+         <validValue name="PreviouslyQuoted">D</validValue>
+      </enum>
+      <enum encodingType="char" name="Side">
+         <validValue name="Buy">1</validValue>
+         <validValue name="Sell">2</validValue>
+         <validValue name="SellShort">5</validValue>
+         <validValue name="SellShortExempt">6</validValue>
+         <validValue name="AsDefined">B</validValue>
+         <validValue name="Opposite">C</validValue>
+         <validValue name="Lend">F</validValue>
+         <validValue name="Borrow">G</validValue>
+         <validValue name="SellUndisclosed">H</validValue>
+      </enum>
+      <enum encodingType="int32" name="EncryptMethod">
+         <validValue name="None">0</validValue>
+      </enum>
+      <enum encodingType="char" name="ResetSeqNumFlag">
+         <validValue name="NO">N</validValue>
+         <validValue name="YES">Y</validValue>
+      </enum>
+      <enum encodingType="char" name="ExecType">
+         <validValue name="New">0</validValue>
+         <validValue name="DoneForDay">3</validValue>
+         <validValue name="Canceled">4</validValue>
+         <validValue name="PendingCancel">6</validValue>
+         <validValue name="Rejected">8</validValue>
+         <validValue name="PendingNew">A</validValue>
+         <validValue name="Expired">C</validValue>
+         <validValue name="Restated">D</validValue>
+         <validValue name="Trade">F</validValue>
+         <validValue name="TradeCorrect">G</validValue>
+         <validValue name="OrderStatus">I</validValue>
+         <validValue name="PendingTrade">z</validValue>
+      </enum>
+      <enum encodingType="int32" name="QuoteCancelType">
+         <validValue name="CancelAllQuotes">4</validValue>
+         <validValue name="CancelSpecifiedSingleQuote">5</validValue>
+         <validValue name="SuspendSpecific">100</validValue>
+      </enum>
+      <enum encodingType="int32" name="QuoteRejectReason">
+         <validValue name="UnknownSymbol">1</validValue>
+         <validValue name="InsufficientCreditLimit">17</validValue>
+         <validValue name="ExceededClipSizeLimit">18</validValue>
+         <validValue name="ExceededMaxNotionalOrderAmt">19</validValue>
+         <validValue name="ExceededDV01PV01Limit">20</validValue>
+         <validValue name="ExceededCS01Limit">21</validValue>
+         <validValue name="Other">99</validValue>
+         <validValue name="WireTimeViolation">100</validValue>
+         <validValue name="BetterQuote">101</validValue>
+      </enum>
+      <enum encodingType="int32" name="SessionRejectReason">
+         <validValue name="InvalidTagNumber">0</validValue>
+         <validValue name="RequiredTagMissing">1</validValue>
+         <validValue name="TagNotDefinedForThisMessageType">2</validValue>
+         <validValue name="UndefinedTag">3</validValue>
+         <validValue name="TagSpecifiedWithoutAValue">4</validValue>
+         <validValue name="ValueIsIncorrect">5</validValue>
+         <validValue name="IncorrectDataFormatForValue">6</validValue>
+         <validValue name="DecryptionProblem">7</validValue>
+         <validValue name="SignatureProblem">8</validValue>
+         <validValue name="CompIDProblem">9</validValue>
+         <validValue name="SendingTimeAccuracyProblem">10</validValue>
+         <validValue name="InvalidMsgType">11</validValue>
+         <validValue name="XMLValidationError">12</validValue>
+         <validValue name="TagAppearsMoreThanOnce">13</validValue>
+         <validValue name="TagSpecifiedOutOfRequiredOrder">14</validValue>
+         <validValue name="RepeatingGroupFieldsOutOfOrder">15</validValue>
+         <validValue name="IncorrectNumInGroupCountForRepeatingGroup">16</validValue>
+         <validValue name="Non">17</validValue>
+         <validValue name="Invalid">18</validValue>
+         <validValue name="Other">99</validValue>
+      </enum>
+      <enum encodingType="int32" name="PriceType">
+         <validValue name="Percentage">1</validValue>
+         <validValue name="PerUnit">2</validValue>
+         <validValue name="FixedAmount">3</validValue>
+         <validValue name="Discount">4</validValue>
+         <validValue name="Premium">5</validValue>
+         <validValue name="Spread">6</validValue>
+         <validValue name="Yield">9</validValue>
+         <validValue name="Yield1">10</validValue>
+         <validValue name="ParPriceSpread">12</validValue>
+         <validValue name="BasisPoints">22</validValue>
+         <validValue name="UpfrontPoints">23</validValue>
+         <validValue name="InterestRate">24</validValue>
+         <validValue name="PercentageOfNotional">25</validValue>
+         <validValue name="DiscountMargin">100</validValue>
+         <validValue name="PricedLevel">104</validValue>
+      </enum>
+      <enum encodingType="char" name="PartyIDSource">
+         <validValue name="KoreanInvestorID">1</validValue>
+         <validValue name="BIC">B</validValue>
+         <validValue name="Proprietary">D</validValue>
+         <validValue name="MIC">G</validValue>
+         <validValue name="LegalEntityIdentifier">N</validValue>
+         <validValue name="ShortCodeIdentifier">P</validValue>
+      </enum>
+      <enum encodingType="int32" name="PartyRole">
+         <validValue name="ExecutingFirm">1</validValue>
+         <validValue name="ClientID">3</validValue>
+         <validValue name="ClearingFirm">4</validValue>
+         <validValue name="InvestorID">5</validValue>
+         <validValue name="Locate">8</validValue>
+         <validValue name="SettlementLocation">10</validValue>
+         <validValue name="OrderOriginationTrader">11</validValue>
+         <validValue name="ExecutingTrader">12</validValue>
+         <validValue name="OrderOriginationFirm">13</validValue>
+         <validValue name="ExecutingSystem">16</validValue>
+         <validValue name="ContraFirm">17</validValue>
+         <validValue name="UnderlyingContraFirm">20</validValue>
+         <validValue name="ClearingOrganization">21</validValue>
+         <validValue name="CustomerAccount">24</validValue>
+         <validValue name="CorrespondentBroker">26</validValue>
+         <validValue name="EnteringTrader">36</validValue>
+         <validValue name="PrimeBroker">79</validValue>
+         <validValue name="ClearingAccount">83</validValue>
+         <validValue name="DataRepository">102</validValue>
+         <validValue name="ReportingEntity">116</validValue>
+         <validValue name="SalesPerson">117</validValue>
+         <validValue name="InvestmentDecisionMaker">122</validValue>
+         <validValue name="PublishingIntermediary">123</validValue>
+         <validValue name="UserOBOOrigFirm">1003</validValue>
+         <validValue name="OriginalCounterparty">1004</validValue>
+         <validValue name="ClearingChannel">1005</validValue>
+         <validValue name="TraderBookNumber">1007</validValue>
+         <validValue name="SalesBookNumber">1008</validValue>
+         <validValue name="IntermediatingBroker">1016</validValue>
+         <validValue name="TraderDestination">1019</validValue>
+         <validValue name="TraderBookNumberOverride">1020</validValue>
+         <validValue name="AutoPricerName">1031</validValue>
+      </enum>
+      <enum encodingType="int32" name="Product">
+         <validValue name="AGENCY">1</validValue>
+         <validValue name="CORPORATE">3</validValue>
+         <validValue name="GOVERNMENT">6</validValue>
+         <validValue name="LOAN">8</validValue>
+         <validValue name="MONEYMARKET">9</validValue>
+         <validValue name="MORTGAGE">10</validValue>
+         <validValue name="MUNICIPAL">11</validValue>
+         <validValue name="OTHER">12</validValue>
+         <validValue name="FINANCING">13</validValue>
+      </enum>
+      <enum encodingType="int32" name="TradeReportTransType">
+         <validValue name="New">0</validValue>
+         <validValue name="Replace">2</validValue>
+      </enum>
+      <enum encodingType="int32" name="QuoteType">
+         <validValue name="Indicative">0</validValue>
+         <validValue name="Tradeable">1</validValue>
+         <validValue name="Counter">3</validValue>
+         <validValue name="BenchmarkSpotIndicative">100</validValue>
+         <validValue name="BenchmarkSpotTradeable">101</validValue>
+         <validValue name="Counter">103</validValue>
+         <validValue name="AlwaysFirm">104</validValue>
+         <validValue name="CounterWithSubjectQuote">105</validValue>
+         <validValue name="IRSBilateralBasketNovationRequest">106</validValue>
+         <validValue name="FirmQuoteIfBest">107</validValue>
+         <validValue name="SubjectQuoteIfBest">108</validValue>
+         <validValue name="Consented">109</validValue>
+      </enum>
+      <enum encodingType="char" name="PreviouslyReported">
+         <validValue name="NotReportedToCounterparty">N</validValue>
+         <validValue name="PerviouslyReportedToCounterparty">Y</validValue>
+      </enum>
+      <enum encodingType="int32" name="QuotePriceType">
+         <validValue name="Percentage">1</validValue>
+         <validValue name="PerUnit">2</validValue>
+         <validValue name="FixedAmount">3</validValue>
+         <validValue name="Discount">4</validValue>
+         <validValue name="Premium">5</validValue>
+         <validValue name="Spread">6</validValue>
+         <validValue name="Yield">9</validValue>
+         <validValue name="Yield1">10</validValue>
+         <validValue name="PriceSpread">12</validValue>
+         <validValue name="BasisPoints">22</validValue>
+         <validValue name="UpfrontPoints">23</validValue>
+         <validValue name="InterestRate">24</validValue>
+         <validValue name="PercentageOfNotional">25</validValue>
+         <validValue name="DiscountMargin">100</validValue>
+         <validValue name="PricedLevel">104</validValue>
+      </enum>
+      <enum encodingType="int32" name="QuoteRespType">
+         <validValue name="Hit">1</validValue>
+         <validValue name="Counter">2</validValue>
+         <validValue name="Expired">3</validValue>
+         <validValue name="Cover">4</validValue>
+         <validValue name="DoneAway">5</validValue>
+         <validValue name="Pass">6</validValue>
+         <validValue name="EndTrade">7</validValue>
+         <validValue name="TimedOut">8</validValue>
+         <validValue name="Tied">9</validValue>
+         <validValue name="DlrRespTimeClsd">100</validValue>
+         <validValue name="ReqBnchmrkSpotFirmPx">101</validValue>
+         <validValue name="LiveStatusChange">102</validValue>
+         <validValue name="RequestExpired">103</validValue>
+         <validValue name="HitLiftWithConfirmation">104</validValue>
+         <validValue name="TransitionToActionable">106</validValue>
+         <validValue name="HitLiftAndLeaveOrder">107</validValue>
+         <validValue name="RequestConsentToTrade">110</validValue>
+         <validValue name="CompetitionChanged">111</validValue>
+         <validValue name="ActiveQuoteTied">112</validValue>
+         <validValue name="ClientCounterExpired">113</validValue>
+         <validValue name="QuoteSuspended">114</validValue>
+         <validValue name="ConfirmIndexConvertedPrice">115</validValue>
+         <validValue name="Routed">500</validValue>
+      </enum>
+      <enum encodingType="char" name="QuoteQualifier">
+         <validValue name="QtyNegotiable">1</validValue>
+         <validValue name="AllowLateBids">2</validValue>
+         <validValue name="ImmediateCounter">3</validValue>
+         <validValue name="AutoTrader">4</validValue>
+         <validValue name="AllOrNone">A</validValue>
+         <validValue name="Axe">E</validValue>
+         <validValue name="AutomaticSpot">a</validValue>
+         <validValue name="BloombergCalculatedSpot">b</validValue>
+         <validValue name="DeferredSpot">d</validValue>
+         <validValue name="CorporateIndexSpot">i</validValue>
+         <validValue name="NegotiatedSpot">n</validValue>
+         <validValue name="OneSidedQuoteAllowed">v</validValue>
+         <validValue name="SuspendQuoteNotAllowed">w</validValue>
+         <validValue name="MostOrNone">y</validValue>
+         <validValue name="DeferredBloombergCalculatedSpot">z</validValue>
+      </enum>
+      <enum encodingType="int32" name="TrdRegTimestampType">
+         <validValue name="ExecutionTime">1</validValue>
+         <validValue name="TimeIn">2</validValue>
+         <validValue name="DeskReceipt">6</validValue>
+         <validValue name="OrderSubmissionTime">10</validValue>
+         <validValue name="TraderFirmQuoteTime">103</validValue>
+         <validValue name="QuoteCommunicatedToCient">104</validValue>
+         <validValue name="HitLiftTime">105</validValue>
+         <validValue name="EndTradeTime">106</validValue>
+      </enum>
+      <enum encodingType="int32" name="PartySubIDType">
+         <validValue name="Person">2</validValue>
+         <validValue name="Application">4</validValue>
+         <validValue name="FullLegalNameOfFirm">5</validValue>
+         <validValue name="EmailAddress">8</validValue>
+         <validValue name="ContactName">9</validValue>
+         <validValue name="RegistrationName">14</validValue>
+         <validValue name="BIC">16</validValue>
+         <validValue name="LocationDesk">25</validValue>
+         <validValue name="SecurityLocateID">27</validValue>
+         <validValue name="EligibleCounterparty">29</validValue>
+         <validValue name="AddressCity">34</validValue>
+         <validValue name="ISOCountryCode">39</validValue>
+         <validValue name="USPerson">48</validValue>
+         <validValue name="ReportingEntityIndicator">49</validValue>
+         <validValue name="DealIdentifier">56</validValue>
+         <validValue name="LocationOrJurisdiction">70</validValue>
+         <validValue name="Payer">74</validValue>
+         <validValue name="Receiver">75</validValue>
+         <validValue name="SystematicInternaliser">76</validValue>
+         <validValue name="BBSalespersonUserID">4000</validValue>
+         <validValue name="DirectClearingMember">4019</validValue>
+         <validValue name="ClearingCode">4023</validValue>
+         <validValue name="LEI">4025</validValue>
+         <validValue name="CustAccID">4026</validValue>
+         <validValue name="CustomerTier">4027</validValue>
+         <validValue name="TicketOriginator">4028</validValue>
+         <validValue name="TerminalSerialNumer">4032</validValue>
+         <validValue name="DelegateGrpName">4037</validValue>
+         <validValue name="DelegateGrpID">4038</validValue>
+         <validValue name="MarkitWireParticipantID">4039</validValue>
+         <validValue name="MarkitWireGroupID">4040</validValue>
+         <validValue name="MarkitWireUserID">4041</validValue>
+         <validValue name="LiquidityMaker">4046</validValue>
+         <validValue name="LiquidityTaker">4047</validValue>
+         <validValue name="BrokerNumber">4055</validValue>
+         <validValue name="FuturesReportingBroker">4068</validValue>
+         <validValue name="SellSide">4075</validValue>
+         <validValue name="BloombergLEISource">4082</validValue>
+      </enum>
+      <enum encodingType="int32" name="TrdType">
+         <validValue name="RegularTrade">0</validValue>
+         <validValue name="EFP">2</validValue>
+         <validValue name="BunchedTrade">7</validValue>
+         <validValue name="FinancingTransaction">47</validValue>
+         <validValue name="PackageTrade">65</validValue>
+      </enum>
+      <enum encodingType="int32" name="QtyType">
+         <validValue name="Units">0</validValue>
+         <validValue name="Contracts">1</validValue>
+      </enum>
+      <enum encodingType="int32" name="TradeReportType">
+         <validValue name="TradeRecapOrRecon">100</validValue>
+      </enum>
+      <enum encodingType="int32" name="TrdRptStatus">
+         <validValue name="Accepted">0</validValue>
+      </enum>
+      <enum encodingType="char" name="ExecAckStatus">
+         <validValue name="Accepted">1</validValue>
+         <validValue name="Don">2</validValue>
+      </enum>
+      <enum encodingType="int32" name="ApplExtID">
+         <validValue name="EP168">168</validValue>
+         <validValue name="EP178">178</validValue>
+         <validValue name="EP208">208</validValue>
+      </enum>
+      <enum encodingType="int32" name="DefaultApplExtID">
+         <validValue name="EP173">173</validValue>
+      </enum>
+      <enum encodingType="char" name="VenueType">
+         <validValue name="CentralLimitOrderBook">B</validValue>
+         <validValue name="HybridMarket">H</validValue>
+         <validValue name="QuoteNegotiation">N</validValue>
+         <validValue name="QuoteDrivenMarket">Q</validValue>
+         <validValue name="VoiceNegotiation">V</validValue>
+      </enum>
+      <enum encodingType="int32" name="TrdAckStatus">
+         <validValue name="Accepted">0</validValue>
+         <validValue name="Rejected">1</validValue>
+      </enum>
+      <enum encodingType="int32" name="QuoteAckStatus">
+         <validValue name="ReceivedNotYetProcessed">0</validValue>
+         <validValue name="Accepted">1</validValue>
+         <validValue name="Rejected">2</validValue>
+      </enum>
+      <enum encodingType="int32" name="RegulatoryTradeIDEvent">
+         <validValue name="InitialBlockTrade">0</validValue>
+         <validValue name="Allocation">1</validValue>
+         <validValue name="Clearing">2</validValue>
+         <validValue name="Compression">3</validValue>
+         <validValue name="Novation">4</validValue>
+         <validValue name="Termination">5</validValue>
+      </enum>
+      <enum encodingType="int32" name="RegulatoryTradeIDType">
+         <validValue name="Current">0</validValue>
+         <validValue name="Previous">1</validValue>
+         <validValue name="Block">2</validValue>
+         <validValue name="Related">3</validValue>
+         <validValue name="TradingVenueTransactionIdentifier">5</validValue>
+      </enum>
+      <enum encodingType="int32" name="ExposureDurationUnit">
+         <validValue name="Seconds">0</validValue>
+      </enum>
+      <enum encodingType="int32" name="PartyRoleQualifier">
+         <validValue name="Algorithm">22</validValue>
+         <validValue name="FirmOrLegalEntity">23</validValue>
+         <validValue name="NaturalPerson">24</validValue>
+      </enum>
+      <enum encodingType="int32" name="TrdRegPublicationType">
+         <validValue name="PreTradeTransparencyWaiver">0</validValue>
+         <validValue name="PostTradeDeferral">1</validValue>
+         <validValue name="ExemptedFromPublication">2</validValue>
+      </enum>
+      <enum encodingType="int32" name="TrdRegPublicationReason">
+         <validValue name="NoPublicPriceDueToIlliquid">4</validValue>
+         <validValue name="NoPublicPriceDueToOrderSize">5</validValue>
+         <validValue name="DeferralDueToLargeInScale">6</validValue>
+         <validValue name="DeferralDueToIlliquid">7</validValue>
+         <validValue name="DeferralDueToSizeSpecific">8</validValue>
+         <validValue name="ExemptedDueToSecuritiesFinancingTransaction">11</validValue>
+         <validValue name="ExemptedDueToESCBPolicyTransaction">12</validValue>
+      </enum>
+      <enum encodingType="int32" name="RefPriceType">
+         <validValue name="Percentage">1</validValue>
+         <validValue name="PerUnit">2</validValue>
+         <validValue name="FixedAmount">3</validValue>
+         <validValue name="Discount">4</validValue>
+         <validValue name="Premium">5</validValue>
+         <validValue name="Spread">6</validValue>
+         <validValue name="Yield">9</validValue>
+         <validValue name="Yield1">10</validValue>
+         <validValue name="PriceSpread">12</validValue>
+         <validValue name="BasisPoints">22</validValue>
+         <validValue name="UpfrontPoints">23</validValue>
+         <validValue name="InterestRate">24</validValue>
+         <validValue name="PercentageOfNotional">25</validValue>
+         <validValue name="DiscountMargin">100</validValue>
+      </enum>
+      <enum encodingType="int32" name="RefPriceSource">
+         <validValue name="BloombergCompositePrice">0</validValue>
+         <validValue name="DealerCurrentQuotedPrice">1</validValue>
+         <validValue name="PreviousFixingPrice">5</validValue>
+         <validValue name="PreviousClosingMarketPrice">6</validValue>
+         <validValue name="DealersOriginalFillPrice">10</validValue>
+         <validValue name="DealersOriginalQuotedPrice">11</validValue>
+         <validValue name="CalculatedInitialPayment">14</validValue>
+         <validValue name="DealersIOI">15</validValue>
+      </enum>
+      <enum encodingType="int32" name="PriceDescription">
+         <validValue name="DealerQuotedFirmPrice">0</validValue>
+         <validValue name="PreAgreedPrice">1</validValue>
+         <validValue name="TargetPrice">2</validValue>
+         <validValue name="FirmPrice">3</validValue>
+         <validValue name="STWTargetPrice">4</validValue>
+      </enum>
+      <enum encodingType="char" name="PartyAltIDSource">
+         <validValue name="BIC">B</validValue>
+         <validValue name="Proprietary">D</validValue>
+         <validValue name="MIC">G</validValue>
+         <validValue name="LegalEntityIdentifier">N</validValue>
+         <validValue name="ShortCodeIdentifier">P</validValue>
+      </enum>
+      <enum encodingType="int32" name="PartyAltSubIDType">
+         <validValue name="Person">2</validValue>
+         <validValue name="BloombergCustomerName">4015</validValue>
+         <validValue name="BloombergCustomerNumber">4016</validValue>
+         <validValue name="BloombergRealCustomerName">4080</validValue>
+         <validValue name="BloombergRealCustomerNumber">4081</validValue>
+      </enum>
+      <enum encodingType="int32" name="ExpiredBy">
+         <validValue name="BYCLIENT">0</validValue>
+         <validValue name="BYDEALER">1</validValue>
+      </enum>
+      <enum encodingType="int32" name="QuoteEndLevel">
+         <validValue name="Best">1</validValue>
+         <validValue name="TiedBest">2</validValue>
+         <validValue name="Cover">3</validValue>
+         <validValue name="TiedCover">4</validValue>
+         <validValue name="DoneAway">5</validValue>
+      </enum>
+      <enum encodingType="int32" name="RFQProtocol">
+         <validValue name="Normal">0</validValue>
+         <validValue name="QuantityOrNotionalBelowSST">1</validValue>
+         <validValue name="QuantityOrNotionalEqualGreaterSSTI">2</validValue>
+      </enum>
+      <enum encodingType="int32" name="RFQSubLISState">
+         <validValue name="NotApplicable">0</validValue>
+         <validValue name="PriceCollection">1</validValue>
+         <validValue name="Actionable">2</validValue>
+      </enum>
+      <enum encodingType="char" name="DealerSide">
+         <validValue name="Buy">1</validValue>
+         <validValue name="Sell">2</validValue>
+         <validValue name="SellShort">5</validValue>
+         <validValue name="SellShortExempt">6</validValue>
+         <validValue name="SellUndisclosed">H</validValue>
+      </enum>
+      <composite description="Message identifiers and length of message root" name="messageHeader">
+         <type name="blockLength" primitiveType="uint16"/>
+         <type name="templateId" primitiveType="uint16"/>
+         <type name="schemaId" primitiveType="uint16"/>
+         <type name="version" primitiveType="uint16"/>
+      </composite>
+      <composite description="Repeating group dimensions" name="groupSizeEncoding">
+         <type name="blockLength" primitiveType="uint16"/>
+         <type name="numInGroup" primitiveType="uint16"/>
+      </composite>
+      <composite description="FIX protocol header" name="fixHeader">
+         <type name="MsgSeqNum" primitiveType="uint32"/>
+         <ref name="SenderCompID" type="idString"/>
+         <ref name="TargetCompID" type="idString"/>
+         <ref name="SendingTime" type="UTCTimestamp"/>
+         <ref name="OrigSendingTime" presence="optional" type="UTCTimestamp"/>
+         <ref name="OnBehalfOfCompID" presence="optional" type="idString"/>
+         <ref name="DeliverToCompID" presence="optional" type="idString"/>
+      </composite>
+   </types>
+   <messages>
+      <sbe:message id="0" name="Heartbeat">
+         <field id="20007" name="FixHeader" type="fixHeader"/>
+         <field id="112" name="TestReqID" presence="optional" type="String100"/>
+      </sbe:message>
+      <sbe:message id="1" name="TestRequest">
+         <field id="20007" name="FixHeader" type="fixHeader"/>
+         <field id="112" name="TestReqID" presence="required" type="String100"/>
+         <field id="347" name="MessageEncoding" presence="optional" type="String100"/>
+      </sbe:message>
+      <sbe:message id="2" name="ResendRequest">
+         <field id="20007" name="FixHeader" type="fixHeader"/>
+         <field id="7" name="BeginSeqNo" presence="required" type="int32"/>
+         <field id="16" name="EndSeqNo" presence="required" type="int32"/>
+         <field id="347" name="MessageEncoding" presence="optional" type="String100"/>
+      </sbe:message>
+      <sbe:message id="20" name="QuoteRequest">
+         <field id="20007" name="FixHeader" type="fixHeader"/>
+         <field id="131" name="QuoteReqID" presence="required" type="idString"/>
+         <field id="11" name="ClOrdID" presence="optional" type="idString"/>
+         <group id="146" name="NoRelatedSym">
+            <field id="55" name="Symbol" presence="optional" type="String100"/>
+            <field id="48" name="SecurityID" presence="optional" type="String100"/>
+            <field id="22" name="SecurityIDSource" presence="optional" type="String100"/>
+            <field id="460" name="Product" presence="optional" type="Product"/>
+            <field id="167" name="SecurityType" presence="optional" type="String100"/>
+            <field id="541" name="MaturityDate" presence="optional" type="LocalMktDate"/>
+            <field id="228" name="Factor" presence="optional" type="double"/>
+            <field id="470" name="CountryOfIssue" presence="optional" type="String100"/>
+            <field id="969" name="MinPriceIncrement" presence="optional" type="double"/>
+            <field id="223" name="CouponRate" presence="optional" type="double"/>
+            <field id="1751" name="SecondaryQuoteID" presence="optional" type="String100"/>
+            <field id="537" name="QuoteType" presence="optional" type="QuoteType"/>
+            <field id="1913" name="NumOfCompetitors" presence="optional" type="int32"/>
+            <field id="54" name="Side" presence="optional" type="Side"/>
+            <field id="854" name="QtyType" presence="optional" type="QtyType"/>
+            <field id="38" name="OrderQty" presence="optional" type="double"/>
+            <field id="64" name="SettlDate" presence="optional" type="LocalMktDate"/>
+            <field id="15" name="Currency" presence="optional" type="Currency"/>
+            <field id="828" name="TrdType" presence="optional" type="TrdType"/>
+            <field id="692" name="QuotePriceType" presence="optional" type="QuotePriceType"/>
+            <field id="126" name="ExpireTime" presence="optional" type="UTCTimestamp"/>
+            <field id="1914" name="ResponseTime" presence="optional" type="UTCTimestamp"/>
+            <field id="1629" name="ExposureDuration" presence="optional" type="int32"/>
+            <field id="1916" name="ExposureDurationUnit" presence="optional" type="ExposureDurationUnit"/>
+            <field id="60" name="TransactTime" presence="optional" type="UTCTimestamp"/>
+            <field id="75" name="TradeDate" presence="optional" type="LocalMktDate"/>
+            <field id="1300" name="MarketSegmentID" presence="optional" type="String100"/>
+            <field id="22653" name="BidQuoteReqID" presence="optional" type="String100"/>
+            <field id="22654" name="OfferQuoteReqID" presence="optional" type="String100"/>
+            <field id="22351" name="RFQProtocol" presence="optional" type="RFQProtocol"/>
+            <field id="22352" name="RFQSubLISState" presence="optional" type="RFQSubLISState"/>
+            <group id="454" name="NoSecurityAltID">
+               <field id="455" name="SecurityAltID" presence="optional" type="String100"/>
+               <field id="456" name="SecurityAltIDSource" presence="optional" type="String100"/>
+            </group>
+            <group id="735" name="NoQuoteQualifiers">
+               <field id="695" name="QuoteQualifier" presence="optional" type="QuoteQualifier"/>
+            </group>
+            <group id="453" name="NoPartyIDs">
+               <field id="448" name="PartyID" presence="optional" type="String100"/>
+               <field id="447" name="PartyIDSource" presence="optional" type="PartyIDSource"/>
+               <field id="452" name="PartyRole" presence="optional" type="PartyRole"/>
+               <group id="802" name="NoPartySubIDs">
+                  <field id="523" name="PartySubID" presence="optional" type="String100"/>
+                  <field id="803" name="PartySubIDType" presence="optional" type="PartySubIDType"/>
+               </group>
+               <group id="22086" name="NoPartyAltIDs">
+                  <field id="22087" name="PartyAltID" presence="optional" type="String100"/>
+                  <field id="22088" name="PartyAltIDSource" presence="optional" type="PartyAltIDSource"/>
+                  <group id="22089" name="NoPartyAltSubIDs">
+                     <field id="22090" name="PartyAltSubID" presence="optional" type="String100"/>
+                     <field id="22091" name="PartyAltSubIDType" presence="optional" type="PartyAltSubIDType"/>
+                  </group>
+               </group>
+            </group>
+            <group id="136" name="NoMiscFees">
+               <field id="137" name="MiscFeeAmt" presence="optional" type="double"/>
+               <field id="138" name="MiscFeeCurr" presence="optional" type="Currency"/>
+               <field id="139" name="MiscFeeType" presence="optional" type="String100"/>
+            </group>
+            <group id="2668" name="NoTrdRegPublications">
+               <field id="2669" name="TrdRegPublicationType" presence="optional" type="TrdRegPublicationType"/>
+               <field id="2670" name="TrdRegPublicationReason" presence="optional" type="TrdRegPublicationReason"/>
+            </group>
+            <group id="22078" name="NoRefPrices">
+               <field id="22079" name="RefPrice" presence="optional" type="double"/>
+               <field id="22080" name="RefPriceType" presence="optional" type="RefPriceType"/>
+               <field id="22081" name="RefPriceSource" presence="optional" type="RefPriceSource"/>
+               <field id="22082" name="RefPriceFirmIndicator" presence="optional" type="char"/>
+               <field id="22083" name="RefPriceInventoryIndicator" presence="optional" type="char"/>
+            </group>
+         </group>
+      </sbe:message>
+      <sbe:message id="21" name="Quote">
+         <field id="20007" name="FixHeader" type="fixHeader"/>
+         <field id="131" name="QuoteReqID" presence="optional" type="idString"/>
+         <field id="117" name="QuoteID" presence="required" type="idString"/>
+         <field id="1751" name="SecondaryQuoteID" presence="required" type="String100"/>
+         <field id="693" name="QuoteRespID" presence="optional" type="idString"/>
+         <field id="537" name="QuoteType" presence="required" type="QuoteType"/>
+         <field id="55" name="Symbol" presence="optional" type="String100"/>
+         <field id="48" name="SecurityID" presence="optional" type="String100"/>
+         <field id="22" name="SecurityIDSource" presence="optional" type="String100"/>
+         <field id="460" name="Product" presence="optional" type="Product"/>
+         <field id="167" name="SecurityType" presence="optional" type="String100"/>
+         <field id="541" name="MaturityDate" presence="optional" type="LocalMktDate"/>
+         <field id="228" name="Factor" presence="optional" type="double"/>
+         <field id="470" name="CountryOfIssue" presence="optional" type="String100"/>
+         <field id="223" name="CouponRate" presence="optional" type="double"/>
+         <field id="54" name="Side" presence="optional" type="Side"/>
+         <field id="38" name="OrderQty" presence="optional" type="double"/>
+         <field id="64" name="SettlDate" presence="optional" type="LocalMktDate"/>
+         <field id="15" name="Currency" presence="optional" type="Currency"/>
+         <field id="132" name="BidPx" presence="optional" type="double"/>
+         <field id="133" name="OfferPx" presence="optional" type="double"/>
+         <field id="1629" name="ExposureDuration" presence="optional" type="int32"/>
+         <field id="1916" name="ExposureDurationUnit" presence="optional" type="ExposureDurationUnit"/>
+         <field id="632" name="BidYield" presence="optional" type="double"/>
+         <field id="634" name="OfferYield" presence="optional" type="double"/>
+         <field id="60" name="TransactTime" presence="optional" type="UTCTimestamp"/>
+         <field id="423" name="PriceType" presence="optional" type="PriceType"/>
+         <field id="235" name="YieldType" presence="optional" type="String100"/>
+         <field id="236" name="Yield" presence="optional" type="double"/>
+         <field id="11" name="ClOrdID" presence="optional" type="idString"/>
+         <field id="126" name="ExpireTime" presence="optional" type="UTCTimestamp"/>
+         <field id="828" name="TrdType" presence="optional" type="TrdType"/>
+         <field id="854" name="QtyType" presence="optional" type="QtyType"/>
+         <field id="1300" name="MarketSegmentID" presence="optional" type="String100"/>
+         <group id="453" name="NoPartyIDs">
+            <field id="448" name="PartyID" presence="optional" type="String100"/>
+            <field id="447" name="PartyIDSource" presence="optional" type="PartyIDSource"/>
+            <field id="452" name="PartyRole" presence="optional" type="PartyRole"/>
+            <field id="2376" name="PartyRoleQualifier" presence="optional" type="PartyRoleQualifier"/>
+            <group id="802" name="NoPartySubIDs">
+               <field id="523" name="PartySubID" presence="optional" type="String100"/>
+               <field id="803" name="PartySubIDType" presence="optional" type="PartySubIDType"/>
+            </group>
+            <group id="22086" name="NoPartyAltIDs">
+               <field id="22087" name="PartyAltID" presence="optional" type="String100"/>
+               <field id="22088" name="PartyAltIDSource" presence="optional" type="PartyAltIDSource"/>
+               <group id="22089" name="NoPartyAltSubIDs">
+                  <field id="22090" name="PartyAltSubID" presence="optional" type="String100"/>
+                  <field id="22091" name="PartyAltSubIDType" presence="optional" type="PartyAltSubIDType"/>
+               </group>
+            </group>
+         </group>
+         <group id="454" name="NoSecurityAltID">
+            <field id="455" name="SecurityAltID" presence="optional" type="String100"/>
+            <field id="456" name="SecurityAltIDSource" presence="optional" type="String100"/>
+         </group>
+      </sbe:message>
+      <sbe:message id="22" name="QuoteAck">
+         <field id="20007" name="FixHeader" type="fixHeader"/>
+         <field id="117" name="QuoteID" presence="required" type="idString"/>
+         <field id="131" name="QuoteReqID" presence="optional" type="idString"/>
+         <field id="1751" name="SecondaryQuoteID" presence="required" type="String100"/>
+         <field id="1865" name="QuoteAckStatus" presence="required" type="QuoteAckStatus"/>
+         <field id="300" name="QuoteRejectReason" presence="optional" type="QuoteRejectReason"/>
+         <group id="136" name="NoMiscFees">
+            <field id="137" name="MiscFeeAmt" presence="optional" type="double"/>
+            <field id="138" name="MiscFeeCurr" presence="optional" type="Currency"/>
+            <field id="139" name="MiscFeeType" presence="optional" type="String100"/>
+         </group>
+      </sbe:message>
+      <sbe:message id="23" name="QuoteResponse">
+         <field id="20007" name="FixHeader" type="fixHeader"/>
+         <field id="693" name="QuoteRespID" presence="required" type="idString"/>
+         <field id="117" name="QuoteID" presence="optional" type="idString"/>
+         <field id="131" name="QuoteReqID" presence="optional" type="idString"/>
+         <field id="694" name="QuoteRespType" presence="required" type="QuoteRespType"/>
+         <field id="11" name="ClOrdID" presence="optional" type="idString"/>
+         <field id="537" name="QuoteType" presence="optional" type="QuoteType"/>
+         <field id="828" name="TrdType" presence="optional" type="TrdType"/>
+         <field id="55" name="Symbol" presence="optional" type="String100"/>
+         <field id="48" name="SecurityID" presence="optional" type="String100"/>
+         <field id="22" name="SecurityIDSource" presence="optional" type="String100"/>
+         <field id="460" name="Product" presence="optional" type="Product"/>
+         <field id="167" name="SecurityType" presence="optional" type="String100"/>
+         <field id="541" name="MaturityDate" presence="optional" type="LocalMktDate"/>
+         <field id="228" name="Factor" presence="optional" type="double"/>
+         <field id="470" name="CountryOfIssue" presence="optional" type="String100"/>
+         <field id="969" name="MinPriceIncrement" presence="optional" type="double"/>
+         <field id="223" name="CouponRate" presence="optional" type="double"/>
+         <field id="54" name="Side" presence="optional" type="Side"/>
+         <field id="38" name="OrderQty" presence="optional" type="double"/>
+         <field id="64" name="SettlDate" presence="optional" type="LocalMktDate"/>
+         <field id="15" name="Currency" presence="optional" type="Currency"/>
+         <field id="62" name="ValidUntilTime" presence="optional" type="UTCTimestamp"/>
+         <field id="60" name="TransactTime" presence="optional" type="UTCTimestamp"/>
+         <field id="44" name="Price" presence="optional" type="double"/>
+         <field id="423" name="PriceType" presence="optional" type="PriceType"/>
+         <field id="235" name="YieldType" presence="optional" type="String100"/>
+         <field id="236" name="Yield" presence="optional" type="double"/>
+         <field id="75" name="TradeDate" presence="optional" type="LocalMktDate"/>
+         <field id="126" name="ExpireTime" presence="optional" type="UTCTimestamp"/>
+         <field id="854" name="QtyType" presence="optional" type="QtyType"/>
+         <field id="1300" name="MarketSegmentID" presence="optional" type="String100"/>
+         <field id="1751" name="SecondaryQuoteID" presence="required" type="String100"/>
+         <field id="1913" name="NumOfCompetitors" presence="optional" type="int32"/>
+         <field id="22084" name="PriceDescription" presence="optional" type="PriceDescription"/>
+         <field id="22094" name="ExpiredBy" presence="optional" type="ExpiredBy"/>
+         <field id="22281" name="QuoteEndLevel" presence="optional" type="QuoteEndLevel"/>
+         <field id="22653" name="BidQuoteReqID" presence="optional" type="String100"/>
+         <field id="22654" name="OfferQuoteReqID" presence="optional" type="String100"/>
+         <field id="22351" name="RFQProtocol" presence="optional" type="RFQProtocol"/>
+         <field id="22352" name="RFQSubLISState" presence="optional" type="RFQSubLISState"/>
+         <group id="453" name="NoPartyIDs">
+            <field id="448" name="PartyID" presence="optional" type="String100"/>
+            <field id="447" name="PartyIDSource" presence="optional" type="PartyIDSource"/>
+            <field id="452" name="PartyRole" presence="optional" type="PartyRole"/>
+            <field id="2376" name="PartyRoleQualifier" presence="optional" type="PartyRoleQualifier"/>
+            <group id="802" name="NoPartySubIDs">
+               <field id="523" name="PartySubID" presence="optional" type="String100"/>
+               <field id="803" name="PartySubIDType" presence="optional" type="PartySubIDType"/>
+            </group>
+            <group id="22086" name="NoPartyAltIDs">
+               <field id="22087" name="PartyAltID" presence="optional" type="String100"/>
+               <field id="22088" name="PartyAltIDSource" presence="optional" type="PartyAltIDSource"/>
+               <group id="22089" name="NoPartyAltSubIDs">
+                  <field id="22090" name="PartyAltSubID" presence="optional" type="String100"/>
+                  <field id="22091" name="PartyAltSubIDType" presence="optional" type="PartyAltSubIDType"/>
+               </group>
+            </group>
+         </group>
+         <group id="454" name="NoSecurityAltID">
+            <field id="455" name="SecurityAltID" presence="optional" type="String100"/>
+            <field id="456" name="SecurityAltIDSource" presence="optional" type="String100"/>
+         </group>
+         <group id="136" name="NoMiscFees">
+            <field id="137" name="MiscFeeAmt" presence="optional" type="double"/>
+            <field id="138" name="MiscFeeCurr" presence="optional" type="Currency"/>
+            <field id="139" name="MiscFeeType" presence="optional" type="String100"/>
+         </group>
+         <group id="2668" name="NoTrdRegPublications">
+            <field id="2669" name="TrdRegPublicationType" presence="optional" type="TrdRegPublicationType"/>
+            <field id="2670" name="TrdRegPublicationReason" presence="optional" type="TrdRegPublicationReason"/>
+         </group>
+      </sbe:message>
+      <sbe:message id="25" name="ExecutionReport">
+         <field id="20007" name="FixHeader" type="fixHeader"/>
+         <field id="37" name="OrderID" presence="required" type="String100"/>
+         <field id="198" name="SecondaryOrderID" presence="required" type="String100"/>
+         <field id="11" name="ClOrdID" presence="required" type="idString"/>
+         <field id="17" name="ExecID" presence="required" type="idString"/>
+         <field id="150" name="ExecType" presence="required" type="ExecType"/>
+         <field id="39" name="OrdStatus" presence="required" type="OrdStatus"/>
+         <field id="828" name="TrdType" presence="optional" type="TrdType"/>
+         <field id="64" name="SettlDate" presence="optional" type="LocalMktDate"/>
+         <field id="55" name="Symbol" presence="optional" type="String100"/>
+         <field id="48" name="SecurityID" presence="optional" type="String100"/>
+         <field id="22" name="SecurityIDSource" presence="optional" type="String100"/>
+         <field id="460" name="Product" presence="optional" type="Product"/>
+         <field id="167" name="SecurityType" presence="optional" type="String100"/>
+         <field id="541" name="MaturityDate" presence="optional" type="LocalMktDate"/>
+         <field id="228" name="Factor" presence="optional" type="double"/>
+         <field id="470" name="CountryOfIssue" presence="optional" type="String100"/>
+         <field id="223" name="CouponRate" presence="optional" type="double"/>
+         <field id="54" name="Side" presence="required" type="Side"/>
+         <field id="854" name="QtyType" presence="optional" type="QtyType"/>
+         <field id="38" name="OrderQty" presence="optional" type="double"/>
+         <field id="40" name="OrdType" presence="optional" type="OrdType"/>
+         <field id="423" name="PriceType" presence="required" type="PriceType"/>
+         <field id="44" name="Price" presence="optional" type="double"/>
+         <field id="15" name="Currency" presence="required" type="Currency"/>
+         <field id="32" name="LastQty" presence="optional" type="double"/>
+         <field id="31" name="LastPx" presence="optional" type="double"/>
+         <field id="30" name="LastMkt" presence="optional" type="Exchange"/>
+         <field id="1430" name="VenueType" presence="optional" type="VenueType"/>
+         <field id="1300" name="MarketSegmentID" presence="optional" type="String100"/>
+         <field id="151" name="LeavesQty" presence="required" type="double"/>
+         <field id="14" name="CumQty" presence="required" type="double"/>
+         <field id="75" name="TradeDate" presence="required" type="LocalMktDate"/>
+         <field id="60" name="TransactTime" presence="required" type="UTCTimestamp"/>
+         <field id="235" name="YieldType" presence="optional" type="String100"/>
+         <field id="236" name="Yield" presence="optional" type="double"/>
+         <field id="22448" name="DealerSide" presence="optional" type="DealerSide"/>
+         <group id="453" name="NoPartyIDs">
+            <field id="448" name="PartyID" presence="optional" type="String100"/>
+            <field id="447" name="PartyIDSource" presence="optional" type="PartyIDSource"/>
+            <field id="452" name="PartyRole" presence="optional" type="PartyRole"/>
+            <field id="2376" name="PartyRoleQualifier" presence="optional" type="PartyRoleQualifier"/>
+            <group id="802" name="NoPartySubIDs">
+               <field id="523" name="PartySubID" presence="optional" type="String100"/>
+               <field id="803" name="PartySubIDType" presence="optional" type="PartySubIDType"/>
+            </group>
+            <group id="22086" name="NoPartyAltIDs">
+               <field id="22087" name="PartyAltID" presence="optional" type="String100"/>
+               <field id="22088" name="PartyAltIDSource" presence="optional" type="PartyAltIDSource"/>
+               <group id="22089" name="NoPartyAltSubIDs">
+                  <field id="22090" name="PartyAltSubID" presence="optional" type="String100"/>
+                  <field id="22091" name="PartyAltSubIDType" presence="optional" type="PartyAltSubIDType"/>
+               </group>
+            </group>
+         </group>
+         <group id="454" name="NoSecurityAltID">
+            <field id="455" name="SecurityAltID" presence="optional" type="String100"/>
+            <field id="456" name="SecurityAltIDSource" presence="optional" type="String100"/>
+         </group>
+         <group id="2668" name="NoTrdRegPublications">
+            <field id="2669" name="TrdRegPublicationType" presence="optional" type="TrdRegPublicationType"/>
+            <field id="2670" name="TrdRegPublicationReason" presence="optional" type="TrdRegPublicationReason"/>
+         </group>
+      </sbe:message>
+      <sbe:message id="26" name="ExecutionAck">
+         <field id="20007" name="FixHeader" type="fixHeader"/>
+         <field id="37" name="OrderID" presence="required" type="String100"/>
+         <field id="198" name="SecondaryOrderID" presence="required" type="String100"/>
+         <field id="11" name="ClOrdID" presence="optional" type="idString"/>
+         <field id="1036" name="ExecAckStatus" presence="required" type="ExecAckStatus"/>
+         <field id="17" name="ExecID" presence="required" type="idString"/>
+         <field id="55" name="Symbol" presence="optional" type="String100"/>
+         <field id="22" name="SecurityIDSource" presence="optional" type="String100"/>
+         <field id="54" name="Side" presence="required" type="Side"/>
+         <field id="38" name="OrderQty" presence="optional" type="double"/>
+         <field id="1913" name="NumOfCompetitors" presence="optional" type="int32"/>
+      </sbe:message>
+      <sbe:message id="27" name="TradeCaptureReport">
+         <field id="20007" name="FixHeader" type="fixHeader"/>
+         <field id="571" name="TradeReportID" presence="required" type="String100"/>
+         <field id="1040" name="SecondaryTradeID" presence="required" type="String100"/>
+         <field id="487" name="TradeReportTransType" presence="required" type="TradeReportTransType"/>
+         <field id="856" name="TradeReportType" presence="required" type="TradeReportType"/>
+         <field id="939" name="TrdRptStatus" presence="required" type="TrdRptStatus"/>
+         <field id="828" name="TrdType" presence="optional" type="TrdType"/>
+         <field id="570" name="PreviouslyReported" presence="optional" type="PreviouslyReported"/>
+         <field id="423" name="PriceType" presence="required" type="PriceType"/>
+         <field id="1430" name="VenueType" presence="optional" type="VenueType"/>
+         <field id="1300" name="MarketSegmentID" presence="optional" type="String100"/>
+         <field id="55" name="Symbol" presence="optional" type="String100"/>
+         <field id="48" name="SecurityID" presence="optional" type="String100"/>
+         <field id="22" name="SecurityIDSource" presence="optional" type="String100"/>
+         <field id="460" name="Product" presence="optional" type="Product"/>
+         <field id="167" name="SecurityType" presence="optional" type="String100"/>
+         <field id="541" name="MaturityDate" presence="optional" type="LocalMktDate"/>
+         <field id="228" name="Factor" presence="optional" type="double"/>
+         <field id="470" name="CountryOfIssue" presence="optional" type="String100"/>
+         <field id="969" name="MinPriceIncrement" presence="optional" type="double"/>
+         <field id="223" name="CouponRate" presence="optional" type="double"/>
+         <field id="854" name="QtyType" presence="optional" type="QtyType"/>
+         <field id="235" name="YieldType" presence="optional" type="String100"/>
+         <field id="236" name="Yield" presence="optional" type="double"/>
+         <field id="32" name="LastQty" presence="optional" type="double"/>
+         <field id="31" name="LastPx" presence="optional" type="double"/>
+         <field id="30" name="LastMkt" presence="optional" type="Exchange"/>
+         <field id="75" name="TradeDate" presence="required" type="LocalMktDate"/>
+         <field id="60" name="TransactTime" presence="required" type="UTCTimestamp"/>
+         <field id="64" name="SettlDate" presence="optional" type="LocalMktDate"/>
+         <field id="1913" name="NumOfCompetitors" presence="optional" type="int32"/>
+         <field id="22653" name="BidQuoteReqID" presence="optional" type="String100"/>
+         <field id="22654" name="OfferQuoteReqID" presence="optional" type="String100"/>
+         <group id="1907" name="NoRegulatoryTradeIDs">
+            <field id="1903" name="RegulatoryTradeID" presence="optional" type="String100"/>
+            <field id="1905" name="RegulatoryTradeIDSource" presence="optional" type="String100"/>
+            <field id="1904" name="RegulatoryTradeIDEvent" presence="optional" type="RegulatoryTradeIDEvent"/>
+            <field id="1906" name="RegulatoryTradeIDType" presence="optional" type="RegulatoryTradeIDType"/>
+            <field id="2411" name="RegulatoryLegRefID" presence="optional" type="String100"/>
+         </group>
+         <group id="454" name="NoSecurityAltID">
+            <field id="455" name="SecurityAltID" presence="optional" type="String100"/>
+            <field id="456" name="SecurityAltIDSource" presence="optional" type="String100"/>
+         </group>
+         <group id="768" name="NoTrdRegTimestamps">
+            <field id="769" name="TrdRegTimestamp" presence="optional" type="UTCTimestamp"/>
+            <field id="770" name="TrdRegTimestampType" presence="optional" type="TrdRegTimestampType"/>
+         </group>
+         <group id="552" name="NoSides">
+            <field id="54" name="Side" presence="required" type="Side"/>
+            <field id="1427" name="SideExecID" presence="optional" type="String100"/>
+            <field id="1154" name="SideCurrency" presence="optional" type="Currency"/>
+            <field id="157" name="NumDaysInterest" presence="optional" type="int32"/>
+            <field id="159" name="AccruedInterestAmt" presence="optional" type="double"/>
+            <field id="118" name="NetMoney" presence="optional" type="double"/>
+            <field id="1072" name="SideGrossTradeAmt" presence="optional" type="double"/>
+            <field id="37" name="OrderID" presence="optional" type="String100"/>
+            <field id="11" name="ClOrdID" presence="optional" type="idString"/>
+            <field id="29" name="LastCapacity" presence="optional" type="LastCapacity"/>
+            <group id="453" name="NoPartyIDs">
+               <field id="448" name="PartyID" presence="optional" type="String100"/>
+               <field id="447" name="PartyIDSource" presence="optional" type="PartyIDSource"/>
+               <field id="452" name="PartyRole" presence="optional" type="PartyRole"/>
+               <field id="2376" name="PartyRoleQualifier" presence="optional" type="PartyRoleQualifier"/>
+               <group id="802" name="NoPartySubIDs">
+                  <field id="523" name="PartySubID" presence="optional" type="String100"/>
+                  <field id="803" name="PartySubIDType" presence="optional" type="PartySubIDType"/>
+               </group>
+               <group id="22086" name="NoPartyAltIDs">
+                  <field id="22087" name="PartyAltID" presence="optional" type="String100"/>
+                  <field id="22088" name="PartyAltIDSource" presence="optional" type="PartyAltIDSource"/>
+                  <group id="22089" name="NoPartyAltSubIDs">
+                     <field id="22090" name="PartyAltSubID" presence="optional" type="String100"/>
+                     <field id="22091" name="PartyAltSubIDType" presence="optional" type="PartyAltSubIDType"/>
+                  </group>
+               </group>
+            </group>
+            <group id="136" name="NoMiscFees">
+               <field id="137" name="MiscFeeAmt" presence="optional" type="double"/>
+               <field id="138" name="MiscFeeCurr" presence="optional" type="Currency"/>
+               <field id="139" name="MiscFeeType" presence="optional" type="String100"/>
+            </group>
+            <group id="22078" name="NoRefPrices">
+               <field id="22079" name="RefPrice" presence="optional" type="double"/>
+               <field id="22080" name="RefPriceType" presence="optional" type="RefPriceType"/>
+               <field id="22081" name="RefPriceSource" presence="optional" type="RefPriceSource"/>
+               <field id="22082" name="RefPriceFirmIndicator" presence="optional" type="char"/>
+               <field id="22083" name="RefPriceInventoryIndicator" presence="optional" type="char"/>
+            </group>
+         </group>
+         <group id="2668" name="NoTrdRegPublications">
+            <field id="2669" name="TrdRegPublicationType" presence="optional" type="TrdRegPublicationType"/>
+            <field id="2670" name="TrdRegPublicationReason" presence="optional" type="TrdRegPublicationReason"/>
+         </group>
+      </sbe:message>
+      <sbe:message id="28" name="TradeCaptureReportAck">
+         <field id="20007" name="FixHeader" type="fixHeader"/>
+         <field id="571" name="TradeReportID" presence="required" type="String100"/>
+         <field id="1040" name="SecondaryTradeID" presence="required" type="String100"/>
+         <field id="487" name="TradeReportTransType" presence="optional" type="TradeReportTransType"/>
+         <field id="856" name="TradeReportType" presence="optional" type="TradeReportType"/>
+         <field id="1523" name="TrdAckStatus" presence="required" type="TrdAckStatus"/>
+         <field id="55" name="Symbol" presence="optional" type="String100"/>
+         <field id="48" name="SecurityID" presence="optional" type="String100"/>
+         <field id="22" name="SecurityIDSource" presence="optional" type="String100"/>
+         <field id="460" name="Product" presence="optional" type="Product"/>
+         <field id="167" name="SecurityType" presence="optional" type="String100"/>
+         <field id="541" name="MaturityDate" presence="optional" type="LocalMktDate"/>
+         <field id="228" name="Factor" presence="optional" type="double"/>
+         <field id="470" name="CountryOfIssue" presence="optional" type="String100"/>
+         <field id="223" name="CouponRate" presence="optional" type="double"/>
+         <field id="75" name="TradeDate" presence="optional" type="LocalMktDate"/>
+         <field id="60" name="TransactTime" presence="optional" type="UTCTimestamp"/>
+         <group id="454" name="NoSecurityAltID">
+            <field id="455" name="SecurityAltID" presence="optional" type="String100"/>
+            <field id="456" name="SecurityAltIDSource" presence="optional" type="String100"/>
+         </group>
+         <group id="552" name="NoSides">
+            <field id="54" name="Side" presence="optional" type="Side"/>
+            <field id="1154" name="SideCurrency" presence="optional" type="Currency"/>
+            <field id="11" name="ClOrdID" presence="optional" type="idString"/>
+            <group id="453" name="NoPartyIDs">
+               <field id="448" name="PartyID" presence="optional" type="String100"/>
+               <field id="447" name="PartyIDSource" presence="optional" type="PartyIDSource"/>
+               <field id="452" name="PartyRole" presence="optional" type="PartyRole"/>
+               <group id="802" name="NoPartySubIDs">
+                  <field id="523" name="PartySubID" presence="optional" type="String100"/>
+                  <field id="803" name="PartySubIDType" presence="optional" type="PartySubIDType"/>
+               </group>
+               <group id="22086" name="NoPartyAltIDs">
+                  <field id="22087" name="PartyAltID" presence="optional" type="String100"/>
+                  <field id="22088" name="PartyAltIDSource" presence="optional" type="PartyAltIDSource"/>
+                  <group id="22089" name="NoPartyAltSubIDs">
+                     <field id="22090" name="PartyAltSubID" presence="optional" type="String100"/>
+                     <field id="22091" name="PartyAltSubIDType" presence="optional" type="PartyAltSubIDType"/>
+                  </group>
+               </group>
+            </group>
+         </group>
+      </sbe:message>
+      <sbe:message id="3" name="Reject">
+         <field id="20007" name="FixHeader" type="fixHeader"/>
+         <field id="45" name="RefSeqNum" presence="required" type="int32"/>
+         <field id="371" name="RefTagID" presence="optional" type="int32"/>
+         <field id="372" name="RefMsgType" presence="optional" type="String100"/>
+         <field id="1130" name="RefApplVerID" presence="optional" type="String100"/>
+         <field id="1406" name="RefApplExtID" presence="optional" type="int32"/>
+         <field id="1131" name="RefCstmApplVerID" presence="optional" type="String100"/>
+         <field id="373" name="SessionRejectReason" presence="optional" type="SessionRejectReason"/>
+         <field id="58" name="Text" presence="optional" type="String100"/>
+         <field id="354" name="EncodedTextLen" presence="optional" type="int32"/>
+         <field id="355" name="EncodedText" presence="optional" type="String100"/>
+      </sbe:message>
+      <sbe:message id="5" name="Logout">
+         <field id="20007" name="FixHeader" type="fixHeader"/>
+         <field id="58" name="Text" presence="optional" type="String100"/>
+         <field id="354" name="EncodedTextLen" presence="optional" type="int32"/>
+         <field id="355" name="EncodedText" presence="optional" type="String100"/>
+         <field id="347" name="MessageEncoding" presence="optional" type="String100"/>
+      </sbe:message>
+      <sbe:message id="7" name="Logon">
+         <field id="20007" name="FixHeader" type="fixHeader"/>
+         <field id="98" name="EncryptMethod" presence="required" type="EncryptMethod"/>
+         <field id="108" name="HeartBtInt" presence="required" type="int32"/>
+         <field id="1137" name="DefaultApplVerID" presence="required" type="String100"/>
+         <field id="1407" name="DefaultApplExtID" presence="optional" type="DefaultApplExtID"/>
+         <field id="141" name="ResetSeqNumFlag" presence="optional" type="ResetSeqNumFlag"/>
+         <field id="1600" name="FIXEngineName" presence="optional" type="String100"/>
+         <field id="1601" name="FIXEngineVersion" presence="optional" type="String100"/>
+         <field id="1602" name="FIXEngineVendor" presence="optional" type="String100"/>
+         <field id="1603" name="ApplicationSystemName" presence="optional" type="String100"/>
+         <field id="1604" name="ApplicationSystemVersion" presence="optional" type="String100"/>
+         <field id="1605" name="ApplicationSystemVendor" presence="optional" type="String100"/>
+      </sbe:message>
+      <sbe:message id="50" name="QuoteRequestExpiration">
+         <field id="131" name="QuoteReqID" presence="required" type="idString"/>
+      </sbe:message>
+      <sbe:message id="51" name="QuoteExpiration">
+         <field id="117" name="QuoteID" presence="required" type="idString"/>
+         <field id="131" name="QuoteReqID" presence="required" type="idString"/>
+      </sbe:message>
+      <sbe:message id="52" name="QuoteRequestTrigger">
+         <field id="131" name="QuoteReqID" presence="required" type="idString"/>
+         <field id="20008" name="TargetUserID" presence="required" type="uint64"/>
+         <field id="20010" name="ExchangepathInstrumentID" presence="required" type="uint64"/>
+         <field id="126" name="ExpireTime" presence="required" type="UTCTimestamp"/>
+         <field id="55" name="Symbol" presence="required" type="String100"/>
+         <field id="48" name="SecurityID" presence="required" type="String100"/>
+         <field id="22" name="SecurityIDSource" presence="required" type="String100"/>
+         <field id="460" name="Product" presence="required" type="Product"/>
+         <field id="167" name="SecurityType" presence="required" type="String100"/>
+         <field id="541" name="MaturityDate" presence="required" type="LocalMktDate"/>
+         <field id="470" name="CountryOfIssue" presence="required" type="String100"/>
+         <field id="223" name="CouponRate" presence="required" type="double"/>
+         <field id="228" name="Factor" presence="required" type="double"/>
+         <field id="15" name="Currency" presence="required" type="Currency"/>
+         <field id="54" name="Side" presence="required" type="Side"/>
+         <field id="38" name="OrderQty" presence="required" type="double"/>
+         <field id="854" name="QtyType" presence="required" type="QtyType"/>
+         <field id="22079" name="RefPrice" presence="required" type="double"/>
+         <group id="454" name="NoSecurityAltID">
+            <field id="455" name="SecurityAltID" presence="required" type="String100"/>
+            <field id="456" name="SecurityAltIDSource" presence="required" type="String100"/>
+         </group>
+         <group id="735" name="NoQuoteQualifiers">
+            <field id="695" name="QuoteQualifier" presence="required" type="QuoteQualifier"/>
+         </group>
+         <group id="453" name="NoPartyIDs">
+            <field id="448" name="PartyID" presence="required" type="String100"/>
+            <field id="447" name="PartyIDSource" presence="required" type="PartyIDSource"/>
+            <field id="452" name="PartyRole" presence="required" type="PartyRole"/>
+            <group id="802" name="NoPartySubIDs">
+               <field id="523" name="PartySubID" presence="required" type="String100"/>
+               <field id="803" name="PartySubIDType" presence="required" type="PartySubIDType"/>
+            </group>
+            <group id="22086" name="NoPartyAltIDs">
+               <field id="22087" name="PartyAltID" presence="required" type="String100"/>
+               <field id="22088" name="PartyAltIDSource" presence="required" type="PartyAltIDSource"/>
+               <group id="22089" name="NoPartyAltSubIDs">
+                  <field id="22090" name="PartyAltSubID" presence="required" type="String100"/>
+                  <field id="22091" name="PartyAltSubIDType" presence="required" type="PartyAltSubIDType"/>
+               </group>
+            </group>
+         </group>
+      </sbe:message>
+      <sbe:message id="53" name="QuoteMatchRequest">
+         <field id="131" name="QuoteReqID" presence="required" type="idString"/>
+         <field id="117" name="QuoteID" presence="required" type="idString"/>
+         <field id="62" name="ValidUntilTime" presence="required" type="UTCTimestamp"/>
+      </sbe:message>
+      <sbe:message id="70" name="RepeatingEvent"/>
+      <sbe:message id="81" name="Instrument">
+         <field id="20009" name="ExchangepathID" presence="required" type="uint64"/>
+         <field id="55" name="Symbol" presence="required" type="String100"/>
+         <field id="48" name="SecurityID" presence="required" type="String100"/>
+         <field id="22" name="SecurityIDSource" presence="required" type="String100"/>
+         <field id="460" name="Product" presence="required" type="Product"/>
+         <field id="167" name="SecurityType" presence="required" type="String100"/>
+         <field id="541" name="MaturityDate" presence="required" type="LocalMktDate"/>
+         <field id="470" name="CountryOfIssue" presence="required" type="String100"/>
+         <field id="223" name="CouponRate" presence="required" type="double"/>
+         <field id="15" name="Currency" presence="required" type="Currency"/>
+      </sbe:message>
+   </messages>
+</sbe:messageSchema>
