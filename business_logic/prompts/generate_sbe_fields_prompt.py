@@ -13,7 +13,7 @@ Only applicable if the field corresponds to a FIX protocol tag number, either st
 Assign the appropriate tag number to this attribute. 
 If no FIX tag number is applicable, this attribute must be -1.
 4. data_type:
-Select a suitable data type from the list provided:
+Select a suitable data type exclusively from the list provided:
 - char
 - int8
 - uint8
@@ -26,6 +26,7 @@ Select a suitable data type from the list provided:
 - Field Name in camelCase + "_enum" (For fields with a limited number of options where only one value can be selected)
 - Field Name in camelCase + "_set" (For fields with a limited number of options where multiple values can be selected)
 - null (if the data type is not defined)
+Choose ONLY from the specified data types.
 5. presence: 
 Indicate whether the field is mandatory or optional. 
 The "mandatory" designation means the field must always be present, while "optional" allows for the field to be omitted under certain conditions. 

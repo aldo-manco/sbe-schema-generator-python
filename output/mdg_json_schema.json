@@ -4,7 +4,7 @@
         "namespace_enx": "enx",
         "namespace_str": "http://exslt.org/strings",
         "namespace_ext": "http://exslt.org/common",
-        "package": "mdg_pack",
+        "package": "pack",
         "schema_id": "25",
         "version": "306",
         "semantic_version": "4.6.0",
@@ -12,42 +12,159 @@
         "byte_order": "littleEndian",
         "array_number_data_types": [
             {
-                "name_type": "uint8_t",
-                "data_type": "uint8",
-                "presence": "optional"
-            },
-            {
                 "name_type": "uint64_t",
                 "data_type": "uint64",
                 "presence": "optional"
             },
             {
-                "name_type": "uint32_t",
-                "data_type": "uint32",
+                "name_type": "uint8_t",
+                "data_type": "uint8",
                 "presence": "optional"
             },
             {
                 "name_type": "uint16_t",
                 "data_type": "uint16",
                 "presence": "optional"
+            },
+            {
+                "name_type": "uint32_t",
+                "data_type": "uint32",
+                "presence": "optional"
             }
         ],
         "array_string_data_types": [
+            {
+                "name_type": "char60",
+                "data_type": "char",
+                "presence": "mandatory",
+                "length": 60
+            },
+            {
+                "name_type": "char5_optional",
+                "data_type": "char",
+                "presence": "optional",
+                "length": 5
+            },
+            {
+                "name_type": "char4",
+                "data_type": "char",
+                "presence": "mandatory",
+                "length": 4
+            },
+            {
+                "name_type": "char3",
+                "data_type": "char",
+                "presence": "mandatory",
+                "length": 3
+            },
+            {
+                "name_type": "char4_optional",
+                "data_type": "char",
+                "presence": "optional",
+                "length": 4
+            },
             {
                 "name_type": "char12_optional",
                 "data_type": "char",
                 "presence": "optional",
                 "length": 12
+            },
+            {
+                "name_type": "char1_optional",
+                "data_type": "char",
+                "presence": "optional",
+                "length": 1
             }
         ],
         "array_enum_data_types": [
             {
-                "data_type": "MMProtections_enum",
+                "data_type": "InstrumentUnitExpression_enum",
                 "possible_values": {
-                    "0": "Disabled",
-                    "1": "Enabled"
+                    "1": "Units",
+                    "2": "Percentage of Nominal Excluding Accrued Interest (Clean)",
+                    "3": "Basis Points",
+                    "5": "Percentage of Nominal Including Accrued Interest (Dirty)",
+                    "7": "Yield",
+                    "8": "Kilograms",
+                    "9": "Ounces"
                 },
                 "encoding_type": "uint8"
+            },
+            {
+                "data_type": "OptiqSegment_enum",
+                "possible_values": {
+                    "1": "Equities",
+                    "2": "Funds",
+                    "3": "Fixed Income",
+                    "4": "Warrants and Certificates",
+                    "5": "Bourse de Luxembourg",
+                    "6": "Financial Options",
+                    "7": "Financial Futures",
+                    "8": "Commodity Derivatives",
+                    "9": "Indices",
+                    "10": "Trade Reporting and Publication",
+                    "11": "Index Derivatives",
+                    "12": "Equity Derivatives",
+                    "14": "Block",
+                    "15": "Forex",
+                    "16": "ISE Bonds and Funds Feed"
+                },
+                "encoding_type": "uint8"
+            },
+            {
+                "data_type": "ExchangeCode_enum",
+                "possible_values": {
+                    "A": "Amsterdam Equity Derivatives",
+                    "B": "Brussels Equity Derivatives",
+                    "C": "Paris Equity Underlyings",
+                    "D": "Brussels Cash Underlyings",
+                    "F": "Brussels Index Derivatives",
+                    "G": "Amsterdam Cash Underlyings",
+                    "H": "Lisbon Cash Underlyings",
+                    "J": "Paris Index Derivatives",
+                    "K": "Amsterdam Index Derivatives",
+                    "L": "Oslo Cash Underlying",
+                    "M": "Lisbon Index Derivatives",
+                    "N": "Oslo Index Derivatives",
+                    "O": "Oslo Equity Derivatives",
+                    "P": "Paris Equity Derivatives",
+                    "R": "Amsterdam Commodities Derivatives",
+                    "S": "Lisbon Equity Derivatives",
+                    "Y": "Paris Commodities Derivatives",
+                    "Z": "Amsterdam Currency Derivatives"
+                },
+                "encoding_type": "char"
+            },
+            {
+                "data_type": "ExerciseStyle_enum",
+                "possible_values": {
+                    "0": "European",
+                    "1": "American",
+                    "2": "Asian",
+                    "3": "Bermudan",
+                    "4": "Other"
+                },
+                "encoding_type": "uint8"
+            },
+            {
+                "data_type": "ContractType_enum",
+                "possible_values": {
+                    "F": "Future",
+                    "O": "Option",
+                    "U": "Underlying"
+                },
+                "encoding_type": "char"
+            },
+            {
+                "data_type": "UnderlyingType_enum",
+                "possible_values": {
+                    "C": "Commodity",
+                    "F": "Future",
+                    "I": "Index",
+                    "S": "Stock",
+                    "X": "Exchange Rate"
+                },
+                "encoding_type": "char"
             },
             {
                 "data_type": "ContractTradingType_enum",
@@ -60,14 +177,36 @@
                 "encoding_type": "uint8"
             },
             {
-                "data_type": "InstrumentUnitExpression_enum",
-                "possible_values": {},
-                "encoding_type": "null"
-            },
-            {
                 "data_type": "UnderlyingSubtype_enum",
-                "possible_values": {},
-                "encoding_type": "null"
+                "possible_values": {
+                    "0": "Basket",
+                    "1": "Dividend",
+                    "2": "ETF",
+                    "3": "Share",
+                    "4": "Dividend Index",
+                    "5": "Equity Index",
+                    "6": "TRF Index",
+                    "7": "Volatility Index",
+                    "8": "Future on Commodities",
+                    "9": "FX Cross Rates (FXCR)",
+                    "10": "FX Emerging Markets (FXEM)",
+                    "11": "FX Majors (FXMJ)",
+                    "12": "Agricultural (AGRI)",
+                    "13": "Environmental (ENVR)",
+                    "14": "Freight (FRGT)",
+                    "15": "Fertilizer (FRTL)",
+                    "16": "Industrial products (INDP)",
+                    "17": "Inflation (INFL)",
+                    "18": "Multi Commodity Exotic (MCEX)",
+                    "19": "Metals (METL)",
+                    "20": "Energy (NRGY)",
+                    "21": "Official economic statistics (OEST)",
+                    "22": "Other C10 (OTHC)",
+                    "23": "Other (OTHR)",
+                    "24": "Paper (PAPR)",
+                    "25": "Polypropylene (POLY)"
+                },
+                "encoding_type": "uint8"
             },
             {
                 "data_type": "TradingPolicy_enum",
@@ -85,9 +224,85 @@
                     "2": "Event Driven Implied Matching"
                 },
                 "encoding_type": "uint8"
+            },
+            {
+                "data_type": "ReferencePriceOriginInCall_enum",
+                "possible_values": {
+                    "4": "Authorized value 4",
+                    "5": "Authorized value 5",
+                    "6": "Authorized value 6",
+                    "7": "Authorized value 7"
+                },
+                "encoding_type": "uint8"
+            },
+            {
+                "data_type": "ReferencePriceOriginInContinuous_enum",
+                "possible_values": {
+                    "4": "Authorized value 4",
+                    "5": "Authorized value 5",
+                    "6": "Authorized value 6",
+                    "7": "Authorized value 7"
+                },
+                "encoding_type": "uint8"
+            },
+            {
+                "data_type": "ReferencePriceOriginInTradingInterruption_enum",
+                "possible_values": {
+                    "4": "Authorized value 4",
+                    "5": "Authorized value 5",
+                    "6": "Authorized value 6",
+                    "7": "Authorized value 7"
+                },
+                "encoding_type": "uint8"
+            },
+            {
+                "data_type": "PricingAlgorithm_enum",
+                "possible_values": {
+                    "0": "Standard",
+                    "1": "Total Return Future",
+                    "2": "Market On Close"
+                },
+                "encoding_type": "uint8"
+            },
+            {
+                "data_type": "EMM_enum",
+                "possible_values": {
+                    "Authorized values": "See field description"
+                },
+                "encoding_type": "uint8"
+            },
+            {
+                "data_type": "DynamicCollarLogic_enum",
+                "possible_values": {
+                    "0": "Not Active",
+                    "2": "No Halt with Reject (not in use)",
+                    "3": "Halt with Acceptation"
+                },
+                "encoding_type": "uint8"
             }
         ],
-        "array_set_data_types": [],
+        "array_set_data_types": [
+            {
+                "data_type": "OrderTypeRules_set",
+                "possible_values": {
+                    "0": "Market orders are available for this instrument (0: No ; 1: Yes)",
+                    "1": "Limit orders are available for this instrument (0: No ; 1: Yes)",
+                    "2": "Stop / Stop Loss orders are available for this instrument (0: No ; 1: Yes)",
+                    "3": "Stop Limit orders are available for this instrument (0: No ; 1: Yes)",
+                    "4": "Market on Open (MOO) orders are available for this instrument (0: No ; 1: Yes)",
+                    "5": "Trade at Settlement orders are available for this instrument (0: No ; 1: Yes)"
+                },
+                "encoding_type": "uint16"
+            },
+            {
+                "data_type": "MMProtections_set",
+                "possible_values": {
+                    "0": "Delta",
+                    "1": "Volume"
+                },
+                "encoding_type": "uint8"
+            }
+        ],
         "array_document_messages": [
             {
                 "message_name": "ContractStandingData",
@@ -95,26 +310,331 @@
                 "array_sbe_fields": [
                     {
                         "ai_engine_id": 1,
-                        "field_name": "StrikePriceDecimals",
+                        "field_name": "LotSize",
+                        "field_tag_number": -1,
+                        "data_type": "uint64",
+                        "presence": "optional",
+                        "custom_type": "uint64_t"
+                    },
+                    {
+                        "ai_engine_id": 2,
+                        "field_name": "InstrumentUnitExpression",
+                        "field_tag_number": -1,
+                        "data_type": "InstrumentUnitExpression_enum",
+                        "presence": "optional",
+                        "possible_values": {
+                            "1": "Units",
+                            "2": "Percentage of Nominal Excluding Accrued Interest (Clean)",
+                            "3": "Basis Points",
+                            "5": "Percentage of Nominal Including Accrued Interest (Dirty)",
+                            "7": "Yield",
+                            "8": "Kilograms",
+                            "9": "Ounces"
+                        },
+                        "encoding_type": "uint8"
+                    },
+                    {
+                        "ai_engine_id": 3,
+                        "field_name": "Anonymous",
                         "field_tag_number": -1,
                         "data_type": "uint8",
                         "presence": "optional",
                         "custom_type": "uint8_t"
                     },
                     {
-                        "ai_engine_id": 2,
-                        "field_name": "MMProtections",
+                        "ai_engine_id": 4,
+                        "field_name": "MarketDataSequenceNumber",
                         "field_tag_number": -1,
-                        "data_type": "MMProtections_enum",
+                        "data_type": "uint64",
+                        "presence": "mandatory"
+                    },
+                    {
+                        "ai_engine_id": 5,
+                        "field_name": "RebroadcastIndicator",
+                        "field_tag_number": -1,
+                        "data_type": "uint8",
+                        "presence": "mandatory"
+                    },
+                    {
+                        "ai_engine_id": 6,
+                        "field_name": "SymbolIndex",
+                        "field_tag_number": -1,
+                        "data_type": "uint32",
+                        "presence": "mandatory"
+                    },
+                    {
+                        "ai_engine_id": 7,
+                        "field_name": "OptiqSegment",
+                        "field_tag_number": -1,
+                        "data_type": "OptiqSegment_enum",
                         "presence": "mandatory",
                         "possible_values": {
-                            "0": "Disabled",
-                            "1": "Enabled"
+                            "1": "Equities",
+                            "2": "Funds",
+                            "3": "Fixed Income",
+                            "4": "Warrants and Certificates",
+                            "5": "Bourse de Luxembourg",
+                            "6": "Financial Options",
+                            "7": "Financial Futures",
+                            "8": "Commodity Derivatives",
+                            "9": "Indices",
+                            "10": "Trade Reporting and Publication",
+                            "11": "Index Derivatives",
+                            "12": "Equity Derivatives",
+                            "14": "Block",
+                            "15": "Forex",
+                            "16": "ISE Bonds and Funds Feed"
                         },
                         "encoding_type": "uint8"
                     },
                     {
-                        "ai_engine_id": 3,
+                        "ai_engine_id": 8,
+                        "field_name": "PartitionID",
+                        "field_tag_number": -1,
+                        "data_type": "uint16",
+                        "presence": "mandatory"
+                    },
+                    {
+                        "ai_engine_id": 9,
+                        "field_name": "ContractEventDate",
+                        "field_tag_number": -1,
+                        "data_type": "uint16",
+                        "presence": "optional",
+                        "custom_type": "uint16_t"
+                    },
+                    {
+                        "ai_engine_id": 10,
+                        "field_name": "ExchangeCode",
+                        "field_tag_number": -1,
+                        "data_type": "ExchangeCode_enum",
+                        "presence": "mandatory",
+                        "possible_values": {
+                            "A": "Amsterdam Equity Derivatives",
+                            "B": "Brussels Equity Derivatives",
+                            "C": "Paris Equity Underlyings",
+                            "D": "Brussels Cash Underlyings",
+                            "F": "Brussels Index Derivatives",
+                            "G": "Amsterdam Cash Underlyings",
+                            "H": "Lisbon Cash Underlyings",
+                            "J": "Paris Index Derivatives",
+                            "K": "Amsterdam Index Derivatives",
+                            "L": "Oslo Cash Underlying",
+                            "M": "Lisbon Index Derivatives",
+                            "N": "Oslo Index Derivatives",
+                            "O": "Oslo Equity Derivatives",
+                            "P": "Paris Equity Derivatives",
+                            "R": "Amsterdam Commodities Derivatives",
+                            "S": "Lisbon Equity Derivatives",
+                            "Y": "Paris Commodities Derivatives",
+                            "Z": "Amsterdam Currency Derivatives"
+                        },
+                        "encoding_type": "char",
+                        "length": 1
+                    },
+                    {
+                        "ai_engine_id": 11,
+                        "field_name": "ExerciseStyle",
+                        "field_tag_number": -1,
+                        "data_type": "ExerciseStyle_enum",
+                        "presence": "optional",
+                        "possible_values": {
+                            "0": "European",
+                            "1": "American",
+                            "2": "Asian",
+                            "3": "Bermudan",
+                            "4": "Other"
+                        },
+                        "encoding_type": "uint8"
+                    },
+                    {
+                        "ai_engine_id": 12,
+                        "field_name": "ContractName",
+                        "field_tag_number": -1,
+                        "data_type": "char",
+                        "presence": "mandatory",
+                        "length": 60,
+                        "custom_type": "char60"
+                    },
+                    {
+                        "ai_engine_id": 13,
+                        "field_name": "ContractType",
+                        "field_tag_number": -1,
+                        "data_type": "ContractType_enum",
+                        "presence": "optional",
+                        "possible_values": {
+                            "F": "Future",
+                            "O": "Option",
+                            "U": "Underlying"
+                        },
+                        "encoding_type": "char",
+                        "length": 1
+                    },
+                    {
+                        "ai_engine_id": 14,
+                        "field_name": "UnderlyingType",
+                        "field_tag_number": -1,
+                        "data_type": "UnderlyingType_enum",
+                        "presence": "mandatory",
+                        "possible_values": {
+                            "C": "Commodity",
+                            "F": "Future",
+                            "I": "Index",
+                            "S": "Stock",
+                            "X": "Exchange Rate"
+                        },
+                        "encoding_type": "char",
+                        "length": 1
+                    },
+                    {
+                        "ai_engine_id": 15,
+                        "field_name": "PriceIndexLevelDecimals",
+                        "field_tag_number": -1,
+                        "data_type": "uint8",
+                        "presence": "optional",
+                        "custom_type": "uint8_t"
+                    },
+                    {
+                        "ai_engine_id": 16,
+                        "field_name": "QuantityDecimals",
+                        "field_tag_number": -1,
+                        "data_type": "uint8",
+                        "presence": "optional",
+                        "custom_type": "uint8_t"
+                    },
+                    {
+                        "ai_engine_id": 17,
+                        "field_name": "AmountDecimals",
+                        "field_tag_number": -1,
+                        "data_type": "uint8",
+                        "presence": "optional",
+                        "custom_type": "uint8_t"
+                    },
+                    {
+                        "ai_engine_id": 18,
+                        "field_name": "RatioMultiplierDecimals",
+                        "field_tag_number": -1,
+                        "data_type": "uint8",
+                        "presence": "optional",
+                        "custom_type": "uint8_t"
+                    },
+                    {
+                        "ai_engine_id": 19,
+                        "field_name": "MainDepositary",
+                        "field_tag_number": -1,
+                        "data_type": "char",
+                        "presence": "optional",
+                        "length": 5,
+                        "custom_type": "char5_optional"
+                    },
+                    {
+                        "ai_engine_id": 20,
+                        "field_name": "MIC",
+                        "field_tag_number": -1,
+                        "data_type": "char",
+                        "presence": "mandatory",
+                        "length": 4,
+                        "custom_type": "char4"
+                    },
+                    {
+                        "ai_engine_id": 21,
+                        "field_name": "CountryOfExchange",
+                        "field_tag_number": -1,
+                        "data_type": "char",
+                        "presence": "mandatory",
+                        "length": 3,
+                        "custom_type": "char3"
+                    },
+                    {
+                        "ai_engine_id": 22,
+                        "field_name": "ProductCode",
+                        "field_tag_number": -1,
+                        "data_type": "char",
+                        "presence": "mandatory",
+                        "length": 4,
+                        "custom_type": "char4"
+                    },
+                    {
+                        "ai_engine_id": 23,
+                        "field_name": "UnderlyingMIC",
+                        "field_tag_number": -1,
+                        "data_type": "char",
+                        "presence": "optional",
+                        "length": 4,
+                        "custom_type": "char4_optional"
+                    },
+                    {
+                        "ai_engine_id": 24,
+                        "field_name": "UnderlyingISINCode",
+                        "field_tag_number": -1,
+                        "data_type": "char",
+                        "presence": "optional",
+                        "length": 12,
+                        "custom_type": "char12_optional"
+                    },
+                    {
+                        "ai_engine_id": 25,
+                        "field_name": "UnderlyingExpiry",
+                        "field_tag_number": -1,
+                        "data_type": "uint32",
+                        "presence": "optional",
+                        "custom_type": "uint32_t"
+                    },
+                    {
+                        "ai_engine_id": 26,
+                        "field_name": "OrderTypeRules",
+                        "field_tag_number": -1,
+                        "data_type": "OrderTypeRules_set",
+                        "presence": "mandatory",
+                        "possible_values": {
+                            "0": "Market orders are available for this instrument (0: No ; 1: Yes)",
+                            "1": "Limit orders are available for this instrument (0: No ; 1: Yes)",
+                            "2": "Stop / Stop Loss orders are available for this instrument (0: No ; 1: Yes)",
+                            "3": "Stop Limit orders are available for this instrument (0: No ; 1: Yes)",
+                            "4": "Market on Open (MOO) orders are available for this instrument (0: No ; 1: Yes)",
+                            "5": "Trade at Settlement orders are available for this instrument (0: No ; 1: Yes)"
+                        },
+                        "encoding_type": "uint16"
+                    },
+                    {
+                        "ai_engine_id": 27,
+                        "field_name": "SettlementMethod",
+                        "field_tag_number": -1,
+                        "data_type": "char",
+                        "presence": "optional",
+                        "length": 1,
+                        "custom_type": "char1_optional"
+                    },
+                    {
+                        "ai_engine_id": 28,
+                        "field_name": "TradingCurrency",
+                        "field_tag_number": -1,
+                        "data_type": "char",
+                        "presence": "mandatory",
+                        "length": 3,
+                        "custom_type": "char3"
+                    },
+                    {
+                        "ai_engine_id": 29,
+                        "field_name": "StrikePriceDecimalsRatio",
+                        "field_tag_number": -1,
+                        "data_type": "uint8",
+                        "presence": "optional",
+                        "custom_type": "uint8_t"
+                    },
+                    {
+                        "ai_engine_id": 30,
+                        "field_name": "MMProtections",
+                        "field_tag_number": -1,
+                        "data_type": "MMProtections_set",
+                        "presence": "mandatory",
+                        "possible_values": {
+                            "0": "Delta",
+                            "1": "Volume"
+                        },
+                        "encoding_type": "uint8"
+                    },
+                    {
+                        "ai_engine_id": 31,
                         "field_name": "ContractTradingType",
                         "field_tag_number": -1,
                         "data_type": "ContractTradingType_enum",
@@ -128,25 +648,60 @@
                         "encoding_type": "uint8"
                     },
                     {
-                        "ai_engine_id": 4,
+                        "ai_engine_id": 32,
                         "field_name": "InstrumentUnitExpression",
                         "field_tag_number": -1,
                         "data_type": "InstrumentUnitExpression_enum",
                         "presence": "optional",
-                        "possible_values": {},
-                        "encoding_type": "null"
+                        "possible_values": {
+                            "1": "Units",
+                            "2": "Percentage of Nominal Excluding Accrued Interest (Clean)",
+                            "3": "Basis Points",
+                            "5": "Percentage of Nominal Including Accrued Interest (Dirty)",
+                            "7": "Yield",
+                            "8": "Kilograms",
+                            "9": "Ounces"
+                        },
+                        "encoding_type": "uint8"
                     },
                     {
-                        "ai_engine_id": 5,
+                        "ai_engine_id": 33,
                         "field_name": "UnderlyingSubtype",
                         "field_tag_number": -1,
                         "data_type": "UnderlyingSubtype_enum",
                         "presence": "optional",
-                        "possible_values": {},
-                        "encoding_type": "null"
+                        "possible_values": {
+                            "0": "Basket",
+                            "1": "Dividend",
+                            "2": "ETF",
+                            "3": "Share",
+                            "4": "Dividend Index",
+                            "5": "Equity Index",
+                            "6": "TRF Index",
+                            "7": "Volatility Index",
+                            "8": "Future on Commodities",
+                            "9": "FX Cross Rates (FXCR)",
+                            "10": "FX Emerging Markets (FXEM)",
+                            "11": "FX Majors (FXMJ)",
+                            "12": "Agricultural (AGRI)",
+                            "13": "Environmental (ENVR)",
+                            "14": "Freight (FRGT)",
+                            "15": "Fertilizer (FRTL)",
+                            "16": "Industrial products (INDP)",
+                            "17": "Inflation (INFL)",
+                            "18": "Multi Commodity Exotic (MCEX)",
+                            "19": "Metals (METL)",
+                            "20": "Energy (NRGY)",
+                            "21": "Official economic statistics (OEST)",
+                            "22": "Other C10 (OTHC)",
+                            "23": "Other (OTHR)",
+                            "24": "Paper (PAPR)",
+                            "25": "Polypropylene (POLY)"
+                        },
+                        "encoding_type": "uint8"
                     },
                     {
-                        "ai_engine_id": 6,
+                        "ai_engine_id": 34,
                         "field_name": "MotherStockISIN",
                         "field_tag_number": -1,
                         "data_type": "char",
@@ -155,32 +710,31 @@
                         "custom_type": "char12_optional"
                     },
                     {
-                        "ai_engine_id": 7,
+                        "ai_engine_id": 35,
                         "field_name": "SettlementTickSize",
                         "field_tag_number": -1,
-                        "data_type": "Price",
-                        "presence": "optional"
+                        "data_type": "uint64",
+                        "presence": "optional",
+                        "custom_type": "uint64_t"
                     },
                     {
-                        "ai_engine_id": 8,
+                        "ai_engine_id": 36,
                         "field_name": "EDSPTickSize",
                         "field_tag_number": -1,
                         "data_type": "uint64",
                         "presence": "optional",
-                        "length": 8,
                         "custom_type": "uint64_t"
                     },
                     {
-                        "ai_engine_id": 9,
+                        "ai_engine_id": 37,
                         "field_name": "UnderlyingSymbolIndex",
                         "field_tag_number": -1,
                         "data_type": "uint32",
                         "presence": "optional",
-                        "length": 4,
                         "custom_type": "uint32_t"
                     },
                     {
-                        "ai_engine_id": 10,
+                        "ai_engine_id": 38,
                         "field_name": "TradingPolicy",
                         "field_tag_number": -1,
                         "data_type": "TradingPolicy_enum",
@@ -192,16 +746,15 @@
                         "encoding_type": "uint8"
                     },
                     {
-                        "ai_engine_id": 11,
+                        "ai_engine_id": 39,
                         "field_name": "ReferenceSpreadTableID",
                         "field_tag_number": -1,
                         "data_type": "uint16",
                         "presence": "optional",
-                        "length": 2,
                         "custom_type": "uint16_t"
                     },
                     {
-                        "ai_engine_id": 12,
+                        "ai_engine_id": 40,
                         "field_name": "DerivativesMarketModel",
                         "field_tag_number": -1,
                         "data_type": "DerivativesMarketModel_enum",
@@ -214,61 +767,162 @@
                         "encoding_type": "uint8"
                     },
                     {
-                        "ai_engine_id": 13,
+                        "ai_engine_id": 41,
                         "field_name": "TradingUnit",
                         "field_tag_number": -1,
                         "data_type": "uint64",
                         "presence": "optional",
-                        "length": 8
+                        "custom_type": "uint64_t"
                     },
                     {
-                        "ai_engine_id": 7,
-                        "field_name": "SettlementTickSize",
+                        "ai_engine_id": 42,
+                        "field_name": "ReferencePriceOriginInCall",
                         "field_tag_number": -1,
-                        "data_type": "uint64",
-                        "presence": "optional"
-                    },
-                    {
-                        "ai_engine_id": 8,
-                        "field_name": "EDSPTickSize",
-                        "field_tag_number": -1,
-                        "data_type": "Price",
+                        "data_type": "ReferencePriceOriginInCall_enum",
                         "presence": "optional",
-                        "length": 8
+                        "possible_values": {
+                            "4": "Authorized value 4",
+                            "5": "Authorized value 5",
+                            "6": "Authorized value 6",
+                            "7": "Authorized value 7"
+                        },
+                        "encoding_type": "uint8"
                     },
                     {
-                        "ai_engine_id": 9,
-                        "field_name": "UnderlyingSymbolIndex",
+                        "ai_engine_id": 43,
+                        "field_name": "ReferencePriceOriginInContinuous",
                         "field_tag_number": -1,
-                        "data_type": "uint32",
-                        "presence": "optional"
-                    },
-                    {
-                        "ai_engine_id": 11,
-                        "field_name": "ReferenceSpreadTableID",
-                        "field_tag_number": -1,
-                        "data_type": "uint16",
-                        "presence": "optional"
-                    },
-                    {
-                        "ai_engine_id": 13,
-                        "field_name": "TradingUnit",
-                        "field_tag_number": -1,
-                        "data_type": "Quantity",
+                        "data_type": "ReferencePriceOriginInContinuous_enum",
                         "presence": "optional",
-                        "length": 8
+                        "possible_values": {
+                            "4": "Authorized value 4",
+                            "5": "Authorized value 5",
+                            "6": "Authorized value 6",
+                            "7": "Authorized value 7"
+                        },
+                        "encoding_type": "uint8"
                     },
                     {
-                        "ai_engine_id": 1,
-                        "field_name": "StrikePriceDecimals",
+                        "ai_engine_id": 44,
+                        "field_name": "ReferencePriceOriginInTradingInterruption",
+                        "field_tag_number": -1,
+                        "data_type": "ReferencePriceOriginInTradingInterruption_enum",
+                        "presence": "optional",
+                        "possible_values": {
+                            "4": "Authorized value 4",
+                            "5": "Authorized value 5",
+                            "6": "Authorized value 6",
+                            "7": "Authorized value 7"
+                        },
+                        "encoding_type": "uint8"
+                    },
+                    {
+                        "ai_engine_id": 45,
+                        "field_name": "CollarExpansionFactor",
                         "field_tag_number": -1,
                         "data_type": "uint8",
-                        "presence": "optional"
+                        "presence": "optional",
+                        "custom_type": "uint8_t"
+                    },
+                    {
+                        "ai_engine_id": 46,
+                        "field_name": "MIFID_IILiquidFlag",
+                        "field_tag_number": -1,
+                        "data_type": "uint8",
+                        "presence": "mandatory"
+                    },
+                    {
+                        "ai_engine_id": 47,
+                        "field_name": "PricingAlgorithm",
+                        "field_tag_number": -1,
+                        "data_type": "PricingAlgorithm_enum",
+                        "presence": "mandatory",
+                        "possible_values": {
+                            "0": "Standard",
+                            "1": "Total Return Future",
+                            "2": "Market On Close"
+                        },
+                        "encoding_type": "uint8"
                     }
                 ],
-                "array_sbe_repeating_groups": [],
-                "starting_page": 75,
-                "ending_page": 75
+                "array_sbe_repeating_groups": [
+                    {
+                        "group_name": "ContractEMMPropertiesGroup",
+                        "items": [
+                            {
+                                "ai_engine_id": 50,
+                                "field_name": "EMM",
+                                "field_tag_number": -1,
+                                "data_type": "EMM_enum",
+                                "presence": "optional",
+                                "possible_values": {
+                                    "Authorized values": "See field description"
+                                },
+                                "encoding_type": "uint8"
+                            },
+                            {
+                                "ai_engine_id": 51,
+                                "field_name": "TickSizeIndexID",
+                                "field_tag_number": -1,
+                                "data_type": "uint16",
+                                "presence": "optional",
+                                "custom_type": "uint16_t"
+                            },
+                            {
+                                "ai_engine_id": 52,
+                                "field_name": "PatternID",
+                                "field_tag_number": -1,
+                                "data_type": "uint16",
+                                "presence": "optional",
+                                "custom_type": "uint16_t"
+                            },
+                            {
+                                "ai_engine_id": 53,
+                                "field_name": "LotSize",
+                                "field_tag_number": -1,
+                                "data_type": "uint64",
+                                "presence": "optional",
+                                "custom_type": "uint64_t"
+                            },
+                            {
+                                "ai_engine_id": 54,
+                                "field_name": "StrategyAuthorized",
+                                "field_tag_number": -1,
+                                "data_type": "null",
+                                "presence": "optional"
+                            },
+                            {
+                                "ai_engine_id": 55,
+                                "field_name": "DynamicCollarLogic",
+                                "field_tag_number": -1,
+                                "data_type": "DynamicCollarLogic_enum",
+                                "presence": "optional",
+                                "possible_values": {
+                                    "0": "Not Active",
+                                    "2": "No Halt with Reject (not in use)",
+                                    "3": "Halt with Acceptation"
+                                },
+                                "encoding_type": "uint8"
+                            },
+                            {
+                                "ai_engine_id": 56,
+                                "field_name": "CollarMaxUnhaltNb",
+                                "field_tag_number": -1,
+                                "data_type": "uint8",
+                                "presence": "optional"
+                            },
+                            {
+                                "ai_engine_id": 57,
+                                "field_name": "CollarUnhaltDelay",
+                                "field_tag_number": -1,
+                                "data_type": "uint32",
+                                "presence": "optional"
+                            }
+                        ]
+                    }
+                ],
+                "starting_page": 73,
+                "ending_page": 76
             }
         ]
     }

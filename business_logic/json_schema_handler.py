@@ -347,9 +347,9 @@ class JsonSchemaHandler:
     def add_custom_data_type(
             self,
             array_custom_data_type,
-            encoding_type,
             data_type,
-            possible_values
+            possible_values,
+            encoding_type
     ):
         if self.is_custom_data_type_exists_in_json_schema(
                 array_custom_data_type,
@@ -400,6 +400,8 @@ class JsonSchemaHandler:
             "char"
         ]
 
+        logging.info(f"DICTDICTDICT: {sbe_field}")
+
         if sbe_field["data_type"].lower() in array_alphanumeric_data_types:
             self.add_alphanumeric_data_type(
                 sbe_field
@@ -414,17 +416,17 @@ class JsonSchemaHandler:
         elif sbe_field["data_type"].lower().endswith("_enum"):
             self.add_custom_data_type(
                 "array_enum_data_types",
-                sbe_field["encoding_type"],
                 sbe_field["data_type"],
-                sbe_field["possible_values"]
+                sbe_field["possible_values"],
+                sbe_field["encoding_type"]
             )
 
         elif sbe_field["data_type"].lower().endswith("_set"):
             self.add_custom_data_type(
                 "array_set_data_types",
-                sbe_field["encoding_type"],
                 sbe_field["data_type"],
-                sbe_field["possible_values"]
+                sbe_field["possible_values"],
+                sbe_field["encoding_type"]
             )
 
     def save_schema(self):
@@ -464,7 +466,7 @@ class JsonSchemaHandler:
             self.add_repeating_group_to_message(
                 message_name,
                 repeating_group["group_name"],
-                repeating_group["group_tag_number"]
+                repeating_group["group_tag_number"] if "group_tag_number" in repeating_group else -1
             )
 
             for sbe_field in repeating_group["items"]:

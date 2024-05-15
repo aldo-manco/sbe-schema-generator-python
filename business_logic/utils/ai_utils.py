@@ -270,9 +270,7 @@ def generate_unknown_attributes_from_embeddings(
 
     logging.info(f"\n\n{log_name}: {output}\n\n")
 
-    return {
-        ai_engine_id: json.loads(output)
-    }
+    return json.loads(output)
 
 
 def get_array_pdf_partitions(
@@ -479,10 +477,15 @@ def update_array_sbe_fields_with_unknown_attributes(
         log_name
     )
 
+    logging.info(f"DICTIONARY NEW ATTRIBUTES: {dictionary_new_attributes}")
+    logging.info(f"ARRAY SBE FIELDS (BEFORE): {array_sbe_fields}")
+
     extend_array_sbe_fields(
         dictionary_new_attributes,
         array_sbe_fields
     )
+
+    logging.info(f"ARRAY SBE FIELDS (AFTER): {array_sbe_fields}")
 
 
 def generate_completed_sbe_fields(
@@ -499,18 +502,32 @@ def generate_completed_sbe_fields(
 
     unknown_datatype_sbe_fields = {}
     unknown_presence_sbe_fields = {}
-    array_numeric_datatypes = ['int8', 'uint8', 'int16', 'uint16', 'int32', 'uint32', 'int64', 'uint64']
-    array_alphanumeric_datatypes = ['char']
-    array_valid_datatypes = array_numeric_datatypes + array_alphanumeric_datatypes
-    array_valid_presences = ["mandatory", "optional"]
+    array_numeric_datatypes = [
+        'int8',
+        'uint8',
+        'int16',
+        'uint16',
+        'int32',
+        'uint32',
+        'int64',
+        'uint64'
+    ]
+    array_alphanumeric_datatypes = [
+        'char'
+    ]
+    array_valid_presences = [
+        "mandatory",
+        "optional"
+    ]
 
     array_document_fields, array_sbe_fields = tuple_array_document_sbe_fields
     for document_field, sbe_field in zip(array_document_fields, array_sbe_fields):
         ai_engine_id = sbe_field['ai_engine_id']
 
         if ('data_type' not in sbe_field
-                or sbe_field['data_type'] not in array_valid_datatypes
-                or re.search(r'\b(enum|set)$', sbe_field['data_type'])
+                or not (sbe_field['data_type'].lower() not in array_alphanumeric_datatypes
+                        or sbe_field['data_type'].lower() not in array_numeric_datatypes
+                        or sbe_field['data_type'].lower().strip().endswith(('enum', 'set')))
         ):
             unknown_datatype_sbe_fields[ai_engine_id] = {}
 
@@ -545,15 +562,23 @@ def generate_completed_sbe_fields(
     for sbe_field in array_sbe_fields:
         ai_engine_id = sbe_field['ai_engine_id']
         assert 'data_type' in sbe_field, "\'data_type\' must exist"
+        logging.info(f"DICTIONARY: {sbe_field['data_type']}")
 
-        if sbe_field['data_type'] in array_numeric_datatypes:
+        if sbe_field['data_type'].lower() in array_numeric_datatypes:
+            logging.info(f"NUMERIC DATA TYPE: {sbe_field['data_type'].lower()}")
             continue
-        elif sbe_field['data_type'] in array_alphanumeric_datatypes:
+        elif sbe_field['data_type'].lower() in array_alphanumeric_datatypes:
+            logging.info(f"ALPHANUMERIC DATA TYPE: {sbe_field['data_type'].lower()}")
             if 'length' not in sbe_field:
+                logging.info(f"NO LENGTH")
                 unknown_char_attributes_sbe_fields[ai_engine_id] = {}
-        elif re.search(r'\b(enum|set)$', sbe_field['data_type']):
-            logging.info("ENUMENUMENUM")
-            if 'possible_values' not in sbe_field or not sbe_field['possible_values']:
+        elif sbe_field['data_type'].lower().strip().endswith(('enum', 'set')):
+            logging.info(f"ENUM SET DATA TYPE: {sbe_field['data_type'].lower()}")
+            if ('possible_values' not in sbe_field
+                    or 'encoding_type' not in sbe_field
+                    or not sbe_field['possible_values']
+                    or not sbe_field['encoding_type']):
+                logging.info(f"NO POSSIBLE VALUES")
                 unknown_enumerations_set_attributes_sbe_fields[ai_engine_id] = {}
 
     update_array_sbe_fields_with_unknown_attributes(
@@ -575,3 +600,7 @@ def generate_completed_sbe_fields(
         "The possible values and the encoding type of the following enumeration/set field -> ",
         "ENUMERATIONS SET ATTRIBUTES"
     )
+
+    logging.info(f"ARRAY SBE FIELDS END GENERATE COMPLETED SBE FIELDS FUNCTION: {array_sbe_fields}")
+
+    return array_sbe_fields

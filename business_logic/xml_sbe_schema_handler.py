@@ -8,33 +8,64 @@ from utils import utils
 
 
 class XmlSbeSchemaHandler:
-    def __init__(self, schema_name, suffix_name="_sbe_xml_schema"):
+    def __init__(
+            self,
+            schema_name,
+            suffix_name="_sbe_xml_schema"
+    ):
         self.directory_name = "output"
-        utils.create_directory_if_not_exists(self.directory_name)
+        utils.create_directory_if_not_exists(
+            self.directory_name
+        )
         self.file_name = f"{schema_name.lower()}{suffix_name.lower()}.xml"
-        self.file_path = Path(self.directory_name, self.file_name)
+        self.file_path = Path(
+            self.directory_name,
+            self.file_name
+        )
         self.namespaces = {}
-        self.json_handler = JsonSchemaHandler(schema_name)
-        self.generate_sbe_xml_header(schema_name)
-
+        self.json_handler = JsonSchemaHandler(
+            schema_name
+        )
+        self.generate_sbe_xml_header(
+            schema_name
+        )
 
     def save_xml_document(self):
-        tree = etree.ElementTree(self.sbe_message_schema_tag)
-        tree.write(str(self.file_path), pretty_print=True, xml_declaration=True, encoding="UTF-8")
+        tree = etree.ElementTree(
+            self.sbe_message_schema_tag
+        )
+        tree.write(
+            str(self.file_path),
+            pretty_print=True,
+            xml_declaration=True,
+            encoding="UTF-8"
+        )
 
-
-    def append_to_sbe_types_section(self, new_element_xml):
-        self.types_tag.append(new_element_xml)
+    def append_to_sbe_types_section(
+            self,
+            new_element_xml
+    ):
+        self.types_tag.append(
+            new_element_xml
+        )
         self.save_xml_document()
 
-
-    def append_to_sbe_schema_root(self, new_element_xml):
-        self.sbe_message_schema_tag.append(new_element_xml)
+    def append_to_sbe_schema_root(
+            self,
+            new_element_xml
+    ):
+        self.sbe_message_schema_tag.append(
+            new_element_xml
+        )
         self.save_xml_document()
 
-
-    def generate_sbe_xml_header(self, json_schema_name):
-        json_handler = JsonSchemaHandler(json_schema_name)
+    def generate_sbe_xml_header(
+            self,
+            json_schema_name
+    ):
+        json_handler = JsonSchemaHandler(
+            json_schema_name
+        )
 
         if not self.namespaces:
             self.namespaces = {
@@ -44,22 +75,30 @@ class XmlSbeSchemaHandler:
                 'ext': json_handler.get_json_schema_field("namespace_ext")
             }
 
-        messageSchema = etree.Element("{%s}messageSchema" % self.namespaces['sbe'], nsmap=self.namespaces, attrib={
-            'package': json_handler.get_json_schema_field("package"),
-            'id': json_handler.get_json_schema_field("schema_id"),
-            'version': json_handler.get_json_schema_field("version"),
-            'semanticVersion': json_handler.get_json_schema_field("semantic_version"),
-            'description': json_handler.get_json_schema_field("description"),
-            'byteOrder': json_handler.get_json_schema_field("byte_order")
-        })
+        messageSchema = etree.Element(
+            "{%s}messageSchema" % self.namespaces['sbe'],
+            nsmap=self.namespaces,
+            attrib={
+                'package': json_handler.get_json_schema_field("package"),
+                'id': json_handler.get_json_schema_field("schema_id"),
+                'version': json_handler.get_json_schema_field("version"),
+                'semanticVersion': json_handler.get_json_schema_field("semantic_version"),
+                'description': json_handler.get_json_schema_field("description"),
+                'byteOrder': json_handler.get_json_schema_field("byte_order")
+            }
+        )
 
-        tree = etree.ElementTree(messageSchema)
+        tree = etree.ElementTree(
+            messageSchema
+        )
         self.sbe_message_schema_tag = tree.getroot()
         self.types_tag = etree.SubElement(
             self.sbe_message_schema_tag,
             "types"
         )
-        self.append_to_sbe_schema_root(self.types_tag)
+        self.append_to_sbe_schema_root(
+            self.types_tag
+        )
         return etree.tostring(
             self.sbe_message_schema_tag,
             xml_declaration=True,
@@ -67,9 +106,12 @@ class XmlSbeSchemaHandler:
             pretty_print=True
         ).decode("UTF-8")
 
-
-    def generate_sbe_enum_definition(self, encoding_type, name_enum, enum_possible_values):
-
+    def generate_sbe_enum_definition(
+            self,
+            encoding_type,
+            name_enum,
+            enum_possible_values
+    ):
         enum_element = etree.SubElement(
             self.types_tag,
             'enum',
@@ -85,14 +127,21 @@ class XmlSbeSchemaHandler:
             )
             valid_value_element.text = str(value)
 
-        self.append_to_sbe_types_section(enum_element)
+        self.append_to_sbe_types_section(
+            enum_element
+        )
+
         return etree.tostring(
             enum_element,
             pretty_print=True
         ).decode()
 
-
-    def generate_sbe_set_definition(self, encoding_type, name_set, set_possible_values):
+    def generate_sbe_set_definition(
+            self,
+            encoding_type,
+            name_set,
+            set_possible_values
+    ):
 
         set_element = etree.SubElement(
             self.types_tag,
@@ -109,15 +158,21 @@ class XmlSbeSchemaHandler:
             )
             valid_value_element.text = str(value)
 
-        self.append_to_sbe_types_section(set_element)
+        self.append_to_sbe_types_section(
+            set_element
+        )
+
         return etree.tostring(
             set_element,
             pretty_print=True
         ).decode()
 
-
-    def generate_sbe_number_definition(self, name_type, primitive_type, presence):
-
+    def generate_sbe_number_definition(
+            self,
+            name_type,
+            primitive_type,
+            presence
+    ):
         type_values = {
             "int8": ("-128", "-127", "127"),
             "uint8": ("255", "0", "254"),
@@ -144,15 +199,22 @@ class XmlSbeSchemaHandler:
             maxValue=max_value
         )
 
-        self.append_to_sbe_types_section(type_element)
+        self.append_to_sbe_types_section(
+            type_element
+        )
+
         return etree.tostring(
             type_element,
             pretty_print=True
         ).decode()
 
-
-    def generate_sbe_string_definition(self, name_type, primitive_type, length, presence):
-
+    def generate_sbe_string_definition(
+            self,
+            name_type,
+            primitive_type,
+            length,
+            presence
+    ):
         type_element = etree.SubElement(
             self.types_tag,
             'type',
@@ -162,16 +224,24 @@ class XmlSbeSchemaHandler:
         )
 
         if presence == "optional":
-            type_element.set('presence', presence)
+            type_element.set(
+                'presence',
+                presence
+            )
 
-        self.append_to_sbe_types_section(type_element)
+        self.append_to_sbe_types_section(
+            type_element
+        )
+
         return etree.tostring(
             type_element,
             pretty_print=True
         ).decode()
 
-
-    def generate_sbe_composite(self, composite):
+    def generate_sbe_composite(
+            self,
+            composite
+    ):
 
         composite_element = etree.SubElement(
             self.types_tag,
@@ -188,13 +258,15 @@ class XmlSbeSchemaHandler:
             for key, value in element.items():
                 type.set(key, value)
 
-        self.append_to_sbe_types_section(composite_element)
+        self.append_to_sbe_types_section(
+            composite_element
+        )
+
         return etree.tostring(
             composite_element,
             pretty_print=True,
             encoding="UTF-8"
         ).decode("utf-8")
-
 
     def generate_sbe_default_composites(self):
 
@@ -228,15 +300,23 @@ class XmlSbeSchemaHandler:
         ]
 
         for composite in composites:
-            self.generate_sbe_composite(composite)
+            self.generate_sbe_composite(
+                composite
+            )
 
-
-    def generate_sbe_message_xml(self, message_name, template_id, iterator_sbe_fields,
-                                 iterator_sbe_repeating_groups):
+    def generate_sbe_message_xml(
+            self,
+            message_name,
+            template_id,
+            iterator_sbe_fields,
+            iterator_sbe_repeating_groups
+    ):
         if not self.namespaces:
             raise ValueError("Namespaces must be registered before generating XML.")
 
-        nsmap = {'sbe': self.namespaces['sbe']}
+        nsmap = {
+            'sbe': self.namespaces['sbe']
+        }
         message_element = etree.SubElement(
             self.sbe_message_schema_tag,
             "{%s}message" % self.namespaces['sbe'],
@@ -258,7 +338,8 @@ class XmlSbeSchemaHandler:
         for sbe_field in iterator_sbe_fields:
 
             field_id = counter
-            if "field_tag_number" in sbe_field and sbe_field["field_tag_number"] is not None:
+            if ("field_tag_number" in sbe_field
+                    and sbe_field["field_tag_number"] != -1):
                 field_id = sbe_field["field_tag_number"]
 
             field = etree.SubElement(
@@ -266,18 +347,25 @@ class XmlSbeSchemaHandler:
                 'field',
                 id=str(field_id),
                 name=sbe_field["field_name"],
-                type=sbe_field.get("custom_type", sbe_field["data_type"])
+                type=sbe_field.get(
+                    "custom_type",
+                    sbe_field["data_type"]
+                )
             )
 
             counter = counter + 1
 
             if sbe_field["presence"] == "optional":
-                field.set('presence', sbe_field["presence"])
+                field.set(
+                    'presence',
+                    sbe_field["presence"]
+                )
 
         for sbe_repeating_group in iterator_sbe_repeating_groups:
 
             repeating_group_id = counter
-            if "group_tag_number" in sbe_repeating_group and sbe_repeating_group["group_tag_number"] is not None:
+            if ("group_tag_number" in sbe_repeating_group
+                    and sbe_repeating_group["group_tag_number"] != -1):
                 repeating_group_id = sbe_repeating_group["group_tag_number"]
 
             group = etree.SubElement(
@@ -295,7 +383,8 @@ class XmlSbeSchemaHandler:
             for field_info in iter(sbe_repeating_group.get("items", [])):
 
                 nested_field_id = counter_nested_fields
-                if "field_tag_number" in field_info and field_info["field_tag_number"] is not None:
+                if ("field_tag_number" in field_info
+                        and field_info["field_tag_number"] != -1):
                     nested_field_id = field_info["field_tag_number"]
 
                 etree.SubElement(
@@ -308,45 +397,76 @@ class XmlSbeSchemaHandler:
 
                 counter_nested_fields = counter_nested_fields + 1
 
-        self.append_to_sbe_schema_root(message_element)
+        self.append_to_sbe_schema_root(
+            message_element
+        )
+
         return etree.tostring(
             message_element,
             pretty_print=True,
             encoding='UTF-8'
         ).decode()
 
-
-    def generate_xml_schema_from_json_schema(self, json_handler):
-        number_data_types = json_handler.get_schema_array_iterator("array_number_data_types")
+    def generate_xml_schema_from_json_schema(
+            self,
+            json_handler
+    ):
+        number_data_types = json_handler.get_schema_array_iterator(
+            "array_number_data_types"
+        )
         for number_data_type in number_data_types:
-            self.generate_sbe_number_definition(number_data_type["name_type"], number_data_type["data_type"],
-                                                number_data_type["presence"])
+            self.generate_sbe_number_definition(
+                number_data_type["name_type"],
+                number_data_type["data_type"],
+                number_data_type["presence"]
+            )
 
-        string_data_types = json_handler.get_schema_array_iterator("array_string_data_types")
+        string_data_types = json_handler.get_schema_array_iterator(
+            "array_string_data_types"
+        )
         for string_data_type in string_data_types:
-            self.generate_sbe_string_definition(string_data_type["name_type"], string_data_type["data_type"],
-                                                string_data_type["length"],
-                                                string_data_type["presence"])
+            self.generate_sbe_string_definition(
+                string_data_type["name_type"],
+                string_data_type["data_type"],
+                string_data_type["length"],
+                string_data_type["presence"]
+            )
 
-        enum_data_types = json_handler.get_schema_array_iterator("array_enum_data_types")
+        enum_data_types = json_handler.get_schema_array_iterator(
+            "array_enum_data_types"
+        )
         for enum_data_type in enum_data_types:
-            self.generate_sbe_enum_definition(enum_data_type["encoding_type"], enum_data_type["data_type"],
-                                              enum_data_type["possible_values"])
+            self.generate_sbe_enum_definition(
+                enum_data_type["encoding_type"],
+                enum_data_type["data_type"],
+                enum_data_type["possible_values"]
+            )
 
-        set_data_types = json_handler.get_schema_array_iterator("array_set_data_types")
+        set_data_types = json_handler.get_schema_array_iterator(
+            "array_set_data_types"
+        )
         for set_data_type in set_data_types:
-            self.generate_sbe_set_definition(set_data_type["encoding_type"], set_data_type["data_type"],
-                                             set_data_type["possible_values"])
+            self.generate_sbe_set_definition(
+                set_data_type["encoding_type"],
+                set_data_type["data_type"],
+                set_data_type["possible_values"]
+            )
 
         self.generate_sbe_default_composites()
 
-        document_messages = json_handler.get_schema_array_iterator("array_document_messages")
+        document_messages = json_handler.get_schema_array_iterator(
+            "array_document_messages"
+        )
         for document_message in document_messages:
             self.generate_sbe_message_xml(
                 document_message["message_name"],
                 document_message["template_id"],
-                json_handler.get_message_array_iterator(document_message["message_name"],
-                                                        "array_sbe_fields"),
-                json_handler.get_message_array_iterator(document_message["message_name"],
-                                                        "array_sbe_repeating_groups")
+                json_handler.get_message_array_iterator(
+                    document_message["message_name"],
+                    "array_sbe_fields"
+                ),
+                json_handler.get_message_array_iterator(
+                    document_message["message_name"],
+                    "array_sbe_repeating_groups"
+                )
             )

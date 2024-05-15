@@ -1,14 +1,81 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<sbe:messageSchema xmlns:sbe="http://fixprotocol.io/2016/sbe" xmlns:enx="enx" xmlns:str="http://exslt.org/strings" xmlns:ext="http://exslt.org/common" package="mdg_pack" id="25" version="306" semanticVersion="4.6.0" description="desc" byteOrder="littleEndian">
+<sbe:messageSchema xmlns:sbe="http://fixprotocol.io/2016/sbe" xmlns:enx="enx" xmlns:str="http://exslt.org/strings" xmlns:ext="http://exslt.org/common" package="pack" id="25" version="306" semanticVersion="4.6.0" description="desc" byteOrder="littleEndian">
   <types>
-    <type name="uint8_t" primitiveType="uint8" nullValue="255" presence="optional" minValue="0" maxValue="254"/>
     <type name="uint64_t" primitiveType="uint64" nullValue="18446744073709551615" presence="optional" minValue="0" maxValue="18446744073709551614"/>
-    <type name="uint32_t" primitiveType="uint32" nullValue="4294967295" presence="optional" minValue="0" maxValue="4294967294"/>
+    <type name="uint8_t" primitiveType="uint8" nullValue="255" presence="optional" minValue="0" maxValue="254"/>
     <type name="uint16_t" primitiveType="uint16" nullValue="65535" presence="optional" minValue="0" maxValue="65534"/>
+    <type name="uint32_t" primitiveType="uint32" nullValue="4294967295" presence="optional" minValue="0" maxValue="4294967294"/>
+    <type name="char60" length="60" primitiveType="char"/>
+    <type name="char5_optional" length="5" primitiveType="char" presence="optional"/>
+    <type name="char4" length="4" primitiveType="char"/>
+    <type name="char3" length="3" primitiveType="char"/>
+    <type name="char4_optional" length="4" primitiveType="char" presence="optional"/>
     <type name="char12_optional" length="12" primitiveType="char" presence="optional"/>
-    <enum encodingType="uint8" name="MMProtections_enum">
-      <validValue name="Disabled">0</validValue>
-      <validValue name="Enabled">1</validValue>
+    <type name="char1_optional" length="1" primitiveType="char" presence="optional"/>
+    <enum encodingType="uint8" name="InstrumentUnitExpression_enum">
+      <validValue name="Units">1</validValue>
+      <validValue name="Percentage of Nominal Excluding Accrued Interest (Clean)">2</validValue>
+      <validValue name="Basis Points">3</validValue>
+      <validValue name="Percentage of Nominal Including Accrued Interest (Dirty)">5</validValue>
+      <validValue name="Yield">7</validValue>
+      <validValue name="Kilograms">8</validValue>
+      <validValue name="Ounces">9</validValue>
+    </enum>
+    <enum encodingType="uint8" name="OptiqSegment_enum">
+      <validValue name="Equities">1</validValue>
+      <validValue name="Funds">2</validValue>
+      <validValue name="Fixed Income">3</validValue>
+      <validValue name="Warrants and Certificates">4</validValue>
+      <validValue name="Bourse de Luxembourg">5</validValue>
+      <validValue name="Financial Options">6</validValue>
+      <validValue name="Financial Futures">7</validValue>
+      <validValue name="Commodity Derivatives">8</validValue>
+      <validValue name="Indices">9</validValue>
+      <validValue name="Trade Reporting and Publication">10</validValue>
+      <validValue name="Index Derivatives">11</validValue>
+      <validValue name="Equity Derivatives">12</validValue>
+      <validValue name="Block">14</validValue>
+      <validValue name="Forex">15</validValue>
+      <validValue name="ISE Bonds and Funds Feed">16</validValue>
+    </enum>
+    <enum encodingType="char" name="ExchangeCode_enum">
+      <validValue name="Amsterdam Equity Derivatives">A</validValue>
+      <validValue name="Brussels Equity Derivatives">B</validValue>
+      <validValue name="Paris Equity Underlyings">C</validValue>
+      <validValue name="Brussels Cash Underlyings">D</validValue>
+      <validValue name="Brussels Index Derivatives">F</validValue>
+      <validValue name="Amsterdam Cash Underlyings">G</validValue>
+      <validValue name="Lisbon Cash Underlyings">H</validValue>
+      <validValue name="Paris Index Derivatives">J</validValue>
+      <validValue name="Amsterdam Index Derivatives">K</validValue>
+      <validValue name="Oslo Cash Underlying">L</validValue>
+      <validValue name="Lisbon Index Derivatives">M</validValue>
+      <validValue name="Oslo Index Derivatives">N</validValue>
+      <validValue name="Oslo Equity Derivatives">O</validValue>
+      <validValue name="Paris Equity Derivatives">P</validValue>
+      <validValue name="Amsterdam Commodities Derivatives">R</validValue>
+      <validValue name="Lisbon Equity Derivatives">S</validValue>
+      <validValue name="Paris Commodities Derivatives">Y</validValue>
+      <validValue name="Amsterdam Currency Derivatives">Z</validValue>
+    </enum>
+    <enum encodingType="uint8" name="ExerciseStyle_enum">
+      <validValue name="European">0</validValue>
+      <validValue name="American">1</validValue>
+      <validValue name="Asian">2</validValue>
+      <validValue name="Bermudan">3</validValue>
+      <validValue name="Other">4</validValue>
+    </enum>
+    <enum encodingType="char" name="ContractType_enum">
+      <validValue name="Future">F</validValue>
+      <validValue name="Option">O</validValue>
+      <validValue name="Underlying">U</validValue>
+    </enum>
+    <enum encodingType="char" name="UnderlyingType_enum">
+      <validValue name="Commodity">C</validValue>
+      <validValue name="Future">F</validValue>
+      <validValue name="Index">I</validValue>
+      <validValue name="Stock">S</validValue>
+      <validValue name="Exchange Rate">X</validValue>
     </enum>
     <enum encodingType="uint8" name="ContractTradingType_enum">
       <validValue name="Traded as an outright">1</validValue>
@@ -16,8 +83,34 @@
       <validValue name="Traded as a simple inter-commodity spread">3</validValue>
       <validValue name="Traded as an inter-commodity spread">4</validValue>
     </enum>
-    <enum encodingType="null" name="InstrumentUnitExpression_enum"/>
-    <enum encodingType="null" name="UnderlyingSubtype_enum"/>
+    <enum encodingType="uint8" name="UnderlyingSubtype_enum">
+      <validValue name="Basket">0</validValue>
+      <validValue name="Dividend">1</validValue>
+      <validValue name="ETF">2</validValue>
+      <validValue name="Share">3</validValue>
+      <validValue name="Dividend Index">4</validValue>
+      <validValue name="Equity Index">5</validValue>
+      <validValue name="TRF Index">6</validValue>
+      <validValue name="Volatility Index">7</validValue>
+      <validValue name="Future on Commodities">8</validValue>
+      <validValue name="FX Cross Rates (FXCR)">9</validValue>
+      <validValue name="FX Emerging Markets (FXEM)">10</validValue>
+      <validValue name="FX Majors (FXMJ)">11</validValue>
+      <validValue name="Agricultural (AGRI)">12</validValue>
+      <validValue name="Environmental (ENVR)">13</validValue>
+      <validValue name="Freight (FRGT)">14</validValue>
+      <validValue name="Fertilizer (FRTL)">15</validValue>
+      <validValue name="Industrial products (INDP)">16</validValue>
+      <validValue name="Inflation (INFL)">17</validValue>
+      <validValue name="Multi Commodity Exotic (MCEX)">18</validValue>
+      <validValue name="Metals (METL)">19</validValue>
+      <validValue name="Energy (NRGY)">20</validValue>
+      <validValue name="Official economic statistics (OEST)">21</validValue>
+      <validValue name="Other C10 (OTHC)">22</validValue>
+      <validValue name="Other (OTHR)">23</validValue>
+      <validValue name="Paper (PAPR)">24</validValue>
+      <validValue name="Polypropylene (POLY)">25</validValue>
+    </enum>
     <enum encodingType="uint8" name="TradingPolicy_enum">
       <validValue name="Price Explicit Time">1</validValue>
       <validValue name="Price Pro Rata">2</validValue>
@@ -27,6 +120,49 @@
       <validValue name="Spontaneous Implied Matching">1</validValue>
       <validValue name="Event Driven Implied Matching">2</validValue>
     </enum>
+    <enum encodingType="uint8" name="ReferencePriceOriginInCall_enum">
+      <validValue name="Authorized value 4">4</validValue>
+      <validValue name="Authorized value 5">5</validValue>
+      <validValue name="Authorized value 6">6</validValue>
+      <validValue name="Authorized value 7">7</validValue>
+    </enum>
+    <enum encodingType="uint8" name="ReferencePriceOriginInContinuous_enum">
+      <validValue name="Authorized value 4">4</validValue>
+      <validValue name="Authorized value 5">5</validValue>
+      <validValue name="Authorized value 6">6</validValue>
+      <validValue name="Authorized value 7">7</validValue>
+    </enum>
+    <enum encodingType="uint8" name="ReferencePriceOriginInTradingInterruption_enum">
+      <validValue name="Authorized value 4">4</validValue>
+      <validValue name="Authorized value 5">5</validValue>
+      <validValue name="Authorized value 6">6</validValue>
+      <validValue name="Authorized value 7">7</validValue>
+    </enum>
+    <enum encodingType="uint8" name="PricingAlgorithm_enum">
+      <validValue name="Standard">0</validValue>
+      <validValue name="Total Return Future">1</validValue>
+      <validValue name="Market On Close">2</validValue>
+    </enum>
+    <enum encodingType="uint8" name="EMM_enum">
+      <validValue name="See field description">Authorized values</validValue>
+    </enum>
+    <enum encodingType="uint8" name="DynamicCollarLogic_enum">
+      <validValue name="Not Active">0</validValue>
+      <validValue name="No Halt with Reject (not in use)">2</validValue>
+      <validValue name="Halt with Acceptation">3</validValue>
+    </enum>
+    <set encodingType="uint16" name="OrderTypeRules_set">
+      <choice name="Market orders are available for this instrument (0: No ; 1: Yes)">0</choice>
+      <choice name="Limit orders are available for this instrument (0: No ; 1: Yes)">1</choice>
+      <choice name="Stop / Stop Loss orders are available for this instrument (0: No ; 1: Yes)">2</choice>
+      <choice name="Stop Limit orders are available for this instrument (0: No ; 1: Yes)">3</choice>
+      <choice name="Market on Open (MOO) orders are available for this instrument (0: No ; 1: Yes)">4</choice>
+      <choice name="Trade at Settlement orders are available for this instrument (0: No ; 1: Yes)">5</choice>
+    </set>
+    <set encodingType="uint8" name="MMProtections_set">
+      <choice name="Delta">0</choice>
+      <choice name="Volume">1</choice>
+    </set>
     <composite name="messageHeader" description="Message identifiers and length of message root">
       <type name="blockLength" primitiveType="uint16"/>
       <type name="templateId" primitiveType="uint16"/>
@@ -44,24 +180,59 @@
   </types>
   <sbe:message name="ContractStandingData" id="1013">
     <field id="20007" name="FixHeader" type="fixHeader"/>
-    <field id="-1" name="StrikePriceDecimals" type="uint8_t" presence="optional"/>
-    <field id="-1" name="MMProtections" type="MMProtections_enum"/>
-    <field id="-1" name="ContractTradingType" type="ContractTradingType_enum"/>
-    <field id="-1" name="InstrumentUnitExpression" type="InstrumentUnitExpression_enum" presence="optional"/>
-    <field id="-1" name="UnderlyingSubtype" type="UnderlyingSubtype_enum" presence="optional"/>
-    <field id="-1" name="MotherStockISIN" type="char12_optional" presence="optional"/>
-    <field id="-1" name="SettlementTickSize" type="Price" presence="optional"/>
-    <field id="-1" name="EDSPTickSize" type="uint64_t" presence="optional"/>
-    <field id="-1" name="UnderlyingSymbolIndex" type="uint32_t" presence="optional"/>
-    <field id="-1" name="TradingPolicy" type="TradingPolicy_enum" presence="optional"/>
-    <field id="-1" name="ReferenceSpreadTableID" type="uint16_t" presence="optional"/>
-    <field id="-1" name="DerivativesMarketModel" type="DerivativesMarketModel_enum" presence="optional"/>
-    <field id="-1" name="TradingUnit" type="uint64_t" presence="optional"/>
-    <field id="-1" name="SettlementTickSize" type="uint64_t" presence="optional"/>
-    <field id="-1" name="EDSPTickSize" type="Price" presence="optional"/>
-    <field id="-1" name="UnderlyingSymbolIndex" type="uint32_t" presence="optional"/>
-    <field id="-1" name="ReferenceSpreadTableID" type="uint16_t" presence="optional"/>
-    <field id="-1" name="TradingUnit" type="Quantity" presence="optional"/>
-    <field id="-1" name="StrikePriceDecimals" type="uint8_t" presence="optional"/>
+    <field id="1" name="MarketDataSequenceNumber" type="uint64"/>
+    <field id="2" name="RebroadcastIndicator" type="uint8"/>
+    <field id="3" name="SymbolIndex" type="uint32"/>
+    <field id="4" name="OptiqSegment" type="OptiqSegment_enum"/>
+    <field id="5" name="PartitionID" type="uint16"/>
+    <field id="6" name="ContractEventDate" type="uint16_t" presence="optional"/>
+    <field id="7" name="ExchangeCode" type="ExchangeCode_enum"/>
+    <field id="8" name="ExerciseStyle" type="ExerciseStyle_enum" presence="optional"/>
+    <field id="9" name="ContractName" type="char60"/>
+    <field id="10" name="ContractType" type="ContractType_enum" presence="optional"/>
+    <field id="11" name="UnderlyingType" type="UnderlyingType_enum"/>
+    <field id="12" name="PriceIndexLevelDecimals" type="uint8_t" presence="optional"/>
+    <field id="13" name="QuantityDecimals" type="uint8_t" presence="optional"/>
+    <field id="14" name="AmountDecimals" type="uint8_t" presence="optional"/>
+    <field id="15" name="RatioMultiplierDecimals" type="uint8_t" presence="optional"/>
+    <field id="16" name="MainDepositary" type="char5_optional" presence="optional"/>
+    <field id="17" name="MIC" type="char4"/>
+    <field id="18" name="CountryOfExchange" type="char3"/>
+    <field id="19" name="ProductCode" type="char4"/>
+    <field id="20" name="UnderlyingMIC" type="char4_optional" presence="optional"/>
+    <field id="21" name="UnderlyingISINCode" type="char12_optional" presence="optional"/>
+    <field id="22" name="UnderlyingExpiry" type="uint32_t" presence="optional"/>
+    <field id="23" name="OrderTypeRules" type="OrderTypeRules_set"/>
+    <field id="24" name="SettlementMethod" type="char1_optional" presence="optional"/>
+    <field id="25" name="TradingCurrency" type="char3"/>
+    <field id="26" name="StrikePriceDecimalsRatio" type="uint8_t" presence="optional"/>
+    <field id="27" name="MMProtections" type="MMProtections_set"/>
+    <field id="28" name="ContractTradingType" type="ContractTradingType_enum"/>
+    <field id="29" name="InstrumentUnitExpression" type="InstrumentUnitExpression_enum" presence="optional"/>
+    <field id="30" name="UnderlyingSubtype" type="UnderlyingSubtype_enum" presence="optional"/>
+    <field id="31" name="MotherStockISIN" type="char12_optional" presence="optional"/>
+    <field id="32" name="SettlementTickSize" type="uint64_t" presence="optional"/>
+    <field id="33" name="EDSPTickSize" type="uint64_t" presence="optional"/>
+    <field id="34" name="UnderlyingSymbolIndex" type="uint32_t" presence="optional"/>
+    <field id="35" name="TradingPolicy" type="TradingPolicy_enum" presence="optional"/>
+    <field id="36" name="ReferenceSpreadTableID" type="uint16_t" presence="optional"/>
+    <field id="37" name="DerivativesMarketModel" type="DerivativesMarketModel_enum" presence="optional"/>
+    <field id="38" name="TradingUnit" type="uint64_t" presence="optional"/>
+    <field id="39" name="ReferencePriceOriginInCall" type="ReferencePriceOriginInCall_enum" presence="optional"/>
+    <field id="40" name="ReferencePriceOriginInContinuous" type="ReferencePriceOriginInContinuous_enum" presence="optional"/>
+    <field id="41" name="ReferencePriceOriginInTradingInterruption" type="ReferencePriceOriginInTradingInterruption_enum" presence="optional"/>
+    <field id="42" name="CollarExpansionFactor" type="uint8_t" presence="optional"/>
+    <field id="43" name="MIFID_IILiquidFlag" type="uint8"/>
+    <field id="44" name="PricingAlgorithm" type="PricingAlgorithm_enum"/>
+    <group dimensionType="groupSizeEncoding" name="ContractEMMPropertiesGroup" id="48">
+      <field name="EMM" id="1" type="EMM_enum"/>
+      <field name="TickSizeIndexID" id="2" type="uint16_t"/>
+      <field name="PatternID" id="3" type="uint16_t"/>
+      <field name="LotSize" id="4" type="uint64_t"/>
+      <field name="StrategyAuthorized" id="5" type="null"/>
+      <field name="DynamicCollarLogic" id="6" type="DynamicCollarLogic_enum"/>
+      <field name="CollarMaxUnhaltNb" id="7" type="uint8_t"/>
+      <field name="CollarUnhaltDelay" id="8" type="uint32_t"/>
+    </group>
   </sbe:message>
 </sbe:messageSchema>

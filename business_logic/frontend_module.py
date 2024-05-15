@@ -31,7 +31,9 @@ if 'json_uploaded_state' not in st.session_state:
 
 
 def form_new_sbe_schema():
-    st.subheader("Create New JSON Schema")
+    st.subheader(
+        tab_new_json_schema
+    )
 
     json_schema_name = st.text_input(
         "Name JSON Schema",
@@ -111,7 +113,9 @@ def toggle_action():
 
 
 def form_new_sbe_message():
-    st.subheader(tab_new_document_message)
+    st.subheader(
+        tab_new_document_message
+    )
 
     json_schema_name = st.text_input(
         "Name JSON Schema",
@@ -146,24 +150,43 @@ def form_new_sbe_message():
         st.write(f"Starting Page of Table: {starting_page}")
         st.write(f"Ending Page of Table: {ending_page}")
 
-        json_handler = JsonSchemaHandler(json_schema_name)
+        json_handler = JsonSchemaHandler(
+            json_schema_name
+        )
 
         if st.button(f"Create Message in {json_schema_name}"):
-            json_handler.add_document_message(message_name, template_id, starting_page, ending_page)
+            json_handler.add_document_message(
+                message_name,
+                template_id,
+                starting_page,
+                ending_page
+            )
             st.success(f"SBE Message \'{message_name}\' is in the SBE Schema \'{json_schema_name}\'")
 
 
 def form_generate_sbe_xml_schema_from_pdf():
-    st.subheader(tab_generate_sbe_xml_schema_from_pdf)
+    st.subheader(
+        tab_generate_sbe_xml_schema_from_pdf
+    )
 
-    uploaded_file = st.file_uploader("Carica un file PDF", type="pdf")
+    uploaded_file = st.file_uploader(
+        "Carica un file PDF",
+        type="pdf"
+    )
 
     if uploaded_file is not None:
-        pdf_path = utils.save_uploaded_file("../pdf_documents", uploaded_file)
+        pdf_path = utils.save_uploaded_file(
+            "../pdf_documents",
+            uploaded_file
+        )
         st.success(f"File salvato in: {pdf_path}")
 
         checkbox_label = "Editable PDF" if st.session_state.toggle_state else "Read Only PDF"
-        st.checkbox(checkbox_label, key='toggle_state', value=st.session_state.toggle_state)
+        st.checkbox(
+            checkbox_label,
+            key='toggle_state',
+            value=st.session_state.toggle_state
+        )
 
         json_schema_name = st.text_input(
             "Name JSON Schema",
@@ -182,23 +205,38 @@ def form_generate_sbe_xml_schema_from_pdf():
                     elif st.session_state['toggle_state']:
                         is_pdf_editable = True
 
-                    json_handler = JsonSchemaHandler(json_schema_name)
-
-                    lambda_generate_sbe_message = lambda document_message: (
-                        json_handler.generate_sbe_message(document_message, pdf_path, is_pdf_editable)
+                    json_handler = JsonSchemaHandler(
+                        json_schema_name
                     )
 
-                    json_handler.iterate_document_messages(lambda_generate_sbe_message)
+                    lambda_generate_sbe_message = lambda document_message: (
+                        json_handler.generate_sbe_message(
+                            document_message,
+                            pdf_path,
+                            is_pdf_editable
+                        )
+                    )
+
+                    json_handler.iterate_document_messages(
+                        lambda_generate_sbe_message
+                    )
 
                     lambda_generate_sbe_data_type_definitions = lambda sbe_field: (
-                        json_handler.generate_sbe_data_type_definitions(sbe_field)
+                        json_handler.generate_sbe_data_type_definitions(
+                            sbe_field
+                        )
                     )
 
                     json_handler.iterate_sbe_fields_of_document_messages(
-                        lambda_generate_sbe_data_type_definitions)
+                        lambda_generate_sbe_data_type_definitions
+                    )
 
-                    xml_handler = XmlSbeSchemaHandler(json_schema_name)
-                    xml_handler.generate_xml_schema_from_json_schema(json_handler)
+                    xml_handler = XmlSbeSchemaHandler(
+                        json_schema_name
+                    )
+                    xml_handler.generate_xml_schema_from_json_schema(
+                        json_handler
+                    )
 
                 st.success('Schema SBE XML Generato con successo.')
 
@@ -207,7 +245,9 @@ def form_generate_sbe_xml_schema_from_pdf():
 
 
 def form_generate_sbe_xml_schema_from_json():
-    st.subheader(tab_generate_sbe_xml_schema_from_json)
+    st.subheader(
+        tab_generate_sbe_xml_schema_from_json
+    )
 
     json_schema_name = st.text_input(
         "Name JSON Schema",
@@ -220,20 +260,42 @@ def form_generate_sbe_xml_schema_from_json():
     if st.session_state['json_uploaded_state']:
         if st.button(f"Generate SBE XML Schema \'{json_schema_name}\'"):
 
-            json_handler = JsonSchemaHandler(json_schema_name)
+            json_handler = JsonSchemaHandler(
+                json_schema_name
+            )
 
-            xml_handler = XmlSbeSchemaHandler(json_schema_name)
-            xml_handler.generate_xml_schema_from_json_schema(json_handler)
+            xml_handler = XmlSbeSchemaHandler(
+                json_schema_name
+            )
+            xml_handler.generate_xml_schema_from_json_schema(
+                json_handler
+            )
 
             st.success('Schema SBE XML Generato con successo.')
 
 
 def main():
-    st.title(name_software)
-    st.header("SBE XML Schema AI Generator")
-    tabs = [tab_new_json_schema, tab_new_document_message, tab_generate_sbe_xml_schema_from_pdf, tab_generate_sbe_xml_schema_from_json]
-    default_index = tabs.index(tab_new_document_message)
-    tab = st.selectbox("Select Tab", tabs, index=default_index)
+    st.title(
+        name_software
+    )
+    st.header(
+        "SBE XML Schema AI Generator"
+    )
+
+    tabs = [
+        tab_new_json_schema,
+        tab_new_document_message,
+        tab_generate_sbe_xml_schema_from_pdf,
+        tab_generate_sbe_xml_schema_from_json
+    ]
+    default_index = tabs.index(
+        tab_new_document_message
+    )
+    tab = st.selectbox(
+        "Select Tab",
+        tabs,
+        index=default_index
+    )
 
     if tab == tab_new_json_schema:
         form_new_sbe_schema()

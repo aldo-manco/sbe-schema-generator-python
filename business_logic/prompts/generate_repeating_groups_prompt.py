@@ -332,7 +332,8 @@ example_2_assistant_message = """
       {
         "group_name": "OrdersGroup",
         "items": [15, 16, 17, 18, 19, 20, 21, 22, 23],
-        "indicators_items": [13, 14]
+        "indicators_items": [13, 14],
+        "group_tag_number": -1
       }
     ]
 }
