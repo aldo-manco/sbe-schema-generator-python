@@ -6,8 +6,8 @@ from json_schema_handler import JsonSchemaHandler
 from xml_sbe_schema_handler import XmlSbeSchemaHandler
 from utils import utils
 
-name_software = "Gatelab AI Engine"
-favicon_software_path = "logo/euronext.png"
+name_software = "SBE Schema Generator"
+favicon_software_path = "logo/logo-sbe-schema-generator.png"
 tab_new_json_schema = "Add New JSON Schema File"
 tab_new_document_message = "Add New Document Message"
 tab_new_document_message_column = "Add New Document Message Column"
